@@ -13,6 +13,7 @@
 
 ## What is OurPlace?
 OurPlace is a mobile platform which supports the creation, sharing and completion of highly customisable mobile learning activities. These activities are built by combining together bite-size modular tasks, which can each ask the user to perform a particular action. Tasks can ask the learner to take photos or video, record an audio clip, listen to a given audio clip, match an existing image (by comparing to an image overlay), draw a picture, draw on top of an existing image, mark locations on a map, navigate to a given location, answer a multiple choice question or simply read a piece of text.
+
 This functionality is further expanded by supporting ‘follow-up’ tasks, which become available to the learner once another task has been completed. For example, an activity might ask the learner to walk to a particular location where, upon arrival, follow-up tasks ask them to document their thoughts through photos and an audio recording.	Once created, activities can be shared in numerous ways. The accompanying website supplies QR codes which can be printed and launch the activity when scanned. Users can also enter given share codes, or launch activities when nearby the location activities have been optionally tagged with.
 
 ## Project Structure
