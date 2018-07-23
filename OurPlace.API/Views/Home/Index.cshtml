@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/Views/Shared/_FullWidthLayout.cshtml";
+}
+
+<div class="map-container">
+    <div id="testmap" class="map"></div>
+</div>
+
+
+<script>
+
+    function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('testmap'), {
+            zoom: 8,
+            center: { lat: -28.024, lng: 140.887 }
+        });
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var mapPins = @(new HtmlString(Json.Encode(ViewData["MapPins"])));
+        var markers = [];
+        var bounds = new google.maps.LatLngBounds();
+        var infowindow = new google.maps.InfoWindow();
+
+        for (var i = 0; i < mapPins.length; i++)
+        {
+            var marker = new google.maps.Marker({
+                position: { lat: mapPins[i].Latitude, lng: mapPins[i].Longitude },
+                title: mapPins[i].Name
+            });
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent(
+                        '<div id="content">' +
+                        '<h3>' + mapPins[i].Name + '</h3>' +
+                        '<div id="bodyContent"><p>Number of activities created for this location: ' + mapPins[i].NumActivities +'</p></div>'+
+                        '</div>');
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+
+            markers.push(marker);
+            bounds.extend(marker.position);
+        }
+
+        map.fitBounds(bounds);
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+
+    }
+
+
+</script>
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+</script>
+
+@{
+    string mapsUrl = string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initMap", ViewData["MapsJKey"]);
+
+    <script async defer src="@mapsUrl">
+    </script>
+}
+
+<div class="section shadowed" style="background-color: #8cc04d; color: white; overflow: visible">
+    <div class="container row">
+        <div class="col-md-7 col-sm-12">
+            <h1 class="header center-align">Create. Share. Learn.</h1>
+            <div class="shadowed-soft" style="background-color: #82b544; padding: 1px 10px 10px 10px; border-radius: 12px;">
+                <h3>OurPlace is a mobile learning platform, designed to support communities in creating and sharing interactive learning activities about the places they care most about.</h3>
+                <br />
+                <p style="font-size: 1.2rem">
+                    Designed to allow anyone to create, share and complete fun learning activities, OurPlace uses the broad feature set offered by modern smartphones as an outdoor-learning toolkit.
+                    Offering a wide number of interactions such as photography, video, audio recording, map marking, drawing and location hunting, the app makes it easy to create playful and creative learning activities.
+                    Once uploaded, the learners' images, video and audio recordings created during the activities are then available for use via the website as further learning resources.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-sm-12 center-align">
+            <img src="/Content/img/icons/OurPlaceLogo.png" style="width:65%; padding:40px 20px 20px 20px;">
+            <br />
+            <a class="waves-effect waves-light btn" href="~/GettingStarted">Get started!</a>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+
+    <div class="container">
+        <div class="row">
+            <h2 class="text-center">The OurPlace App</h2>
+            <p class="text-center" style="font-size: 1.2rem">OurPlace offers a large variety of tools to choose from when creating your learning activites.<br />Hover over each tool's icon for more information.</p>
+            <div class="col-md-6 col-sm-12">
+                <div class="icons-table">
+                    <table>
+                        <tr>
+                            <td><img src="~/Content/img/icons/recordAudio.png" onmouseover="hover('recordAudio')" /></td>
+                            <td><img src="~/Content/img/icons/recordVideo.png" onmouseover="hover('recordVideo')" /></td>
+                            <td><img src="~/Content/img/icons/takePhoto.png" onmouseover="hover('takePhoto')" /></td>
+                        </tr>
+                        <tr>
+                            <td><img src="~/Content/img/icons/draw.png" onmouseover="hover('draw')" /></td>
+                            <td><img src="~/Content/img/icons/drawPhoto.png" onmouseover="hover('drawPhoto')" /></td>
+                            <td><img src="~/Content/img/icons/location.png" onmouseover="hover('location')" /></td>
+                        </tr>
+                        <tr>
+                            <td><img src="~/Content/img/icons/locationHunt.png" onmouseover="hover('locationHunt')" /></td>
+                            <td><img src="~/Content/img/icons/matchPhoto.png" onmouseover="hover('matchPhoto')" /></td>
+                            <td><img src="~/Content/img/icons/multipleChoice.png" onmouseover="hover('multipleChoice')" /></td>
+                        </tr>
+                        <tr>
+                            <td><img src="~/Content/img/icons/textEntry.png" onmouseover="hover('textEntry')" /></td>
+                            <td><img src="~/Content/img/icons/info.png" onmouseover="hover('info')" /></td>
+                            <td><img src="~/Content/img/icons/listenAudio.png" onmouseover="hover('listenAudio')" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 text-center">
+                <h5 id="function-title">Choose and combine fun and creative tasks</h5>
+                <img id="function-img" src="~/Content/img/screens/heaton.png" height="475px" />
+                <p id="function-desc" height="200px">OurPlace lets you create learning activities using a number of different task types. Combine them as you see fit!</p>
+            </div>
+        </div>
+
+        <br />
+        <br />
+    </div>
+    </div>
+
+<script>
+
+    var iconDict = {};
+    iconDict["recordAudio"] = { "title": "Record Audio", "desc": "Record audio using the mobile device's microphone!" }
+    iconDict["recordVideo"] = { "title": "Record Video", "desc": "Use the device's camera to record a video!" }
+    iconDict["takePhoto"] = { "title": "Take Photos", "desc": "Take photos using the device's camera!" }
+    iconDict["draw"] = { "title": "Draw a Picture", "desc": "Use the simple paint tool to draw a colourful picture on your device's screen!" }
+    iconDict["drawPhoto"] = { "title": "Draw On Top of a Photo", "desc": "Use the paint tool to draw on top of a given (or created) photo!" }
+    iconDict["location"] = { "title": "Map Marking", "desc": "Use the handy map tool to mark locations of interest!" }
+    iconDict["locationHunt"] = { "title": "Location Hunt", "desc": "Track down a location using your device's GPS and your distance from the goal, like a metal detector!" }
+    iconDict["matchPhoto"] = { "title": "Match Photo", "desc": "Try and match a given photo, using a handy camera overlay!" }
+    iconDict["multipleChoice"] = { "title": "Multiple Choice", "desc": "Decide on and tick one of multiple potential answers." }
+    iconDict["textEntry"] = { "title": "Enter Text", "desc": "Freely write your own words into the given text field." }
+    iconDict["info"] = { "title": "More Information", "desc": "Give the learner more information about a particular topic, through text and images. You can optional provide a link to an external website!" }
+    iconDict["listenAudio"] = { "title": "Listen to Audio", "desc": "Listen to a given audio file - it could be narration, sound effects or music!" }
+
+    function hover(iconName) {
+        var res = iconDict[iconName];
+        if (res != null) {
+            document.getElementById("function-title").innerHTML = res.title;
+            document.getElementById("function-img").src = "/Content/img/screens/" + iconName + ".png";
+            document.getElementById("function-desc").innerHTML = res.desc;
+        }
+    }
+</script>

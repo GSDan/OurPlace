@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Logged in!";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Login successful!</h1>
+    
+<h2>Redirecting you to the OurPlace app.</h2>
+
+<script>
+    function getHashValue(key) {
+        var matches = location.hash.match(new RegExp(key + '=([^&]*)'));
+        return matches ? matches[1] : null;
+    }
+
+    window.location.replace("parklearn://logincallback?"+
+        "access_token=" + getHashValue('access_token')+
+        "&token_type=" + getHashValue('token_type') +
+        "&expires_in=" + getHashValue('expires_in') +
+        "&refresh_token=" + getHashValue('refresh_token') +
+        "&refresh_token_expires=" + getHashValue('refresh_token_expires') +
+        "&state=" + getHashValue('state'));
+</script>

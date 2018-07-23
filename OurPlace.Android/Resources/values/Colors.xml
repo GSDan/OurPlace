@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    OurPlace is a mobile learning platform, designed to support communities
+    in creating and sharing interactive learning activities about the places they care most about.
+    https://github.com/GSDan/OurPlace
+    Copyright (C) 2018 Dan Richardson
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.
+-->
+<resources>
+  <color name="app_blue">#3498DB</color>
+  <color name="app_white">#FFFFFF</color>
+  <color name="app_green">#8cc04d</color>
+  <color name="app_darkgreen">#80AF46</color>
+  <color name="app_lightgreen">#8BC34A</color>
+  <color name="app_lightergreen">#C8E6C9</color>
+  <color name="app_purple">#c04d8c</color>
+  <color name="app_lightpurple">#C55D96</color>
+  <color name="app_darkpurple">#AF4680</color>
+  <color name="app_gray">#738182</color>
+  <color name="app_red">#e03131</color>
+</resources>

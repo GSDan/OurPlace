@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNet.Identity
+
+<ul class="right hide-on-med-and-down navbar-right">
+    @if (Request.IsAuthenticated)
+    {
+        <li>@Html.ActionLink("Your Activities", "Index", "LearningActivities", new { area = "" }, htmlAttributes: new { @class = "waves-effect waves-light btn" })</li>
+        <li>@Html.ActionLink("Your Uploads", "Index", "CompletedActivities", new { area = "" }, htmlAttributes: new { @class = "waves-effect waves-light btn" })</li>
+        <li>@Html.ActionLink("Responses", "Index", "SharedUploads", new { area = "" }, htmlAttributes: new { @class = "waves-effect waves-light btn" })</li>
+
+        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+            <li>
+                <a class="waves-effect waves-light btn" href="javascript:document.getElementById('logoutForm').submit()">Not @Html.Raw(Html.Action("GetCurrentUserFirstName", "Account"))?</a>
+            </li>
+            <li>
+                <img src='@Html.Raw(Html.Action("GetCurrentUserAvatar", "Account"))' class="img-circle center-block avatar" style="margin-left: 6px;margin-right: 15px;" />
+            </li>
+        }
+    }
+    else
+    {
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "waves-effect waves-light btn" })</li>
+    }
+</ul>
+<ul class="side-nav hide-on-large-only" id="slide-out">
+    @if (Request.IsAuthenticated)
+    {
+        <li>
+            <div class="userView">
+                <div class="background">
+                    <img src="~/Content/img/parklearnparallax_mob.jpg">
+                </div>
+                <a href="#!user"><img class="circle" src="@Html.Raw(Html.Action("GetCurrentUserAvatar", "Account"))"></a>
+                <a href="#!name"><span class="white-text name">@Html.Raw(Html.Action("GetCurrentUserFirstName", "Account"))</span></a>
+            </div>
+        </li>
+        <li>@Html.ActionLink("Your Activities", "Index", "LearningActivities", new { area = "" }, null)</li>
+        <li>@Html.ActionLink("Your Uploads", "Index", "CompletedActivities", new { area = "" }, null)</li>
+        <li>@Html.ActionLink("Responses", "Index", "SharedUploads", new { area = "" }, null)</li>
+        <li>
+            <a href="javascript:document.getElementById('logoutForm').submit()">Not @Html.Raw(Html.Action("GetCurrentUserFirstName", "Account"))?</a>
+        </li>
+    }
+    else
+    {
+    <li> @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = ".btn, .btn-large" }) </li>
+    }
+</ul>
+

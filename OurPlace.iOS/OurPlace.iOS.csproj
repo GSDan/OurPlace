@@ -1,0 +1,753 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProjectGuid>{D433EB34-C983-48B4-9969-8A232CB289C6}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OurPlace.iOS</RootNamespace>
+    <AssemblyName>ParkLearn.iOS</AssemblyName>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchFastDev>true</MtouchFastDev>
+    <IOSDebuggerPort>51660</IOSDebuggerPort>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>i386, x86_64</MtouchArch>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <CodesignProvision>VS: uk.ac.ncl.openlab.ourplace Development</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <MtouchFloat32>true</MtouchFloat32>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <AssemblyName>OurPlace.iOS</AssemblyName>
+    <CodesignProvision>VS: uk.ac.ncl.openlab.ourplace Development</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>i386, x86_64</MtouchArch>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <CodesignProvision>VS: uk.ac.ncl.openlab.ourplace Development</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchFastDev>true</MtouchFastDev>
+    <MtouchFloat32>true</MtouchFloat32>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <IOSDebuggerPort>63372</IOSDebuggerPort>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <AssemblyName>OurPlace.iOS</AssemblyName>
+    <CodesignProvision>OurPlace Dev (iCloud compat)</CodesignProvision>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\Xamarin.iOS10\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\Xamarin.iOS10\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="Rivets">
+      <HintPath>..\Components\rivets-1.0.5.1\lib\ios-unified\Rivets.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="MessageBarLib">
+      <HintPath>..\packages\MessageBarLib.1.2.1.1\lib\xamarinios10\MessageBarLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Maps">
+      <HintPath>..\packages\Xamarin.Google.iOS.Maps.2.5.0\lib\Xamarin.iOS10\Google.Maps.dll</HintPath>
+    </Reference>
+    <Reference Include="WebP.Touch">
+      <HintPath>..\packages\WebP.Touch.1.0.8\lib\Xamarin.iOS10\WebP.Touch.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading">
+      <HintPath>..\packages\Xamarin.FFImageLoading.2.4.3.840\lib\Xamarin.iOS10\FFImageLoading.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading.Platform">
+      <HintPath>..\packages\Xamarin.FFImageLoading.2.4.3.840\lib\Xamarin.iOS10\FFImageLoading.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="FFImageLoading.Transformations">
+      <HintPath>..\packages\Xamarin.FFImageLoading.Transformations.2.4.3.840\lib\Xamarin.iOS10\FFImageLoading.Transformations.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Toast">
+      <HintPath>..\packages\Toast.iOS.1.1.0\lib\xamarinios10\Toast.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Connectivity.Abstractions">
+      <HintPath>..\packages\Xam.Plugin.Connectivity.3.1.1\lib\Xamarin.iOS10\Plugin.Connectivity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Connectivity">
+      <HintPath>..\packages\Xam.Plugin.Connectivity.3.1.1\lib\Xamarin.iOS10\Plugin.Connectivity.dll</HintPath>
+    </Reference>
+    <Reference Include="ZXing.Net.Mobile.Core">
+      <HintPath>..\packages\ZXing.Net.Mobile.2.4.1\lib\Xamarin.iOS10\ZXing.Net.Mobile.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.portable">
+      <HintPath>..\packages\ZXing.Net.Mobile.2.4.1\lib\Xamarin.iOS10\zxing.portable.dll</HintPath>
+    </Reference>
+    <Reference Include="ZXingNetMobile">
+      <HintPath>..\packages\ZXing.Net.Mobile.2.4.1\lib\Xamarin.iOS10\ZXingNetMobile.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.106.3.1\lib\netstandard2.0\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLite-net">
+      <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Places">
+      <HintPath>..\packages\Xamarin.Google.iOS.Places.2.5.0\lib\Xamarin.iOS10\Google.Places.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-57.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-114.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-50.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-100.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-72.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-144.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppLogo.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_TakePhoto.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_TakePhoto.imageset\TakePhotoButton.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_SwapCam.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_SwapCam.imageset\ic_switch_camera_white_36pt.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_SwapCam.imageset\ic_switch_camera_white_36pt_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_SwapCam.imageset\ic_switch_camera_white_36pt_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_StartRec.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_StartRec.imageset\RecordButton.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_StopRec.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\Camera_StopRec.imageset\StopButton.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\DeleteIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\DeleteIcon.imageset\ic_delete.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\DeleteIcon.imageset\ic_delete_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\DeleteIcon.imageset\ic_delete_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MicrophoneIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MicrophoneIcon.imageset\ic_mic_black_48px.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MicrophoneIcon.imageset\ic_mic_black_48px%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MicrophoneIcon.imageset\ic_mic_black_48px%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AudioIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AudioIcon.imageset\ic_audiotrack_white_36pt.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AudioIcon.imageset\ic_audiotrack_white_36pt_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AudioIcon.imageset\ic_audiotrack_white_36pt_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\StarIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\StarIcon.imageset\ic_stars.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\StarIcon.imageset\ic_stars_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\StarIcon.imageset\ic_stars_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\UploadIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\UploadIcon.imageset\ic_cloud_upload.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\UploadIcon.imageset\ic_cloud_upload_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\UploadIcon.imageset\ic_cloud_upload_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\TickIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\TickIcon.imageset\ic_check_36pt.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\TickIcon.imageset\ic_check_36pt_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\TickIcon.imageset\ic_check_36pt_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\LocationHuntIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\LocationHuntIcon.imageset\ic_explore_150px.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\LocationHuntIcon.imageset\ic_explore_150px%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\LocationHuntIcon.imageset\ic_explore_150px%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SearchIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SearchIcon.imageset\ic_search_36pt.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SearchIcon.imageset\ic_search_36pt_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SearchIcon.imageset\ic_search_36pt_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SaveIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SaveIcon.imageset\ic_save.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SaveIcon.imageset\ic_save_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SaveIcon.imageset\ic_save_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\ScanIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\ScanIcon.imageset\qrcode-scan.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\ScanIcon.imageset\qrcode-scan %281%29.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\ScanIcon.imageset\qrcode-scan3 %281%29.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-60x60%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-60x60%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-20x20%401x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29%401x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-40x40%401x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-76x76%401x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-76x76%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-83.5x83.5%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\ItunesArtwork%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SettingsIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SettingsIcon.imageset\ic_settings.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SettingsIcon.imageset\ic_settings_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\SettingsIcon.imageset\ic_settings_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MyActivitiesIcon.imageset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MyActivitiesIcon.imageset\ic_edit_location.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MyActivitiesIcon.imageset\ic_edit_location_2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\MyActivitiesIcon.imageset\ic_edit_location_3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppLogo.imageset\OurPlace_logo.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Resources\Assets.xcassets\AppLogo.imageset\logo.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppLogo.imageset\OurPlace_logo%402x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppLogo.imageset\OurPlace_logo%403x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets.xcassets\AudioIcon.imageset\" />
+    <Folder Include="Assets.xcassets\Camera_StartRec.imageset\" />
+    <Folder Include="Assets.xcassets\Camera_StopRec.imageset\" />
+    <Folder Include="Assets.xcassets\Camera_SwapCam.imageset\" />
+    <Folder Include="Assets.xcassets\Camera_TakePhoto.imageset\" />
+    <Folder Include="Assets.xcassets\DeleteIcon.imageset\" />
+    <Folder Include="Assets.xcassets\LocationHuntIcon.imageset\" />
+    <Folder Include="Assets.xcassets\Logo.imageset\" />
+    <Folder Include="Assets.xcassets\MicrophoneIcon.imageset\" />
+    <Folder Include="Assets.xcassets\SearchIcon.imageset\" />
+    <Folder Include="Assets.xcassets\StarIcon.imageset\" />
+    <Folder Include="Assets.xcassets\TickIcon.imageset\" />
+    <Folder Include="Assets.xcassets\UploadIcon.imageset\" />
+    <Folder Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\Properties\" />
+    <Folder Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\Resources\" />
+    <Folder Include="Assets.xcassets\SaveIcon.imageset\" />
+    <Folder Include="Assets.xcassets\ScanIcon.imageset\" />
+    <Folder Include="Cells\TaskCells\" />
+    <Folder Include="Assets.xcassets\SettingsIcon.imageset\" />
+    <Folder Include="Assets.xcassets\MyActivitiesIcon.imageset\" />
+    <Folder Include="Controllers\Create\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <InterfaceDefinition Include="Main.storyboard" />
+    <InterfaceDefinition Include="Resources\InfoTaskCell.xib" />
+    <InterfaceDefinition Include="Cells\TaskCells\TaskCell_Info.xib" />
+    <InterfaceDefinition Include="Cells\TaskCells\TaskCell_Simple.xib" />
+    <InterfaceDefinition Include="Cells\ActivityCollectionCell.xib" />
+    <InterfaceDefinition Include="Resources\Cells\FeedHeaderCell.xib" />
+    <InterfaceDefinition Include="Resources\Cells\FeedSectionHeader.xib" />
+    <InterfaceDefinition Include="Resources\Cells\TaskCells\TaskCell_NameEntry.xib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Info.plist" />
+    <None Include="Entitlements.plist" />
+    <None Include="packages.config" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS\PopColorPicker.iOS.csproj" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\PopColorPicker.iOS-Unified.csproj" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\bin\Debug\PopColorPicker.iOS-Unified.dll" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\bin\Debug\PopColorPicker.iOS-Unified.pdb" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.csproj.CoreCompileInputs.cache" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.csproj.FileListAbsolute.txt" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.dll" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.pdb" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\PopColorPicker.iOS.Shared.projitems" />
+    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\PopColorPicker.iOS.Shared.shproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Helpers\LoadingOverlay.cs" />
+    <Compile Include="ViewSources\ActivityViewSource.cs" />
+    <Compile Include="LoginScreen.cs" />
+    <Compile Include="LoginScreen.designer.cs">
+      <DependentUpon>LoginScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\TaskViewSource.cs" />
+    <Compile Include="AppUtils.cs" />
+    <Compile Include="ViewSources\TaskResultViewSource.cs" />
+    <Compile Include="Delegates\ClickableDelegate.cs" />
+    <Compile Include="Controllers\ResultMediaViewerController.cs" />
+    <Compile Include="Controllers\ResultMediaViewerController.designer.cs">
+      <DependentUpon>ResultMediaViewerController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\UploadViewSource.cs" />
+    <Compile Include="Cells\UploadCell.cs" />
+    <Compile Include="Cells\UploadCell.designer.cs">
+      <DependentUpon>UploadCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Tasks\CameraViewController.cs" />
+    <Compile Include="Controllers\Tasks\CameraViewController.designer.cs">
+      <DependentUpon>CameraViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Tasks\EnterTextViewController.cs" />
+    <Compile Include="Controllers\Tasks\EnterTextViewController.designer.cs">
+      <DependentUpon>EnterTextViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Tasks\RecordAudioController.cs" />
+    <Compile Include="Controllers\Tasks\RecordAudioController.designer.cs">
+      <DependentUpon>RecordAudioController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\LoginController.cs" />
+    <Compile Include="Controllers\Infrastructure\LoginController.designer.cs">
+      <DependentUpon>LoginController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\MainTabBarController.cs" />
+    <Compile Include="Controllers\Infrastructure\MainTabBarController.designer.cs">
+      <DependentUpon>MainTabBarController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\StartUpLogicController.cs" />
+    <Compile Include="Controllers\Infrastructure\StartUpLogicController.designer.cs">
+      <DependentUpon>StartUpLogicController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Delegates\TextViewPlaceholderDelegate.cs" />
+    <Compile Include="Controllers\Tasks\LocationHuntViewController.cs" />
+    <Compile Include="Controllers\Tasks\LocationHuntViewController.designer.cs">
+      <DependentUpon>LocationHuntViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Tasks\TaskViewController.cs" />
+    <Compile Include="Controllers\Tasks\MapMarkingViewController.cs" />
+    <Compile Include="Controllers\Tasks\MapMarkingViewController.designer.cs">
+      <DependentUpon>MapMarkingViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\CGRectHelpers.cs" />
+    <Compile Include="Controllers\Tasks\DrawingViewController.cs" />
+    <Compile Include="Controllers\Tasks\DrawingViewController.designer.cs">
+      <DependentUpon>DrawingViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\TouchCanvas.cs" />
+    <Compile Include="Helpers\TouchCanvas.designer.cs">
+      <DependentUpon>TouchCanvas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS\Properties\AssemblyInfo.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\ColorPickerCustomViewController.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\ColorPickerFavoriteViewController.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\ColorPickerHueGridViewController.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\ColorPickerStandardViewController.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\FavoriteColorManager.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\PopColorPickerViewController.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\Helper\DisplayHelper.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\Helper\LayerHelper.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\Views\ColorPickerHSBView.cs" />
+    <Compile Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\Views\ColorPickerHueCircleView.cs" />
+    <Compile Include="Cells\FeedSectionHeader.cs" />
+    <Compile Include="Cells\FeedSectionHeader.designer.cs">
+      <DependentUpon>FeedSectionHeader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Reachability.cs" />
+    <Compile Include="Controllers\ActivityController.cs" />
+    <Compile Include="Controllers\ActivityController.designer.cs">
+      <DependentUpon>ActivityController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\ActivityHeader.cs" />
+    <Compile Include="Cells\ActivityHeader.designer.cs">
+      <DependentUpon>ActivityHeader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\TaskCell_Info.cs" />
+    <Compile Include="Cells\TaskCells\TaskCell_Info.designer.cs">
+      <DependentUpon>TaskCell_Info.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\TaskCell_Simple.cs" />
+    <Compile Include="Cells\TaskCells\TaskCell_Simple.designer.cs">
+      <DependentUpon>TaskCell_Simple.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\ResultTaskCell.cs" />
+    <Compile Include="Cells\TaskCells\ResultTaskCell.designer.cs">
+      <DependentUpon>ResultTaskCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\ImageResultCell.cs" />
+    <Compile Include="Cells\TaskCells\ImageResultCell.designer.cs" />
+    <Compile Include="Cells\MultipleChoiceCell.cs" />
+    <Compile Include="Cells\MultipleChoiceCell.designer.cs">
+      <DependentUpon>MultipleChoiceCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Tasks\MultipleChoiceController.cs" />
+    <Compile Include="Controllers\Tasks\MultipleChoiceController.designer.cs">
+      <DependentUpon>MultipleChoiceController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\MultipleChoiceViewSource.cs" />
+    <Compile Include="Controllers\Infrastructure\SettingsController.cs" />
+    <Compile Include="Controllers\Infrastructure\SettingsController.designer.cs">
+      <DependentUpon>SettingsController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\SettingsViewSource.cs" />
+    <Compile Include="Cells\ActivityCollectionCell.cs" />
+    <Compile Include="Cells\ActivityCollectionCell.designer.cs">
+      <DependentUpon>ActivityCollectionCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\CreatedActivitiesController.cs" />
+    <Compile Include="Controllers\Infrastructure\CreatedActivitiesController.designer.cs">
+      <DependentUpon>CreatedActivitiesController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\UploadsViewController.cs" />
+    <Compile Include="Controllers\Infrastructure\UploadsViewController.designer.cs">
+      <DependentUpon>UploadsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_ActivityMetaController.cs" />
+    <Compile Include="Controllers\Create\Create_ActivityMetaController.designer.cs">
+      <DependentUpon>Create_ActivityMetaController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Infrastructure\MainHighlightsController.cs" />
+    <Compile Include="Controllers\Infrastructure\MainHighlightsController.designer.cs">
+      <DependentUpon>MainHighlightsController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_ActivityOverviewController.cs" />
+    <Compile Include="Controllers\Create\Create_ActivityOverviewController.designer.cs">
+      <DependentUpon>Create_ActivityOverviewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\CreateTaskCell.cs" />
+    <Compile Include="Cells\TaskCells\CreateTaskCell.designer.cs">
+      <DependentUpon>CreateTaskCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\CreateViewSource.cs" />
+    <Compile Include="Controllers\Create\Create_ChooseTaskTypeController.cs" />
+    <Compile Include="Controllers\Create\Create_ChooseTaskTypeController.designer.cs">
+      <DependentUpon>Create_ChooseTaskTypeController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\TaskTypeViewSource.cs" />
+    <Compile Include="Cells\TaskTypeCell.cs" />
+    <Compile Include="Cells\TaskTypeCell.designer.cs">
+      <DependentUpon>TaskTypeCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_EditTaskController.cs" />
+    <Compile Include="Controllers\Create\Create_EditTaskController.designer.cs">
+      <DependentUpon>Create_EditTaskController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_BaseSegueController.cs" />
+    <Compile Include="Controllers\Create\Create_EditChoosePhotoController.cs" />
+    <Compile Include="Controllers\Create\Create_EditChoosePhotoController.designer.cs">
+      <DependentUpon>Create_EditChoosePhotoController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_ChooseLocationController.cs" />
+    <Compile Include="Controllers\Create\Create_ChooseLocationController.designer.cs">
+      <DependentUpon>Create_ChooseLocationController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_EditLocationHuntController.cs" />
+    <Compile Include="Controllers\Create\Create_EditLocationHuntController.designer.cs">
+      <DependentUpon>Create_EditLocationHuntController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_EditMapMarkController.cs" />
+    <Compile Include="Controllers\Create\Create_EditMapMarkController.designer.cs">
+      <DependentUpon>Create_EditMapMarkController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\MapConfigPickerViewModel.cs" />
+    <Compile Include="Controllers\Create\Create_EditMultiChoiceController.cs" />
+    <Compile Include="Controllers\Create\Create_EditMultiChoiceController.designer.cs">
+      <DependentUpon>Create_EditMultiChoiceController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\CreateMultipleChoiceViewSource.cs" />
+    <Compile Include="Cells\CreateMultipleChoiceCell.cs" />
+    <Compile Include="Cells\CreateMultipleChoiceCell.designer.cs">
+      <DependentUpon>CreateMultipleChoiceCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_EditInfoController.cs" />
+    <Compile Include="Controllers\Create\Create_EditInfoController.designer.cs">
+      <DependentUpon>Create_EditInfoController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_EditListenAudioController.cs" />
+    <Compile Include="Controllers\Create\Create_EditListenAudioController.designer.cs">
+      <DependentUpon>Create_EditListenAudioController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\GenericTextDocument.cs" />
+    <Compile Include="Controllers\Create\Create_ChildTasksOverviewController.cs" />
+    <Compile Include="Controllers\Create\Create_ChildTasksOverviewController.designer.cs">
+      <DependentUpon>Create_ChildTasksOverviewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\Create\Create_FinishController.cs" />
+    <Compile Include="Controllers\Create\Create_FinishController.designer.cs">
+      <DependentUpon>Create_FinishController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cells\TaskCells\TaskCell_NameEntry.cs" />
+    <Compile Include="Cells\TaskCells\TaskCell_NameEntry.designer.cs">
+      <DependentUpon>TaskCell_NameEntry.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\Infrastructure\SignInExplanationController.cs" />
+    <Compile Include="Controllers\Infrastructure\SignInExplanationController.designer.cs">
+      <DependentUpon>SignInExplanationController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\SignInExplanationViewSource.cs" />
+    <Compile Include="Cells\ExplanationCell.cs" />
+    <Compile Include="Cells\ExplanationCell.designer.cs">
+      <DependentUpon>ExplanationCell.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\TakePhotoButton.png" />
+    <BundleResource Include="Resources\ic_switch_camera_white_36pt_2x.png" />
+    <BundleResource Include="Resources\ic_switch_camera_white_36pt_3x.png" />
+    <BundleResource Include="Resources\ic_switch_camera_white_36pt.png" />
+    <BundleResource Include="Resources\RecordButton.png" />
+    <BundleResource Include="Resources\StopButton.png" />
+    <BundleResource Include="Resources\ic_delete_2x.png" />
+    <BundleResource Include="Resources\ic_delete_3x.png" />
+    <BundleResource Include="Resources\ic_delete.png" />
+    <BundleResource Include="Resources\ic_mic_black_48px.png" />
+    <BundleResource Include="Resources\ic_mic_black_48px%402x.png" />
+    <BundleResource Include="Resources\ic_mic_black_48px%403x.png" />
+    <BundleResource Include="Resources\ic_audiotrack_white_36pt_2x.png" />
+    <BundleResource Include="Resources\ic_audiotrack_white_36pt_3x.png" />
+    <BundleResource Include="Resources\ic_audiotrack_white_36pt.png" />
+    <BundleResource Include="Resources\ic_stars_2x.png" />
+    <BundleResource Include="Resources\ic_stars_3x.png" />
+    <BundleResource Include="Resources\ic_stars.png" />
+    <BundleResource Include="Resources\ic_cloud_upload_2x.png" />
+    <BundleResource Include="Resources\ic_cloud_upload_3x.png" />
+    <BundleResource Include="Resources\ic_cloud_upload.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-bar%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-custom%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-favorite%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-grid%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-inner-marker%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-marker%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-save%402x.png" />
+    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-trash%402x.png" />
+    <BundleResource Include="Resources\color-bar%402x.png" />
+    <BundleResource Include="Resources\color-picker-custom%402x.png" />
+    <BundleResource Include="Resources\color-picker-favorite%402x.png" />
+    <BundleResource Include="Resources\color-picker-grid%402x.png" />
+    <BundleResource Include="Resources\color-picker-inner-marker%402x.png" />
+    <BundleResource Include="Resources\color-picker-marker%402x.png" />
+    <BundleResource Include="Resources\color-picker-save%402x.png" />
+    <BundleResource Include="Resources\color-picker-trash%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OurPlace.Common\OurPlace.Common.csproj">
+      <Project>{5B5454AB-9A19-447F-850A-E0C1C24A9AE1}</Project>
+      <Name>OurPlace.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <Import Project="..\packages\Xamarin.Google.iOS.Maps.2.5.0\build\Xamarin.Google.iOS.Maps.targets" Condition="Exists('..\packages\Xamarin.Google.iOS.Maps.2.5.0\build\Xamarin.Google.iOS.Maps.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.Google.iOS.Places.2.5.0\build\Xamarin.Google.iOS.Places.targets" Condition="Exists('..\packages\Xamarin.Google.iOS.Places.2.5.0\build\Xamarin.Google.iOS.Places.targets')" />
+</Project>

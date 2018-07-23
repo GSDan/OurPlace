@@ -1,0 +1,30 @@
+﻿@model OurPlace.API.Models.LearningActivity
+
+@{
+    string uploadUrl = Model.ImageUrl;
+    var myTimeZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+    DateTime convertedTime = TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, myTimeZone);
+
+    if (string.IsNullOrWhiteSpace(uploadUrl))
+    {
+        uploadUrl = "icons/OurPlaceLogo.png";
+    }
+
+    string iconUrl = "https://openlabdata.blob.core.windows.net/parklearn/" + uploadUrl;
+}
+<a href="@Url.Action("Activity", "App", new { code = Model.InviteCode })">
+    <div class="col-md-4 col-xs-12 no-link-style">
+        <div class="card medium hoverable">
+            <div class="custom-card-image">
+                <img src='@iconUrl' class="resizeimg" />
+                <h3 class="truncate"> @Model.Name </h3>
+            </div>
+            <div class="card-content">
+                <p class="overflow4">@Model.Description</p>
+                <br />
+                <i class="card-date">You created this on @convertedTime</i>
+            </div>
+        </div>
+    </div>
+</a>
+

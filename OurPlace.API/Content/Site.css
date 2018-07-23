@@ -1,0 +1,378 @@
+﻿* {
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+h2 {
+    font-size: 210%;
+    font-weight: 500;
+}
+
+h3 {
+    font-size: 180%;
+    font-weight: 500;
+}
+
+h4 {
+    font-size: 130%;
+    font-weight: 500;
+}
+
+#main-wrapper {
+    font-size: 120%;
+    min-height: 100%;
+    margin-bottom: -150px;
+}
+
+    #main-wrapper:after {
+        content: "";
+        display: block;
+    }
+
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#main-wrapper:after {
+    height: 140px;
+}
+
+.share-icon {
+    color: white;
+                   position: absolute;
+                   top: 0px;
+                   right: 0px;
+                   background-color: #529834;
+                   opacity: 0.8;
+                   border-radius: 50%;
+                   padding: 4px;
+                   margin: 5px;
+}
+
+[type="radio"]:not(:checked), [type="radio"]:checked { 
+    position:static !important;
+    left: -9999px; 
+    opacity:1 !important;
+}
+
+.avatar {
+    width: 48px;
+    margin-top: 6px;
+    box-shadow: 0 2px 2px 0 rgb(0, 0, 0);
+}
+
+footer {
+    height: 150px;
+    background-color: #e8f5e9;
+}
+
+#sidenav-overlay {
+    z-index: 1;
+}
+
+.map-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.map-container:before, .map-container:after, .map:before, .map:after {
+    content: '';
+    position: absolute;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.map-container:before {
+    top: -5px;
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+.map-container:after {
+    right: -5px;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+}
+
+.map:before {
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+.map:after {
+    left: -5px;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+}
+
+.map {
+    height: 48.0vh;
+}
+
+.shadowed {
+    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+}
+
+.shadowed-soft {
+    box-shadow: 0 0px 8px 0 rgba(0,0,0,0.1), 0 1px 7px 0 rgba(0,0,0,0.08), 0 3px 1px -2px rgba(0,0,0,0.12);
+}
+
+.nav-wrapper {
+    background-color: #8cc04d;
+    padding-left: 10px;
+    padding-right: 25px;
+}
+
+/*nav ul a {
+    background-color: #c04d8c;
+}*/
+
+.privacy ul li {
+    list-style-type: disc;
+    margin-left: 10px;
+    display: list-item;
+}
+
+.brand-logo img {
+    position: relative;
+    width: 7.0vw;
+}
+
+.brand-title {
+    padding-left: 10px;
+    font-size: 4.0vw;
+}
+
+.icons-table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .icons-table table {
+        margin: 0 auto;
+    }
+
+    .icons-table td {
+        text-align: center;
+    }
+
+    .icons-table img {
+        width: 110px;
+        height: auto;
+    }
+
+@media(min-width:655px) {
+    .brand-title {
+        font-size: 100%;
+    }
+
+    .brand-logo img {
+        width: 50px;
+    }
+}
+
+@media(max-width:700px) {
+    .icons-table img {
+        width: 15.0vw;
+        height: auto;
+    }
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.card {
+    border-radius: 8px;
+}
+
+.card-horizontal {
+    border-radius: 8px;
+}
+
+.card .card-title-lg {
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    width: 100%;
+    color: white;
+    text-shadow: 0px 0px 3px black;
+    font-size: 30pt;
+}
+
+.card-head {
+    padding: 12px;
+    line-height: 100px;
+    min-height: 100px;
+    text-align: center;
+    border: 2px dashed rgba(0,0,0,0);
+    margin-bottom: 15px;
+}
+
+    .card-head h3 {
+        text-align: left;
+        vertical-align: middle;
+        line-height: normal;
+        margin-bottom: 15px;
+        font-size: small;
+    }
+
+.card-uploaded {
+    margin: 10px;
+    margin-bottom: 30px;
+}
+
+.card-date {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 20px;
+    padding-top: 15px;
+}
+
+.task-icon {
+    float: left;
+    width: 100px !important;
+    margin-right: 15px;
+}
+
+.card-content img {
+    width: 250px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.card.horizontal .card-image {
+    max-width: 40%;
+}
+
+    .card.horizontal .card-image img, .card.horizontal .card-image video {
+        height: 290px;
+        width: 100%;
+        object-fit: cover;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+.material-placeholder {
+    display: inline-block;
+}
+
+.textOverImage {
+    text-align: center;
+    position: relative;
+}
+
+.textOverImage h5, .textOverImage h2 {
+    position: absolute;
+    margin: auto;
+    bottom: 10%;
+    text-align: center;
+    width: 100%;
+}
+
+.textOverImage h5 span, .textOverImage h2 span {
+    color: white;
+    background: rgb(0, 0, 0); /* fallback color */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    line-height: 167%;
+}
+
+.photoMatchTarget img {
+    border-color: green;
+    border: 5px solid #4CAF50;
+}
+
+
+.custom-card-image {
+    position: relative;
+}
+
+.custom-card-image h3 {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-shadow: 0px 0px 3px black;
+    font-size: 16pt;
+    text-align: center;
+    color: white;
+    background: rgb(0, 0, 0); /* fallback color */
+    background: rgba(0, 0, 0, 0.25);
+    padding: 5px;
+    line-height: 167%;
+}
+
+.resizeimg {
+    height: 220px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.resizeimgLg {
+    height: 440px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.overflow4 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+.no-link-style {
+    color: black;
+    text-decoration: none;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):hover {
+    color: #d370a6;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating) {
+    color: #c04d8c;
+}
+
+.btn:hover, .btn-large:hover {
+    background-color: #933c6c;
+    color : white;
+}
+
+.btn, .btn-large {
+    background-color: #c04d8c;
+}
+
+nav ul a.btn {
+    margin-left: 4px;
+    margin-right: 4px;
+    padding: 0px 1rem 0px 1rem;
+    background-color: white;
+    color: #c04d8c;
+    font-size: 70%;
+    font-weight: bold;
+}
+
+nav ul a.btn:hover {
+    background-color: #c04d8c;
+    color: white;
+}
+
+ul:not(.browser-default).bullet li {
+    list-style-type: circle;
+    margin-left: 20px;
+}
+
+.modal-fixed-footer { width: 50% !important;  height: 30% !important }

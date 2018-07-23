@@ -1,0 +1,52 @@
+﻿@model OurPlace.API.Models.CompletedTask
+
+@{
+    string storage = (string)ViewData["storage"];
+    string[] links = Json.Decode<string[]>(Model.JsonData);
+    string videoUrl = "";
+
+    if (links != null && links.Length > 0)
+    {
+        videoUrl = storage + links[0];
+    };
+
+    <div class="hide-on-small-only">
+        <div class="card horizontal">
+            <div class="card-stacked">
+                <div class="card-content">
+                    <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                    <h3 class="card-title">@Model.EventTask.Description</h3>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(videoUrl))
+            {
+                <div class="card-image">
+                    <video class="responsive-video" controls>
+                        <source src="@videoUrl" type="video/mp4">
+                    </video>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="hide-on-med-and-up">
+        <div class="card">
+            @if (!string.IsNullOrWhiteSpace(videoUrl))
+            {
+                <div class="card-image">
+                    <video class="responsive-video" controls>
+                        <source src="@videoUrl" type="video/mp4">
+                    </video>
+                </div>
+            }
+            <div class="card-stacked">
+                <div class="card-content">
+                    <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                    <h3 class="card-title">@Model.EventTask.Description</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+}

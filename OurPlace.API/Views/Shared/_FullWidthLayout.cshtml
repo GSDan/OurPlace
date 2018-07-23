@@ -1,0 +1,52 @@
+﻿@using EUCookies
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- FULL WIDTH LAYOUT -->
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    @Html.Partial("_HeaderRefsPartial")
+</head>
+<body>
+
+    @Html.Raw(Consent.Instance.Install(linkUrl: "https://ourplace.app/privacypolicy",
+                messageText: "By continuing to use this site, you agree to our use of cookies",
+                okText: "Agree",
+                learnMoreText: "Learn more"))
+
+    <div id="main-wrapper">
+        <div class="navbar-fixed">
+            <nav>
+                <div class="nav-wrapper">
+                    <a href="~/" class="brand-logo">
+                        <ul id="brand-list" class="left">
+                            <li><img src="~/Content/img/icons/OurPlaceLogo.png" /></li>
+                            <li><div class="brand-title">OurPlace</div></li>
+                        </ul>
+                    </a>
+                    <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons" style="text-decoration: none;">menu</i></a>
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </nav>
+        </div>
+        @RenderBody()
+    </div>
+
+    <br />
+    <br />
+
+    <footer>
+        @Html.Partial("_FooterPartial")
+    </footer>
+    <script>
+        $(".button-collapse").sideNav();
+        $('.parallax').parallax();
+    </script>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

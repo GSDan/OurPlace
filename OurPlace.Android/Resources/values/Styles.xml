@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    OurPlace is a mobile learning platform, designed to support communities
+    in creating and sharing interactive learning activities about the places they care most about.
+    https://github.com/GSDan/OurPlace
+    Copyright (C) 2018 Dan Richardson
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.
+-->
+<resources>
+  <style name="OurPlace" parent="Theme.AppCompat.Light.NoActionBar">
+     <item name="android:colorPrimary">@color/app_green</item>
+     <item name="android:colorAccent">@color/app_lightgreen</item>
+    <item name="colorPrimaryDark">@color/app_darkgreen</item>
+  </style>
+
+  <style name="OurPlaceActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="colorPrimary">@color/app_green</item>
+    <item name="colorAccent">@color/app_lightgreen</item>
+    <item name="colorPrimaryDark">@color/app_darkgreen</item>
+  </style>
+
+  <style name="OurPlaceActionBarAlt" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="colorPrimary">@color/app_purple</item>
+    <item name="colorAccent">@color/app_lightpurple</item>
+    <item name="colorPrimaryDark">@color/app_darkpurple</item>
+  </style>
+  
+  <style name="dialog_color_pciker_view_portrait">
+    <item name="android:layout_width">240dp</item>
+    <item name="android:layout_height">wrap_content</item>
+  </style>
+
+<style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+    <item name="colorPrimaryDark">@color/app_darkgreen</item>
+  <item name="android:navigationBarColor">@color/app_darkgreen</item>
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+</resources>

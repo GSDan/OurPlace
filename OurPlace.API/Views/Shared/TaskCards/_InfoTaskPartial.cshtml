@@ -1,0 +1,59 @@
+﻿@model OurPlace.API.Models.CompletedTask
+
+@{
+    string storage = (string)ViewData["storage"];
+    var obj = Json.Decode(Model.EventTask.JsonData);
+    string imageUrl = obj["ImageUrl"];
+    string fullImg = storage + imageUrl;
+    string external = obj["ExternalUrl"];
+
+
+    <div class="hide-on-small-only">
+        <div class="card horizontal">
+            <div class="card-stacked">
+                <div class="card-content">
+                    <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                    <h3 class="card-title">@Model.EventTask.Description</h3>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(external))
+                {
+                    <div class="card-action">
+                        <a href="@external">More information</a>
+                    </div>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                <div class="card-image">
+                    <img src="@fullImg">
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="hide-on-med-and-up">
+        <div class="card">
+            @if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                <div class="card-image">
+                    <img src="@fullImg" class="resizeimg">
+                </div>
+            }
+            <div class="card-stacked">
+                <div class="card-content">
+                    <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                    <h3 class="card-title">@Model.EventTask.Description</h3>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(external))
+                {
+                    <div class="card-action">
+                        <a href="@external">More information</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+}

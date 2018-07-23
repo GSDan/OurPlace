@@ -1,0 +1,25 @@
+﻿@model IEnumerable<OurPlace.API.Models.CompletedTask>
+
+@{
+    ViewBag.Title = ViewData["title"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewData["title"]</h2>
+
+@if(!string.IsNullOrWhiteSpace((string)ViewData["username"]))
+{
+    <h3>Uploaded by <b>@ViewData["username"]</b></h3>
+}
+
+@foreach (var item in (List<OurPlace.API.Models.CompletedTask>)ViewData["data"])
+{
+    @Html.Partial("_CompletedTaskCardPartial", item)
+}
+
+<div class="center-align">
+    <a class="waves-effect waves-light btn" 
+       href="@Url.Action("Download", "CompletedTasks", new { submissionId = ViewData["submissionId"] })">Download Files</a>
+</div>
+
+<br/>

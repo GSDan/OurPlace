@@ -1,0 +1,48 @@
+﻿@model OurPlace.API.Models.CompletedActivity
+
+@{
+    string uploadUrl = Model.LearningActivity.ImageUrl;
+    var myTimeZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+    DateTime convertedTime = TimeZoneInfo.ConvertTimeFromUtc(Model.CreatedAt, myTimeZone);
+
+    if (string.IsNullOrWhiteSpace(uploadUrl))
+    {
+        uploadUrl = "icons/OurPlaceLogo.png";
+    }
+
+    string shareUrl = (Model.Share != null) ? ServerUtils.GetResultShareUrl(Model.Share.ShareCode) : "";
+    string iconUrl = "https://openlabdata.blob.core.windows.net/parklearn/" + uploadUrl;
+
+}
+
+<div class="col-md-4 col-xs-12 no-link-style" onclick="goToUrl('@Url.Action("Index", "CompletedTasks", new { submissionId = Model.Id })')">
+    <div class="card medium hoverable">
+        <div class="custom-card-image">
+            <img src='@iconUrl' class="resizeimg" />
+
+            @if (!string.IsNullOrWhiteSpace(shareUrl))
+            {
+                <i id="@Model.Id" class="material-icons share-icon hoverable" onclick="shareResult(event, '@shareUrl')">share</i>
+            }
+
+            <h3 class="truncate"> @Model.LearningActivity.Name </h3>
+        </div>
+        <div class="card-content">
+            <p class="overflow4">@Model.LearningActivity.Description</p>
+
+            @if (Model.User.Email != User.Identity.Name)
+            {
+                <i class="card-date">Uploaded @convertedTime.ToString("HH:mm on ddd, MMM d, yyyy") by @Model.User.FirstName @Model.User.Surname </i>
+            }
+            else
+            {
+                <i class="card-date">Uploaded @convertedTime.ToString("HH:mm on ddd, MMM d, yyyy")</i>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.EnteredUsername))
+            {
+                <i>Submitted by <b>@Model.EnteredUsername</b></i>
+            }
+        </div>
+    </div>
+</div>

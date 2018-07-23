@@ -1,0 +1,44 @@
+﻿@model IEnumerable<OurPlace.API.Models.CompletedActivity>
+
+@{
+    ViewBag.Title = "Uploaded responses to your activities";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Uploaded responses to your activities</h2>
+<h5>Here are the repsonses others have made to your activities, and given you permission to see.</h5>
+
+@{
+    bool rowStarted = false;
+}
+
+@for (int i = 0; i < Model.Count(); i++)
+{
+    if (rowStarted && i % 3 == 0)
+    {
+        rowStarted = false;
+        @:</div>
+    }
+
+    if (i % 3 == 0)
+    {
+        rowStarted = true;
+        @:<div class="row">
+    }
+
+    @Html.Partial("_CompletedActivityCardPartial", Model.ElementAt(i));
+
+    if (i == Model.Count() - 1 && rowStarted)
+    {
+        rowStarted = false;
+        @:</div>
+    }
+}
+
+<script>
+
+    function goToUrl(url) {
+        window.location.href = url;
+    }
+
+</script>

@@ -1,0 +1,89 @@
+﻿@model IEnumerable<OurPlace.API.Models.CompletedActivity>
+
+@{
+    ViewBag.Title = "Completed Activities";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Your Uploads</h2>
+
+@{ 
+    bool rowStarted = false;
+}
+
+@for (int i = 0; i < Model.Count(); i++)
+{
+    if (rowStarted && i % 3 == 0)
+    {
+        rowStarted = false;
+        @:</div>
+    }
+
+    if (i % 3 == 0)
+    {
+        rowStarted = true;
+        @:<div class="row">
+    }
+
+    @Html.Partial("_CompletedActivityCardPartial", Model.ElementAt(i));
+
+    if (i == Model.Count() - 1 && rowStarted)
+    {
+        rowStarted = false;
+        @:</div>
+    }
+}
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h4>Share this upload</h4>
+        <p>To allow someone else to have access to this upload, share this link with them:</p>
+        <a id="modalShareLink" class="text-center">A bunch of text</a>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="copyBtn" data-clipboard-target="#modalShareLink" class="modal-action modal-close waves-effect waves-green btn-flat">Copy to Clipboard</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+</div>
+
+<script>
+
+    var sharing = false;
+
+    var btn = document.getElementById('copyBtn');
+    var clipboard = new Clipboard(btn);
+
+    clipboard.on('success', function (e)
+    {
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        Materialize.toast('Link copied!', 2000)
+        e.clearSelection();
+    });
+
+    clipboard.on('error', function (e)
+    {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+    });
+
+    function shareResult(event, shareUrl)
+    {
+        sharing = true;
+        $('#modalShareLink').text(shareUrl);
+        $('#modal1').modal().modal('open');
+    }
+
+    function goToUrl(url)
+    {
+        if (sharing)
+        {
+            sharing = false;
+            return;
+        }
+
+        window.location.href = url;
+    }
+</script>

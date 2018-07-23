@@ -1,0 +1,25 @@
+﻿@using OurPlace.API.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Sign into OurPlace";
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-12">
+        <section id="socialLoginForm">
+
+            <p>
+                By signing in, you agree to the OurPlace <a href="/Terms">terms and conditions</a> and <a href="/PrivacyPolicy">privacy policy</a>. 
+                We will store your name, email address and date of birth as given by your chosen third party provider. Some other personal information—such as location—may be collected during your use of the service. This information helps us identify you across sessions, tailor relevant content for your needs and helps us as researchers understand how OurPlace is being used.
+                For more information, please read our <a href="/PrivacyPolicy">privacy policy</a> before continuing.
+            </p>
+
+            @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

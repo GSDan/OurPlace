@@ -1,0 +1,33 @@
+﻿<!-- START HEADER_REFS_PARTIAL -->
+
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/Content/bootstrapCSS")
+
+<!--For cookie consent-->
+<link href="~/Content/cookies_eu.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.1.1.js"></script>
+<script src="~/Scripts/jquery.cookie.js"></script>
+<script src="~/Scripts/cookies_eu.js"></script>
+
+<!-- MATERIALIZE CSS -->
+<!-- Compiled and minified CSS -->
+<link href="~/Content/materialize.min.css" rel="stylesheet" />
+<!-- Compiled and minified JavaScript -->
+<!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
+<script src="~/Content/materialize.min.js"></script>
+<!--For material icons-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+
+@if (!string.IsNullOrWhiteSpace((string)ViewData["MapsKey"]))
+{
+    string mapsUrl = "https://maps.google.com/maps/api/js?key=" + ViewData["MapsKey"];
+    <script src="@mapsUrl" type="text/javascript"></script>
+}
+
+@Styles.Render("~/Content/css")
+
+<meta name="theme-color" content="#8cc04d">
+<link rel="icon" sizes="192x192" href="~/Content/img/icons/favicon.png">
+
+<!-- END HEADER_REFS_PARTIAL -->

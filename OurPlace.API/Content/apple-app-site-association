@@ -1,0 +1,11 @@
+{
+	"applinks" : {
+		"apps":[],
+		"details": [
+			{
+				"appID": "J3676MPZ85.uk.ac.ncl.openlab.ourplace",
+				"paths" : [ "/app/*", "/App/*" ]
+			}
+		]
+	}
+}

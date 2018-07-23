@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="TaskCell_NameEntry" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TaskCell_NameEntry" rowHeight="118" id="rPp-nT-M2B" customClass="TaskCell_NameEntry">
+            <rect key="frame" x="0.0" y="0.0" width="660" height="118"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rPp-nT-M2B" id="ULk-AC-arz">
+                <rect key="frame" x="0.0" y="0.0" width="660" height="117.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ke0-fw-QYQ">
+                        <rect key="frame" x="25" y="70.5" width="610" height="39.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <state key="normal" title="Enter Your Name"/>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This activity requires you to provide your name(s)." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eNY-0N-mzk">
+                        <rect key="frame" x="20" y="31" width="620" height="19.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="eNY-0N-mzk" secondAttribute="trailing" id="504-Ln-KRl"/>
+                    <constraint firstItem="eNY-0N-mzk" firstAttribute="leading" secondItem="ULk-AC-arz" secondAttribute="leadingMargin" id="WRB-dE-XFx"/>
+                    <constraint firstItem="ke0-fw-QYQ" firstAttribute="top" secondItem="eNY-0N-mzk" secondAttribute="bottom" constant="20" id="azG-jY-ufZ"/>
+                    <constraint firstAttribute="bottom" secondItem="ke0-fw-QYQ" secondAttribute="bottom" constant="7.5" id="gGh-uL-wkS"/>
+                    <constraint firstItem="eNY-0N-mzk" firstAttribute="top" secondItem="ULk-AC-arz" secondAttribute="topMargin" constant="20" id="geU-ce-bXy"/>
+                    <constraint firstItem="ke0-fw-QYQ" firstAttribute="leading" secondItem="ULk-AC-arz" secondAttribute="leading" constant="25" id="l86-Sj-8Lm"/>
+                    <constraint firstAttribute="trailing" secondItem="ke0-fw-QYQ" secondAttribute="trailing" constant="25" id="yZu-Ty-E5A"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" red="0.75294117650000003" green="0.30196078430000001" blue="0.54901960780000003" alpha="1" colorSpace="calibratedRGB"/>
+            <connections>
+                <outlet property="EditButton" destination="ke0-fw-QYQ" id="qfQ-GM-jdL"/>
+                <outlet property="NameLabel" destination="eNY-0N-mzk" id="JQt-aO-aQ8"/>
+            </connections>
+            <point key="canvasLocation" x="-170" y="19"/>
+        </tableViewCell>
+    </objects>
+</document>

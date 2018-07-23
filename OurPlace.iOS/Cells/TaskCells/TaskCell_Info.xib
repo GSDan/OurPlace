@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="TaskCell_Info" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TaskCell_Info" rowHeight="301" id="HJD-Da-8AO" userLabel="TaskCell_Info" customClass="TaskCell_Info">
+            <rect key="frame" x="0.0" y="0.0" width="768" height="301"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="HJD-Da-8AO" id="6Uy-vP-DpM">
+                <rect key="frame" x="0.0" y="0.0" width="768" height="300.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="200" horizontalCompressionResistancePriority="1" verticalCompressionResistancePriority="1000" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GeQ-C4-7Tc">
+                        <rect key="frame" x="52" y="170" width="664" height="87"/>
+                        <string key="text">Task description can be very long, we need to make sure there's enough room. Task description can be very long, we need to make sure there's enough room. Task description can be very long, we need to make sure there's enough room. Task description can be very long, we need to make sure there's enough room. Task description can be very long, we need to make sure there's enough room. Task description can be very long, we need to make sure there's enough room. </string>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="250" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8bj-sC-Q3U">
+                        <rect key="frame" x="25" y="259" width="718" height="34"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="34" id="O7O-CP-QJz"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <state key="normal" title="More Info"/>
+                    </button>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ram-0m-IRR" userLabel="InfoImage">
+                        <rect key="frame" x="0.0" y="10" width="768" height="150"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="150" id="W4U-YY-xZV"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="GeQ-C4-7Tc" secondAttribute="trailing" constant="4" id="0aO-o5-Izp"/>
+                    <constraint firstAttribute="trailing" secondItem="8bj-sC-Q3U" secondAttribute="trailing" constant="25" id="0z7-MH-84m"/>
+                    <constraint firstAttribute="trailing" secondItem="ram-0m-IRR" secondAttribute="trailing" id="6Gk-5g-iLe"/>
+                    <constraint firstItem="GeQ-C4-7Tc" firstAttribute="top" secondItem="ram-0m-IRR" secondAttribute="bottom" constant="10" id="7m6-a5-uyS"/>
+                    <constraint firstItem="8bj-sC-Q3U" firstAttribute="topMargin" secondItem="GeQ-C4-7Tc" secondAttribute="bottom" constant="10" id="JrU-Fm-wQZ"/>
+                    <constraint firstItem="8bj-sC-Q3U" firstAttribute="leading" secondItem="6Uy-vP-DpM" secondAttribute="leading" constant="25" id="SMO-vf-a4f"/>
+                    <constraint firstItem="ram-0m-IRR" firstAttribute="leading" secondItem="6Uy-vP-DpM" secondAttribute="leading" id="VLC-3B-B5r"/>
+                    <constraint firstAttribute="bottom" secondItem="8bj-sC-Q3U" secondAttribute="bottom" constant="7.5" id="gBj-bC-dpu"/>
+                    <constraint firstItem="GeQ-C4-7Tc" firstAttribute="leading" secondItem="6Uy-vP-DpM" secondAttribute="leadingMargin" constant="4" id="hkh-5E-dEu"/>
+                    <constraint firstItem="ram-0m-IRR" firstAttribute="top" secondItem="6Uy-vP-DpM" secondAttribute="top" constant="10" id="hvz-e2-VK7"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="InfoButton" destination="8bj-sC-Q3U" id="xGv-5z-ioY"/>
+                <outlet property="InfoImage" destination="ram-0m-IRR" id="CBN-IY-PJH"/>
+                <outlet property="TaskDescription" destination="GeQ-C4-7Tc" id="uh2-Mv-P4z"/>
+            </connections>
+            <point key="canvasLocation" x="-105" y="-214"/>
+        </tableViewCell>
+    </objects>
+</document>

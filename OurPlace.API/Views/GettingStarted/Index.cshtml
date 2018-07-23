@@ -1,0 +1,78 @@
+﻿
+@{
+    ViewBag.Title = "Getting Started";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Getting Started</h2>
+
+<p><em>Please note: Park:Learn is still in active development, therefore some features may not yet be fully functional. If you find any bugs, please report them!</em></p>
+
+<br />
+
+<h4>Downloading the Application</h4>
+<p>
+    Currently Park:Learn is only available for the Android mobile platform - there are plans to release iOS versions in the future.
+    Download the application from Google Play:
+</p>
+
+<div class="center-align">
+    <a href='https://play.google.com/store/apps/details?id=com.park.learn&utm_source=Website-GettingStarted&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+        <img alt='Get it on Google Play' src='https://play.google.com/intl/en_gb/badges/images/generic/en_badge_web_generic.png' width="290px" />
+    </a>
+</div>
+
+<br />
+<h4>Making Activities</h4>
+<p>Park:Learn allows you to create your own interactive learning activities for others to use.</p>
+<ol>
+    <li>Open the app and swipe over to the 'My Activites' tab.</li>
+    <li>Press the '+' button in the bottom right to create a new activity.</li>
+    <li>Enter a title and short description for your activity. To add a custom image and make your activity stand out, tap the leaf icon to take a photo or choose an existing image from your device.</li>
+    <li>On the 'Add Tasks' screen, tap the '+' button to add a new task to your activity. An activity requires at least one task before it can be uploaded, but you can add as many as you like.</li>
+    <li>Every task you add requires at least an instruction for the learner to follow. Some tasks require additional input - those are detailed below. Once you are happy, click 'Add Task'.</li>
+    <li>Once you are finished adding tasks to your activity, click the 'Finish' button.</li>
+    <li>If you want other people to be able to see and use your activity, tick the 'Make Public' box on the next screen. Else, untick it.</li>
+    <li>If your activity has been designed around particular parks and you want people in the area to see your new activity, click the 'Add Place' button. This will let you choose between nearby locations which have been listed as parks on Google Maps. Add as many as appropriate.</li>
+    <li>After confirming that you agree to the terms and conditions, be aware that clicking 'Finish and Upload' will prevent you from being able to edit the activity any further.</li>
+    <li>Clicking 'Finish and Upload' will take you to the Upload Queue. Tap 'Upload' on your activity to publish it and upload any relevant files. Uploading many images and recordings may take up significant amounts of data, so make sure you're on WiFi.</li>
+    <li>The 'My Activities' tab will update to include your newly uploaded creation.</li>
+    <li>Tapping the activity will show you its 'share code' and give you the option to either delete the activity or open it for your own use.</li>
+</ol>
+
+
+<br />
+<h4>Advanced Task Types</h4>
+<p>While most tasks in Park:Learn require only a simple written instruction from the creator, some tasks are more complicated than others and require more information when creating them:</p>
+<ul class="bullet">
+    <li><b>Photo Match</b> asks the learner to try and match a given image with their camera. Use the 'Choose Target Image' button to take a photo or select an existing image for the learner to match.</li>
+    <li>
+        <b>Draw on Photo</b> tasks involve the user drawing on top of an existing image. This image can even be one that they've taken in a previously completed task! To do this, first make sure you've created a 'Take a Photo'
+        or 'Photo Match' task before selecting 'Choose Take a Photo or Photo Match Task'. Otherwise, select 'Supply Custom Image' button to take a photo or select an existing image for the learner to draw upon.
+    </li>
+    <li>
+        <b>Map Marking</b> asks the user to mark GPS locations. Choose the minimum and maximum number of markers the learner can place on the map (putting a maximum of zero allows unlimited markers). You also have the option of limiting learners to only being able to place markers
+        on the location at which they are currently standing, forcing them to travel to each location they wish to mark. <em>Please note that due to the use of Google Maps, the learner must have a working Internet connection to be able to complete this task type.</em>
+    </li>
+    <li><b>Location Hunt</b> tasks the learner with tracking down a location using only a distance reading. Set the target location by tapping the desired location in the Google Maps view.</li>
+    <li><b>Multiple Choice</b> asks the user to choose between several listed options. Add new choices by typing them and tapping 'Add'. Unwanted choices can then be deleted.</li>
+    <li><b>Listen to Audio</b> simply asks the user to listen to an audio clip. You can either choose an existing audio file on your device, or record a new one. <em>Please note that listening to audio files requires an active Internet connection.</em></li>
+</ul>
+
+<br />
+<h4>Sharing Activities</h4>
+<p>
+    Park:Learn lets users launch your shared activities in two ways: scanning QR Codes and typing share codes into the app. The easiest way to share your activity is by using the Park:Learn website. When logged into the site, go to the "My Activities" page in the top menu (or side drawer if on mobile).
+    Here you will see a list of all of your uploaded activities. Clicking an activity will present you with its share page, featuring a QR code and share code. Clicking the QR code will give you a larger version for printing. Alternatively, you can view your activities' share codes by tapping them
+    in the 'My Activities' tab.
+</p>
+
+<p>If the user already has Park:Learn installed, they can start the activity in a few ways:</p>
+<ul class="bullet">
+    <li>The <i class="material-icons">search</i> search icon at the top of the app's screen lets users enter a given share code and immediately open the matching activity.</li>
+    <li>The scan icon at the top of the app's screen lets users scan a QR Code and immediately open the matching activity.</li>
+    <li>Scanning the QR Code in a separate app will give the user the choice of opening the activity in Park:Learn or viewing the share page in their web browser.</li>
+    <li>If you visit an activity's share page on a device supported by Park:Learn, there will be a button to launch your activity directly in the app.</li>
+</ul>
+
+<p>If the user doesn't have Park:Learn installed, they can use another app to scan the QR Code. This will bring them to the activity's share page, from which they can install the app.</p>

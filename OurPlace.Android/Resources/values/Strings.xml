@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    OurPlace is a mobile learning platform, designed to support communities
+    in creating and sharing interactive learning activities about the places they care most about.
+    https://github.com/GSDan/OurPlace
+    Copyright (C) 2018 Dan Richardson
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.
+-->
+<resources>
+  <string name="ApplicationName">OurPlace</string>
+  <string name="MainLandingTabTitle">Highlights</string>
+  <string name="MainMyActivitiesTabTitle">My Activities</string>
+  <string name="MenuSettings">Settings</string>
+  <string name="MenuScan">Scan QR</string>
+  <string name="MenuSearch">Search</string>
+  <string name="MenuHelp">Help</string>
+  <string name="MenuUploads">Upload Queue</string>
+  <string name="ForceSignOut">Your session has expired, please sign in again!</string>
+  <string name="MenuLogout">Sign out</string>
+  <string name="LogoutConfirm">Are you sure you want to sign out of OurPlace? Any content you haven\'t uploaded will be lost!</string>
+  <string name="LoginPrompt">Sign in to start!\nChoose a service to sign in with:</string>
+  <string name="LoginTermsTitle">Terms and Privacy Policy</string>
+  <string name="LoginTerms">By continuing to use OurPlace, you acknowledge that you have read and agree to both the Terms of Use and Privacy Policy.</string>
+  <string name="LoginInfoPrompt">Why do I need to sign in to a service?</string>
+  <string name="LoginOpenTerms">Terms of Use</string>
+  <string name="LoginOpenPrivacy">Privacy Policy</string>
+  <string name="LoginAgreeTerms">I agree</string>
+  <string name="Connecting">Connecting...</string>
+  <string name="PleaseWait">Please wait...</string>
+  <string name="WelcomeMessage">Welcome, {0}!</string>
+  <string name="WelcomeReturnMessage">Welcome back, {0}!</string>
+  <string name="Continue">Continue</string>
+  <string name="ErrorTitle">Error</string>
+  <string name="WarningTitle">Hold Your Horses!</string>
+  <string name="ErrorLogin">There was an issue logging you into OurPlace. Please check your Internet connection and try again.</string>
+  <string name="ErrorMessage">Oops! Something went wrong!</string>
+  <string name="ConnectionError">There was an error contacting the server. Please try again later.</string>
+  <string name="TaskBtn">Start</string>
+  <string name="FinishBtn">Finish</string>
+  <string name="TakePhotoBtn">Take Photo</string>
+  <string name="EditBtn">Edit</string>
+  <string name="ChosenLocations">You\'ve chosen {0} location{1}</string>
+  <string name="ChosenMaxLocations">You can only place {0} marker{1} at a time.</string>
+  <string name="UserLocationOnly">You can only place markers on your position!</string>
+  <string name="ExternalBtn">Open Website</string>
+  <string name="DeleteBtn">Delete</string>
+  <string name="RemoveBtn">Remove</string>
+  <string name="RecBtn">Record</string>
+  <string name="StartBtn">Start</string>
+  <string name="ListenBtn">Listen</string>
+  <string name="StopBtn">Stop</string>
+  <string name="ChooseBtn">Choose</string>
+  <string name="StartDrawBtn">Draw</string>
+  <string name="TaskBtnNotReady">Not ready!</string>
+  <string name="TasksTitle">Complete each task below and tap \"Finish\"!</string>
+  <string name="dialog_ok">OK</string>
+  <string name="dialog_cancel">Cancel</string>
+  <string name="taskLockedParent">Complete this to view {0} locked task{1}!</string>
+  <string name="taskUnlockedParent">Follow-up tasks:</string>
+  <string name="permissionCameraTitle">Camera access required</string>
+  <string name="permissionVideoExplanation">Please give this app permission to access the camera in order to record video!</string>
+  <string name="permissionPhotoExplanation">Please give this app permission to access the camera in order to take photos!</string>
+  <string name="permissionFilesTitle">External file access required</string>
+  <string name="permissionFilesExplanation">Please give this app permission to read files so it can save your taken photos and videos!</string>
+  <string name="permissionMicTitle">Microphone access required</string>
+  <string name="permissionMicExplanation">Please give this app permission to access the microphone in order to record audio!</string>
+  <string name="permissionLocationTitle">Location access required</string>
+  <string name="permissionLocationExplanation">This type of task requires access to your device\'s location in order to function.</string>
+  <string name="permissionLocationActivitiesTitle">Please Grant Location Access</string>
+  <string name="permissionLocationActivitiesExplanation">Grant Park:Learn permission to access your location to see what activities are available nearby!</string>
+  <string name="permissionRefused">Please give permissions in order to continue!</string>
+  <string name="createNewActivityPrompt">Tap to create your first activity!</string>
+  <string name="createNewActivityTitleView">What\'s the title of your new activity?</string>
+  <string name="createNewActivityImagePrompt">Tap to add an image</string>
+  <string name="createNewActivityDescView">Enter a description of your activity</string>
+  <string name="createNewActivityErrNoTitle">Please enter a title for your activity!</string>
+  <string name="createNewActivityErrNoDesc">Please enter a description of your activity!</string>
+  <string name="createNewActivityWarnNoImage">You haven\'t added a custom image for your activity\'s icon. Are you sure you want to continue?</string>
+  <string name="createNewActivityChooseTaskType">Choose a type of task to add:</string>
+  <string name="createNewActivityTask">Create a new task</string>
+  <string name="createNewActivityTaskInstruct">Write instructions for this task!</string>
+  <string name="createNewActivityTaskAddTask">Save and Add Task</string>
+  <string name="createNewActivityChildTasks">\n\nAdditional tasks:</string>
+  <string name="createNewInfoPrompt">Information for the learner</string>
+  <string name="createNewInfoUrlPrompt">Link to a web page with more information (optional)</string>
+  <string name="createNewInfoUrlInvalid">That isn\'t a valid URL!</string>
+  <string name="createNewInfoAddImage">Tap to add an image (optional)</string>
+  <string name="createNewInfoNoImage">Continue without adding an image?</string>
+  <string name="createNewPhotoMatchPrompt">Choose an image for the user to try and match:</string>
+  <string name="createNewPhotoMatchBtn">Choose Target Image</string>
+  <string name="createNewPhotoMatchErr">Please choose an image for the user to try and match!</string>
+  <string name="createNewLocationHuntChooseLocation">Choose a target location for the user to track down!</string>
+  <string name="createNewLocationHuntMapCheckbox">Allow the user to view on a map</string>
+  <string name="createNewLocationHuntMapExplanation">Unchecking this means users will only know their current proximity to the target</string>
+  <string name="createNewMapMarkerMin">Min required number of markers</string>
+  <string name="createNewMapMarkerMax">Max number of markers</string>
+  <string name="createNewMapMarkerExplanation">Choose the maximum and minimum number of markers for the user to place on the map. To allow an unlimited number of markers, set the maximum as \'0\'.</string>
+  <string name="createNewMapMarkerUserLoc">Limit users to only placing markers on their current, physical location</string>
+  <string name="createNewMapMarkerErrMinLessThanOne">The minimum number of map markers has to be at least 1!</string>
+  <string name="createNewMapMarkerErrMaxLessThanMin">The maximum number of map markers must be greater or equal to the minimum number!</string>
+  <string name="createNewMultChoicePrompt">Type a new option</string>
+  <string name="createNewMultChoiceAdd">Add</string>
+  <string name="createNewMultChoiceNone">No options added yet!</string>
+  <string name="createNewMultChoiceAdded">Added options:</string>
+  <string name="createNewMultChoiceTooFew">Please add at least two options!</string>
+  <string name="createNewDrawPhotoChoosePrompt">Select an image for the user to draw on:</string>
+  <string name="createNewDrawPhotoChooseParent">Use the user\'s response to \n\'{0}\'</string>
+  <string name="createNewDrawPhotoChooseSourceImage">Supply Custom Image</string>
+  <string name="createNewDrawPhotoChosenTask">Using the user\'s response to:\n\"{0}\"</string>
+  <string name="createNewDrawPhotoNothingSelected">Please select an source for the image the user will draw on.</string>
+  <string name="createNewListenChosenPlaceholder">No audio file chosen yet!</string>
+  <string name="createNewListenChosen">Audio file loaded!</string>
+  <string name="createNewListenAudioBtn">Add Audio</string>
+  <string name="createNewListenPopUp">Would you like to choose an existing audio file from your device or record a new one?</string>
+  <string name="createNewListenExisting">Choose Existing</string>
+  <string name="createNewListenNew">Record New</string>
+  <string name="createNewListenNoFile">Please choose or record an audio file!</string>
+  <string name="createTaskChildrenAdd">Add Follow-Up Tasks</string>
+  <string name="createTaskChildrenManage">Manage Follow-Up Tasks</string>
+  <string name="createTaskChildrenDesc">These tasks will become available to the learner once they have completed your \'{0}\' task.</string>
+  <string name="createTaskChildrenFinish">Save and Return</string>
+  <string name="createFinishActivityHeader">Nearly Finished!</string>
+  <string name="createFinishActivityPublicCheck">I want this activity to be publicly accessible</string>
+  <string name="createFinishActivityReqNameCheck">Require that users enter their name(s)</string>
+  <string name="createFinishActivityPublicExplanation">By making an activity public, you\'re allowing anyone else to be able to find and use it. <b>Untick this if you only want to share it privately.</b></string>
+  <string name="createFinishActivityReqNameExplanation">This is useful if you expect several users to be sharing devices and/or accounts</string>   
+  <string name="createFinishActivityPlaceHeader">Is this activity specific to a location?</string>
+  <string name="createFinishActivityPlaceExplanation">If your activity relies on the user being in a specific place, add it here.</string>
+  <string name="createFinishActivityPlaceChosenHeader">Places:</string>
+  <string name="createFinishActivityPlaceBtn">Add Place</string>
+  <string name="createFinishActivityPlaceChoose">Choose a place to add to your activity:</string>
+  <string name="createFinishActivityPlaceExists">That place has already been added!</string>
+  <string name="createFinishActivityTerms">I have read and accept the <a href="https://ourplace.app/terms">terms and conditions</a></string>
+  <string name="createFinishActivityUploadBtn">Finish and Upload</string>
+  <string name="createFinishActivityTermsErr">You must agree to the terms and conditions before proceeding.</string>
+  <string name="uploadsNone">No uploads pending</string>
+  <string name="uploadsSome">Your pending uploads:</string>
+  <string name="uploadBtn">Upload</string>
+  <string name="uploadsUploadingFiles">Uploading Files</string>
+  <string name="uploadsUploadingActivity">Publishing Activity</string>
+  <string name="uploadsUploadingItem">Uploading {0}...</string>
+  <string name="uploadsUploadSuccessTitle">Success!</string>
+  <string name="uploadsUploadSuccessMessage">Your activity has been uploaded!</string>
+  <string name="uploadsSizeWarningTitle">Data Warning</string>
+  <string name="uploadsSizeWarningMessage">The files you\'re about to upload are pretty big ({0}{1} total). Make sure you\'re on a WiFi connection to avoid charges!</string>
+  <string name="activityPending">Awaiting approval</string>
+  <string name="deleteTitle">Delete?</string>
+  <string name="deleteMessage">Are you sure you want to delete this? It can\'t be undone!</string>
+  <string name="createdActivityDialogTitle">Your Activity</string>
+  <string name="createdActivityDialogMessage">This activity\'s share code is &lt;b>{0}&lt;/b>&lt;br/>What do you want to do with it?</string>
+  <string name="createdActivityDialogDelete">Delete</string>
+  <string name="createdActivityDialogOpen">Open</string>
+  <string name="createdActivityDialogUnfinishedMessage">This activity is unfinished. What do you want to do with it?</string>
+  <string name="createdFeedTitle">Your Created Activites</string>
+  <string name="createdFeedDesc">The activities that you\'ve created and uploaded</string>
+  <string name="createdLocalTitle">In Progress</string>
+  <string name="createdLocalDesc">You started making these activities, but they haven\'t been uploaded yet!</string>
+  <string name="approveActivityTitle">Curate this Activity</string>
+  <string name="approveActivityMessage">If the content of this activity is appropriate, tap "Approve" so others can use it! Otherwise, tap "Delete" to remove it from the OurPlace server.</string>
+  <string name="approveActivityBtnApprove">Approve</string>
+  <string name="approveActivityBtnDelete">Delete</string>
+  <string name="approveActivityBtnApproveConfirm">Is this activity suitable for use by children?</string>
+  <string name="approveActivityBtnDeleteConfirm">Delete this activity from the OurPlace server? This can\'t be undone!</string>
+  <string name="approveActivityBtnConfirmTitle">Are you sure?</string>
+  <string name="searchAlertTitle">Search for an Activity</string>
+  <string name="searchAlertMessage">Enter the code you have been given to start the activity:</string>
+  <string name="searchFail">Code Invalid</string>
+  <string name="uploadsPrompt">You have items in your uploads queue!</string>
+  <string name="noAppErrTitle">Can\'t Open File</string>
+  <string name="noAppErrMessage">You don\'t have any apps installed on your device which open this type of file. Please download one and try again!</string>
+  <string name="recordingLimit">Recording limit reached!</string>
+  <string name="ttsError">Error: couldn\'t start Text to Speech!</string>
+  <string name="actLoadStart">Preparing activity...</string>
+  <string name="actLoadMessage">Downloading file {0}/{1}</string>
+  <string name="uploadMissing">Error: file not found!</string>
+  <string name="feedRecentTitle">Your recent activities</string>
+  <string name="feedRecentDesc">You\'ve opened these activities recently</string>
+  <string name="feedRecentAlertMessage">Do you want to start this activity, or remove it from your recently used section?</string>
+  <string name="feedRecentAlertDelete">Remove activity</string>
+  <string name="feedRecentAlertStart">Start activity</string>
+  <string name="saveChanges">Save Changes</string>
+  <string name="errorCamera">Couldn\'t open the camera!</string>
+  <string name="updateTitle">Please update the app</string>
+  <string name="updateMessage">This activity was created using a more recent version of OurPlace, so it can\'t be opened. Please download the most recent version and try again!</string>
+  <string name="mapLoadingMessage">Loading the map...</string>
+  <string name="shareCreatorTitle">Want to let {0} see this?</string>
+  <string name="shareCreatorMessage">Do you want to share your work with {0}, the creator of this activity?</string>
+  <string name="actEnterUsernameTitle">Name entry required for this activity</string>
+  <string name="actEnterUsername">Please enter your name(s):</string>
+  <string name="enteredName">Your name(s):</string>
+  <string name="editNameBtn">Edit name</string>
+  <string name="locationHuntArrivedTitle">You\'ve Arrived!</string>
+  <string name="locationHuntArrivedMessage">Congratulations! You\'ve arrived at the target location!</string>
+  <string name="errorCache">Couldn\'t load cached data</string>
+  <string name="loginInfo_whyTitle">Why do I need to log into OurPlace through another service?</string>
+  <string name="loginInfo_whyAnswer">OurPlace uses other social media services to authenticate user accounts through a secure process called OAuth. This lets our users create and sign into accounts, without needing to think up and remember yet another password. It also means you don\'t have to trust us with keeping any passwords safe - we never receive one! You just sign in with a service you likely already have an account for. This makes things easier and more secure for both of us.</string>
+  <string name="loginInfo_whatTitle">What information does OurPlace take from these services?</string>
+  <string name="loginInfo_whatAnswer">We take the minimum amount of information from your social media account in order to provide a good service. We don\'t have access to your friends lists, and we can\'t and won\'t post things on your behalf. We simply store your name, date of birth, a link to your profile picture and your email address.</string>
+  <string name="loginInfo_howTitle">Why do you need this information and how will it be used?</string>
+  <string name="loginInfo_howAnswer">We need an email address to be able to identify you across services. If, for example, you signed into OurPlace with a Google account and then the next week signed in using Facebook, we could see that you\'re the same person thanks to the matching email address. We will not share any of your details with third parties and we will not spam your email account. The other basic profile information is used to personalise your OurPlace experience and help us keep track of how the service is being used.</string>
+</resources>

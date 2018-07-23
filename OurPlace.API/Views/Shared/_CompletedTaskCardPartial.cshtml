@@ -1,0 +1,39 @@
+﻿@model OurPlace.API.Models.CompletedTask
+
+@{
+    List<string> imageTasks = (List<string>)ViewData["imageTasks"];
+    List<string> linkTasks = (List<string>)ViewData["linkTasks"];
+    string storage = (string)ViewData["storage"];
+}
+
+
+<div class="row">
+    <div class="col s12">
+
+        @if (Model.EventTask.TaskType.IdName == "INFO")
+    {
+        @Html.Partial("TaskCards/_InfoTaskPartial", Model)
+}
+else if (Model.EventTask.TaskType.IdName == "ENTER_TEXT")
+{
+    @Html.Partial("TaskCards/_TextTaskPartial", Model)
+}
+else if (Model.EventTask.TaskType.IdName == "TAKE_VIDEO")
+{
+    @Html.Partial("TaskCards/_VideoTaskPartial", Model)
+}
+else if (Model.EventTask.TaskType.IdName == "MAP_MARK")
+{
+    @Html.Partial("TaskCards/_MapMarkerTaskPartial", Model)
+}
+else if (Model.EventTask.TaskType.IdName == "MULT_CHOICE")
+{
+    @Html.Partial("TaskCards/_MultChoiceTaskPartial", Model)
+}
+else
+{
+    @Html.Partial("TaskCards/_GenericTaskPartial", Model)
+}
+
+    </div>
+</div>

@@ -1,0 +1,18 @@
+﻿@model OurPlace.API.Models.CompletedTask
+
+@{
+        <div class="card horizontal">
+            <div class="card-stacked">
+                <div class="card-content">
+                    <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                    <h3 class="card-title">@Model.EventTask.Description</h3>
+
+                    <br/>
+
+                    <h4>@Model.JsonData</h4>
+
+                </div>
+            </div>
+        </div>
+
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <OurPlace.Android.AutoFitTextureView
+        android:id="@+id/texture"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center" />
+    <FFImageLoading.Views.ImageViewAsync
+        android:id="@+id/targetPhoto"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible"
+        android:scaleType="fitCenter"
+        android:layout_centerInParent="true"
+        android:layout_alignTop="@id/texture"
+        android:layout_alignBottom="@id/texture"
+        android:alpha="0.45" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:background="#000000"
+        android:paddingTop="10dp"
+        android:paddingBottom="30dp">
+        <Button
+            android:id="@+id/takePictureBtn"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/TakePhotoButton" />
+    </FrameLayout>
+</RelativeLayout>

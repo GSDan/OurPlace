@@ -1,0 +1,38 @@
+﻿
+@model OurPlace.API.Models.CompletedTask
+
+@{
+    <div class="card horizontal">
+        <div class="card-stacked">
+            <div class="card-content">
+                <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+                <h3 class="card-title">@Model.EventTask.Description</h3>
+
+                <br /><br/>
+                @{
+                    int chosenIndex = -1;
+
+                    int.TryParse(Model.JsonData, out chosenIndex);
+
+                    string[] options = Json.Decode<string[]>(Model.EventTask.JsonData);
+
+                    for (int i = 0; i < options.Length; i++)
+                    {
+                        if (i == chosenIndex)
+                        {
+                            <input type="radio" name="foo" value="Y" checked>
+                        }
+                        else
+                        {
+                            <input type="radio" name="foo" value="N" disabled>
+                        }
+                        @options[i]
+                        <br/>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+
+}

@@ -1,0 +1,193 @@
+#region copyright
+/*
+    OurPlace is a mobile learning platform, designed to support communities
+    in creating and sharing interactive learning activities about the places they care most about.
+    https://github.com/GSDan/OurPlace
+    Copyright (C) 2018 Dan Richardson
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses.
+*/
+#endregion
+using Android.App;
+using Android.Content;
+using Android.Content.PM;
+using Android.Gms.Common.Apis;
+using Android.Gms.Location;
+using Android.OS;
+using Android.Views;
+using Android.Widget;
+using FFImageLoading;
+using FFImageLoading.Views;
+using Newtonsoft.Json;
+using OurPlace.Android.Fragments;
+using OurPlace.Common;
+using OurPlace.Common.Models;
+using System.IO;
+using System;
+using Android.Gms.Common;
+using Android.Locations;
+using System.Threading.Tasks;
+using static OurPlace.Common.LocalData.Storage;
+
+namespace OurPlace.Android.Activities
+{
+    [Activity(Label = "CameraActivity")]//, ScreenOrientation = ScreenOrientation.Portrait)]
+    public class CameraActivity : Activity, GoogleApiClient.IConnectionCallbacks, GoogleApiClient.IOnConnectionFailedListener
+    {
+        public AppTask learningTask;
+        public int activityId;
+        private GoogleApiClient googleApiClient;
+        private LocationRequest locRequest;
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            SetContentView(Resource.Layout.CameraActivity);
+
+            string jsonData = Intent.GetStringExtra("JSON") ?? "";
+            learningTask = JsonConvert.DeserializeObject<AppTask>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+            activityId = Intent.GetIntExtra("ACTID", -1);
+
+            if (bundle == null)
+            {
+                if (learningTask.TaskType.IdName == "TAKE_VIDEO")
+                {
+                    RequestedOrientation = ScreenOrientation.Landscape;
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+                    {
+                        FragmentManager.BeginTransaction().Replace(Resource.Id.container, Camera2VideoFragment.NewInstance()).Commit();
+                    }
+                    else
+                    {
+                        FragmentManager.BeginTransaction().Replace(Resource.Id.container, Camera1VideoFragment.NewInstance()).Commit();
+                    }
+                }
+                else
+                {
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+                    {
+                        FragmentManager.BeginTransaction().Replace(Resource.Id.container, Camera2Fragment.NewInstance()).Commit();
+                    }
+                    else
+                    {
+                        FragmentManager.BeginTransaction().Replace(Resource.Id.container, Camera1Fragment.NewInstance()).Commit();
+                    }
+                }
+            }
+
+            if (AndroidUtils.IsGooglePlayServicesInstalled(this) && googleApiClient == null)
+            {
+                googleApiClient = new GoogleApiClient.Builder(this)
+                    .AddConnectionCallbacks(this)
+                    .AddOnConnectionFailedListener(this)
+                    .AddApi(LocationServices.API)
+                    .Build();
+                locRequest = new LocationRequest();
+            }
+        }
+
+        public async void LoadIfPhotoMatch(View view)
+        {
+            if (learningTask.TaskType.IdName == "MATCH_PHOTO")
+            {
+                ImageViewAsync targetImageView = view.FindViewById<ImageViewAsync>(Resource.Id.targetPhoto);
+                string imageUrl = learningTask.JsonData;
+                string localRes = GetCacheFilePath(imageUrl,
+                    activityId,
+                    ServerUtils.GetFileExtension(learningTask.TaskType.IdName));
+
+                // Image hasn't been locally cached, try to download remote version
+                if (!File.Exists(localRes))
+                {
+                    Toast.MakeText(this, Resource.String.PleaseWait, ToastLength.Long).Show();
+                    await ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
+                        .DownSample(width: 500)
+                        .IntoAsync(targetImageView);
+                }
+                else
+                {
+                    // Load the local file
+                    await ImageService.Instance.LoadFile(localRes).DownSample(width: 500)
+                        .IntoAsync(targetImageView);
+                }
+
+                targetImageView.Visibility = ViewStates.Visible;
+            }
+        }
+
+        public void ReturnWithFile(string filePath)
+        {
+            // add location to EXIF if it's known
+            global::Android.Locations.Location loc = GetLastLocation();
+            if (loc != null)
+            {
+                AndroidUtils.LocationToEXIF(filePath, loc);
+            }
+
+            Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
+            myIntent.PutExtra("TASK_ID", learningTask.Id);
+            myIntent.PutExtra("FILE_PATH", filePath);
+            SetResult(Result.Ok, myIntent);
+            Finish();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            if (googleApiClient != null)
+            {
+                googleApiClient.Connect();
+            }
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+
+            if (googleApiClient != null && googleApiClient.IsConnected)
+            {
+                googleApiClient.Disconnect();
+            }
+        }
+
+        public void OnConnected(Bundle connectionHint)
+        {
+            Console.WriteLine("Google API client connected!");
+        }
+
+        public void OnConnectionSuspended(int cause)
+        {
+            Console.WriteLine("Google API client suspended!");
+        }
+
+        public void OnConnectionFailed(ConnectionResult result)
+        {
+            Console.WriteLine("Google API client suspended!");
+            Toast.MakeText(this, "Failed to get your location", ToastLength.Long).Show();
+        }
+
+        public global::Android.Locations.Location GetLastLocation()
+        {
+            if (googleApiClient != null && googleApiClient.IsConnected)
+            {
+                return LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+}

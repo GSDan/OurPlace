@@ -1,0 +1,48 @@
+﻿@model OurPlace.API.Models.CompletedTask
+
+@{
+    List<string> imageTasks = (List<string>)ViewData["imageTasks"];
+    List<string> linkTasks = (List<string>)ViewData["linkTasks"];
+    string storage = (string)ViewData["storage"];
+}
+
+<div class="card">
+    <div class="card-head">
+        <img src='@Model.EventTask.TaskType.IconUrl' class="task-icon" />
+        <h3 class="card-title">@Model.EventTask.Description</h3>
+    </div>
+
+    <div class="card-uploaded">
+        <div class="card-content">
+            @if (linkTasks.Contains(Model.EventTask.TaskType.IdName))
+            {
+                string[] links = Json.Decode<string[]>(Model.JsonData);
+
+                if (Model.EventTask.TaskType.IdName == "MATCH_PHOTO")
+                {
+                    <div class="textOverImage photoMatchTarget" style="display: inline-block;">
+                        <img src='@(storage + Model.EventTask.JsonData)' class="materialboxed" />
+                        <h5><span>Target Image</span></h5>
+                    </div>
+
+                }
+
+                if (links != null)
+                {
+                    foreach (var l in links)
+                    {
+                        string src = storage + l;
+                        if (imageTasks.Contains(Model.EventTask.TaskType.IdName))
+                        {
+                            <img src='@src' width="250px" class="materialboxed" />
+                        }
+                        else if (Model.EventTask.TaskType.IdName == "REC_AUDIO")
+                        {
+                            <audio src="@src" controls="controls" />
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>

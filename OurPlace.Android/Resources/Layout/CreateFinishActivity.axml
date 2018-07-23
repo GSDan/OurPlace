@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:focusableInTouchMode="true"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/app_darkgreen"
+            android:text="@string/createFinishActivityHeader"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:textSize="28sp"
+            android:layout_margin="10dp" />
+        <CheckBox
+            android:id="@+id/checkboxPublic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="True"
+            android:text="@string/createFinishActivityPublicCheck"
+            android:textSize="22sp"
+            android:padding="8dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityPublicExplanation"
+            android:textSize="20sp"
+            android:layout_marginBottom="20dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityPlaceHeader"
+            android:textSize="22sp"
+            android:textColor="@color/app_darkgreen"
+            android:gravity="center"
+            android:layout_marginBottom="6dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityPlaceExplanation"
+            android:textSize="20sp"
+            android:layout_marginBottom="6dp"
+            android:id="@+id/textView2" />
+        <LinearLayout
+            android:id="@+id/placesRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_margin="12dp"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/app_darkgreen"
+                android:text="@string/createFinishActivityPlaceChosenHeader"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="italic"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/addPlaceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityPlaceBtn"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="6dp" />
+        <CheckBox
+            android:id="@+id/checkboxReqName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/createFinishActivityReqNameCheck"
+            android:textSize="22sp"
+            android:padding="8dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityReqNameExplanation"
+            android:textSize="20sp"
+            android:layout_marginBottom="26dp" />
+        <Button
+            android:id="@+id/uploadBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/createFinishActivityUploadBtn"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</ScrollView>

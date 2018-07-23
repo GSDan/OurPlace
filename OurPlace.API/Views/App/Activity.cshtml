@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = ViewData["actname"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<div class="row center-align">
+    <div class="col col-sm-8 col-sm-offset-2">
+        <div class="card">
+            <div class="card-image textOverImage">
+                <img src='@ViewData["actImg"]' class="resizeimgLg" />
+                <h2><span>@ViewData["actName"]</span></h2>
+            </div>
+            <div class="card-content" style="padding-top: 0px;">
+                <i><h5>@ViewData["actDesc"]</h5></i>
+
+                <br />
+
+                <h6>Share code:</h6>
+                <h4>@ViewData["actShare"]</h4>
+
+                @if (ViewData["qrCode"] != null)
+    {
+            <!-- Open the QR Code in new tab when clicked for easy viewing/saving/printing -->
+            <a href='@ViewData["qrCode"]' target="_blank">
+                <img width="35%" src='@ViewData["qrCode"]' />
+                <p style="margin-top:0px;padding-top:0px"><i><small>Click to enlarge QR code</small></i></p>
+            </a>
+}
+
+                <p>This page has been visited @ViewData["viewCount"] times</p>
+
+                <br />
+                <div id="androidOnly" style="display:none">
+                    <a class="waves-effect waves-light btn" href=@ViewData["intent"]>Open in OurPlace</a>
+                </div>
+                <div id="iosOnly" style="display:none">
+                    <a class="waves-effect waves-light btn" href=@ViewData["intent"]>Open in OurPlace</a>
+                </div>
+                <div id="otherDevices">
+                    <p>Unfortunately, Park:Learn does not currently support your device. Download the OurPlace app from Google Play to try out this activity!</p>
+                    <br />
+                    <a href='https://play.google.com/store/apps/details?id=com.park.learn&utm_source=Website-QR&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1' target="_blank">
+                        <img alt='Get it on Google Play' class="center-align" src='https://play.google.com/intl/en_gb/badges/images/generic/en_badge_web_generic.png' width="180px" />
+                    </a>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var otherDevices = document.getElementById('otherDevices');
+    var androidOnly = document.getElementById('androidOnly');
+    var ua = navigator.userAgent.toLowerCase();
+    var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+    if (isAndroid) {
+        androidOnly.style.display = 'block';
+        otherDevices.style.display = 'none';
+    }
+</script>
