@@ -4,12 +4,24 @@
 
 <p align="center">
 	OurPlace is a mobile learning platform, designed to support communities in creating and sharing interactive learning activities about the places they care most about.
-</p>
-
-<p align="center">
+	<br><br>
+	<p align="center">
 	<img src="https://raw.githubusercontent.com/GSDan/OurPlace/master/Media/screenshotDevice.png" height="500" align="center">
 	<img src="https://raw.githubusercontent.com/GSDan/OurPlace/master/Media/iphonexspacegrey_portrait.png" height="500" align="center">
 </p>
+
+<p align="center">
+	<br>
+	<a href="https://ourplace.app">Visit the OurPlace website</a>
+	<br><br>
+    <a href="https://itunes.apple.com/us/app/ourplace/id1378985779?ls=1&amp;mt=8">
+        <img alt="Get it on the App Store" src="https://ourplace.app/Content/img/icons/appStore.svg" height="50">
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.park.learn&amp;utm_source=Website-GettingStarted&amp;pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1">
+        <img alt="Get it on Google Play" src="https://ourplace.app/Content/img/icons/googlePlayBadge.png" height="50">
+    </a>
+</p>
+
 
 ## What is OurPlace?
 OurPlace is a mobile platform which supports the creation, sharing and completion of highly customisable mobile learning activities. These activities are built by combining together bite-size modular tasks, which can each ask the user to perform a particular action. Tasks can ask the learner to take photos or video, record an audio clip, listen to a given audio clip, match an existing image (by comparing to an image overlay), draw a picture, draw on top of an existing image, mark locations on a map, navigate to a given location, answer a multiple choice question or simply read a piece of text.
