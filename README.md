@@ -30,11 +30,12 @@ This project uses version 4.6.1 of the .NET Framework, and contains both a ASP .
 ### OurPlace.Android & OurPlace.iOS
 These projects use Xamarin.Android and Xamarin.iOS to produce native mobile applications using a C# codebase. While much of the core logic is shared through reference to OurPlace.Common, both applications contain large amounts of platform-specific code which deals with GUI interactions and native functionality.
 ***Please note that a machine running OSX is required to build OurPlace.iOS***
+	
+
+> I created OurPlace as a part of my [EPSRC funded](http://gow.epsrc.ac.uk/NGBOViewGrant.aspx?GrantRef=EP/L016176/1) [Digital Civics](https://digitalcivics.io/) PhD at Open Lab.<br>It is free to use under the GNU General Public License v3.0, a copy of which can be found in this repository.
+
 
 <p align="center">
-<br>
-I created OurPlace as a part of my [EPSRC funded](http://gow.epsrc.ac.uk/NGBOViewGrant.aspx?GrantRef=EP/L016176/1) [Digital Civics](https://digitalcivics.io/) PhD at Open Lab.<br>It is free to use under the GNU General Public License v3.0, a copy of which can be found in this repository.
-<br>
 	<img src="http://s3.amazonaws.com/libapps/accounts/21667/images/epsrc-lowres.jpg" height="100" align="center">
 	<img src="http://indigomultimedia.com/wp-content/uploads/2016/11/dc-dark.svg" height="150" align="center">
 	<img src="http://www.collectionsdivetwmuseums.org.uk/img/logos/ncl-light.jpeg" height="100" align="center">
