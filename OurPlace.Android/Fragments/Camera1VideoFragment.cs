@@ -146,8 +146,8 @@ namespace OurPlace.Android.Fragments
                 id = ((CameraActivity)Activity).activityId.ToString();
             }
 
-            outputPath = new Java.IO.File(Activity.GetExternalFilesDir(null), 
-                         ((CameraActivity)Activity).learningTask.Id + ".mp4").AbsolutePath;
+            outputPath = new Java.IO.File(Activity.GetExternalFilesDir(null),
+                         DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".mp4").AbsolutePath;
 
             if (File.Exists(outputPath)) File.Delete(outputPath);
 

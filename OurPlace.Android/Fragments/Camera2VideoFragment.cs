@@ -35,6 +35,7 @@ using Java.Lang;
 using Java.Util;
 using Java.Util.Concurrent;
 using OurPlace.Android.Activities;
+using System;
 using System.Collections.Generic;
 
 namespace OurPlace.Android.Fragments
@@ -43,6 +44,7 @@ namespace OurPlace.Android.Fragments
     {
         private const string TAG = "Camera2VideoFragment";
         private SparseIntArray ORIENTATIONS = new SparseIntArray();
+        private string videoPath;
 
         // Button to record video
         private Button buttonVideo;
@@ -67,7 +69,6 @@ namespace OurPlace.Android.Fragments
 
         private Size videoSize;
         private Size previewSize;
-
 
         private HandlerThread backgroundThread;
         private Handler backgroundHandler;
@@ -382,10 +383,12 @@ namespace OurPlace.Android.Fragments
             if (null == Activity)
                 return;
 
+            videoPath = GetVideoFile(Activity).AbsolutePath;
+
             mediaRecorder.SetAudioSource(AudioSource.Mic);
             mediaRecorder.SetVideoSource(VideoSource.Surface);
             mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
-            mediaRecorder.SetOutputFile(GetVideoFile(Activity).AbsolutePath);
+            mediaRecorder.SetOutputFile(videoPath);
             mediaRecorder.SetVideoEncodingBitRate(5000000);
             mediaRecorder.SetVideoFrameRate(30);
             mediaRecorder.SetVideoSize(videoSize.Width, videoSize.Height);
@@ -403,7 +406,7 @@ namespace OurPlace.Android.Fragments
 
         private File GetVideoFile(Context context)
         {
-            return new File(context.GetExternalFilesDir(null), ((CameraActivity)Activity).learningTask.Id + ".mp4");
+            return new File(context.GetExternalFilesDir(null), DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".mp4");
         }
 
         private void StartRecordingVideo()
@@ -432,7 +435,7 @@ namespace OurPlace.Android.Fragments
             // Workaround for https://github.com/googlesamples/android-Camera2Video/issues/2
             CloseCamera();
 
-            ((CameraActivity)Activity).ReturnWithFile(GetVideoFile(Activity).ToString());
+            ((CameraActivity)Activity).ReturnWithFile(videoPath);
         }
 
         public void OnInfo(MediaRecorder mr, [GeneratedEnum] MediaRecorderInfo what, int extra)

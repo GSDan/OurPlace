@@ -26,25 +26,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="8dp">
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <FFImageLoading.Views.ImageViewAsync
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:src="@mipmap/ic_launcher"
-                        android:id="@+id/taskImage"
-                        android:scaleType="centerCrop"
-                        android:layout_centerInParent="true" />
-                    <FFImageLoading.Views.ImageViewAsync
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/ic_play_circle_filled_white_24dp"
-                        android:id="@+id/playIcon"
-                        android:scaleType="centerCrop"
-                        android:layout_centerInParent="true"
-                        android:visibility="invisible" />
-                </RelativeLayout>
+                <FFImageLoading.Views.ImageViewAsync
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@mipmap/ic_launcher"
+                    android:id="@+id/taskImage"
+                    android:scaleType="centerCrop"
+                    android:padding="8dp" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,6 +59,12 @@
                         android:layout_marginLeft="4dp"
                         android:textSize="15sp"
                         android:paddingBottom="10dp" />
+                    <LinearLayout
+                        android:id="@+id/takenPhotoLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp" />
                     <Button
                         android:id="@+id/taskBtn"
                         android:layout_width="wrap_content"

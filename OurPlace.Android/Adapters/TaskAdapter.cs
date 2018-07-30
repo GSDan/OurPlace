@@ -57,10 +57,10 @@ namespace OurPlace.Android.Adapters
         private readonly Dictionary<string, int> viewTypes;
         public event EventHandler<int> ItemClick;
         public event EventHandler<int> TextEntered;
-        public event EventHandler<int> PlayMedia;
         public event EventHandler<bool> Approved;
         public event EventHandler<int> SpeakText;
         public event EventHandler<int> ChangeName;
+        public Action<int, int> PlayMedia;
         public bool onBind = false;
         public bool curator;
         private bool reqName;
@@ -147,11 +147,11 @@ namespace OurPlace.Android.Adapters
             CheckForChildren(position);
         }
 
-        private void OnPlaybackClick(int position)
+        private void OnPlaybackClick(int taskIndex, int pathIndex)
         {
-            PlayMedia?.Invoke(this, position);
-            items[position].IsCompleted = true;
-            CheckForChildren(position);
+            PlayMedia?.Invoke(taskIndex, pathIndex);
+            items[taskIndex].IsCompleted = true;
+            CheckForChildren(taskIndex);
         }
 
         private void OnChangeNameClick()
@@ -194,14 +194,6 @@ namespace OurPlace.Android.Adapters
 
             List<string> files = JsonConvert.DeserializeObject<List<string>>(items[i].CompletionData.JsonData);
             if (files == null) files = new List<string>();
-
-            if (items[i].TaskType.IdName == "REC_AUDIO" ||
-                items[i].TaskType.IdName == "TAKE_VIDEO" ||
-                items[i].TaskType.IdName == "DRAW_PHOTO" ||
-                items[i].TaskType.IdName == "DRAW")
-            {
-                files.Clear();
-            }
 
             files.Add(json);
 
@@ -373,8 +365,20 @@ namespace OurPlace.Android.Adapters
             {
                 vh = holder as TaskViewHolder_RecordVideo;
                 ((TaskViewHolder_RecordVideo)vh).Button.Text = context.Resources.GetString(Resource.String.RecBtn);
-                ((TaskViewHolder_RecordVideo)vh).ManageVideoThumb(items[position].CompletionData.JsonData, items[position].TaskType.IconUrl);
-                items[position].IsCompleted = (items[position].CompletionData.JsonData != null);
+                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordVideo)vh).TaskImage);
+
+                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
+                {
+                    List<string> videoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
+
+                    ((TaskViewHolder_RecordVideo)vh).ShowResults(videoPaths, context);
+                    items[position].IsCompleted = true;
+                }
+                else
+                {
+                    items[position].IsCompleted = false;
+                    ((TaskViewHolder_RecordVideo)vh).ClearResults();
+                }
             }
             else if (thisType == typeof(TaskViewHolder_Photo))
             {
@@ -397,13 +401,13 @@ namespace OurPlace.Android.Adapters
                 {
                     List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
 
-                    ((TaskViewHolder_Photo)vh).ShowPhotos(photoPaths, context);
+                    ((TaskViewHolder_Photo)vh).ShowResults(photoPaths, context);
                     items[position].IsCompleted = true;
                 }
                 else
                 {
                     items[position].IsCompleted = false;
-                    ((TaskViewHolder_Photo)vh).ClearPhotos();
+                    ((TaskViewHolder_Photo)vh).ClearResults();
                 }
             }
             else if (thisType == typeof(TaskViewHolder_Btn))

@@ -49,22 +49,19 @@ namespace OurPlace.Android.Activities
     [Activity(Label = "OurPlace", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTop)]
     public class ActTaskListActivity : HeaderImageActivity
     {
-        global::Android.Support.V7.Widget.Toolbar toolbar;
-        LearningActivity learningActivity;
-        RecyclerView recyclerView;
-        RecyclerView.LayoutManager layoutManager;
-        TaskAdapter adapter;
-        MediaPlayer player;
-        global::Android.Support.V7.App.AlertDialog playerDialog;
-        DatabaseManager dbManager;
-
-        string enteredName = "";
-
-        //Permissions related stuffs
-        int permReqId = 111;
-        Intent lastReqIntent;
-        int lastReqId;
-        bool shouldSave = true;
+        private global::Android.Support.V7.Widget.Toolbar toolbar;
+        private LearningActivity learningActivity;
+        private RecyclerView recyclerView;
+        private RecyclerView.LayoutManager layoutManager;
+        private TaskAdapter adapter;
+        private MediaPlayer player;
+        private global::Android.Support.V7.App.AlertDialog playerDialog;
+        private DatabaseManager dbManager;
+        private readonly int mediaPlayerReqCode = 222;
+        private string enteredName = "";
+        private int permReqId = 111;
+        private Intent lastReqIntent;
+        private bool shouldSave = true;
 
         protected override async void OnCreate(Bundle savedInstanceState)
         {
@@ -393,44 +390,49 @@ namespace OurPlace.Android.Activities
             }
         }
 
-        private void Adapter_PlayMedia(object sender, int position)
+        private void Adapter_PlayMedia(int taskIndex, int pathIndex)
         {
-            string[] paths = JsonConvert.DeserializeObject<string[]>(
-                adapter.items[position].CompletionData.JsonData);
+            Intent viewActivity = new Intent(this, typeof(MediaViewerActivity));
+            viewActivity.PutExtra("RES_INDEX", pathIndex);
+            viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.items[taskIndex]));
+            StartActivityForResult(viewActivity, mediaPlayerReqCode);
 
-            if (paths == null || paths.Length < 1 || !File.Exists(paths[0]))
-            {
-                Toast.MakeText(this, "Problem accessing file", ToastLength.Short).Show();
-                return;
-            }
+            //string[] paths = JsonConvert.DeserializeObject<string[]>(
+            //    adapter.items[taskIndex].CompletionData.JsonData);
 
-            try
-            {
-                if (adapter.items[position].TaskType.IdName == "TAKE_VIDEO")
-                {
-                    global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(paths[0]);
-                    Intent intent = new Intent(Intent.ActionView, uri);
-                    intent.SetDataAndType(uri, "video/mp4");
-                    StartActivity(intent);
-                }
-                else if (adapter.items[position].TaskType.IdName == "REC_AUDIO")
-                {
-                    global::Android.Net.Uri uri = FileProvider.GetUriForFile(this, base.ApplicationContext.PackageName + ".provider", new Java.IO.File(paths[0]));
-                    Intent intent = new Intent(Intent.ActionView, uri);
-                    intent.SetDataAndType(uri, "audio/mp4");
-                    intent.SetFlags(ActivityFlags.GrantReadUriPermission);
-                    StartActivity(intent);
-                }
-            }
-            catch (ActivityNotFoundException)
-            {
-                // The user doesn't have any apps installed to play audio/video files
-                new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                    .SetTitle(Resource.String.noAppErrTitle)
-                    .SetMessage(Resource.String.noAppErrMessage)
-                    .SetPositiveButton(Resource.String.dialog_ok, (e, i) => { })
-                    .Show();
-            }
+            //if (paths == null || paths.Length <= pathIndex || !File.Exists(paths[pathIndex]))
+            //{
+            //    Toast.MakeText(this, "Problem accessing file", ToastLength.Short).Show();
+            //    return;
+            //}
+
+            //try
+            //{
+            //    if (adapter.items[taskIndex].TaskType.IdName == "TAKE_VIDEO")
+            //    {
+            //        global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(paths[pathIndex]);
+            //        Intent intent = new Intent(Intent.ActionView, uri);
+            //        intent.SetDataAndType(uri, "video/mp4");
+            //        StartActivity(intent);
+            //    }
+            //    else if (adapter.items[taskIndex].TaskType.IdName == "REC_AUDIO")
+            //    {
+            //        global::Android.Net.Uri uri = FileProvider.GetUriForFile(this, base.ApplicationContext.PackageName + ".provider", new Java.IO.File(paths[pathIndex]));
+            //        Intent intent = new Intent(Intent.ActionView, uri);
+            //        intent.SetDataAndType(uri, "audio/mp4");
+            //        intent.SetFlags(ActivityFlags.GrantReadUriPermission);
+            //        StartActivity(intent);
+            //    }
+            //}
+            //catch (ActivityNotFoundException)
+            //{
+            //    // The user doesn't have any apps installed to play audio/video files
+            //    new global::Android.Support.V7.App.AlertDialog.Builder(this)
+            //        .SetTitle(Resource.String.noAppErrTitle)
+            //        .SetMessage(Resource.String.noAppErrMessage)
+            //        .SetPositiveButton(Resource.String.dialog_ok, (e, i) => { })
+            //        .Show();
+            //}
 
         }
 
@@ -456,7 +458,7 @@ namespace OurPlace.Android.Activities
 
             if (hasPerm)
             {
-                StartActivityForResult(lastReqIntent, lastReqId);
+                StartActivityForResult(lastReqIntent, 111);
             }
             else
             {

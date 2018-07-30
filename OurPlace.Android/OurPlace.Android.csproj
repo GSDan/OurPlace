@@ -252,6 +252,7 @@
     <Compile Include="Activities\LoginResultActivity.cs" />
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\DrawingActivity.cs" />
+    <Compile Include="Activities\MediaViewerActivity.cs" />
     <Compile Include="Activities\RecordAudioActivity.cs" />
     <Compile Include="Activities\LoginInfoActivity.cs" />
     <Compile Include="Activities\SplashActivity.cs" />
@@ -833,6 +834,11 @@
       <Project>{5b5454ab-9a19-447f-850a-e0c1c24a9ae1}</Project>
       <Name>OurPlace.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Layout\MediaViewerActivity.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
