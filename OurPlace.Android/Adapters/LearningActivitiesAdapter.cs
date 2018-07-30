@@ -156,7 +156,7 @@ namespace OurPlace.Android.Adapters
             {
                 imTask = ImageService.Instance.LoadCompiledResource("logoRect");
             }
-            else if (thisAct.ImageUrl.StartsWith("/storage", StringComparison.Ordinal))
+            else if (thisAct.ImageUrl.StartsWith("/data", StringComparison.Ordinal))
             {
                 imTask = ImageService.Instance.LoadFile(thisAct.ImageUrl);
             }

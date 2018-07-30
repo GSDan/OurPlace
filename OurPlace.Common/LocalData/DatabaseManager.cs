@@ -244,7 +244,14 @@ namespace OurPlace.Common.LocalData
             {
                 foreach(ActivityCache c in found)
                 {
-                    toRet.Add(JsonConvert.DeserializeObject<LearningActivity>(c.JsonData));
+                    try
+                    {
+                        toRet.Add(JsonConvert.DeserializeObject<LearningActivity>(c.JsonData));
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
 

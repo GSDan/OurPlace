@@ -84,7 +84,7 @@ namespace OurPlace.Android.Fragments
                     cached = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(jsonCache,
                         new JsonSerializerSettings
                         {
-                            TypeNameHandling = TypeNameHandling.Objects,
+                            //TypeNameHandling = TypeNameHandling.Objects,
                             ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                             MaxDepth = 10
                         });
@@ -94,6 +94,8 @@ namespace OurPlace.Android.Fragments
                     Console.WriteLine(e.Message);
                     Toast.MakeText(Activity, Resource.String.errorCache, ToastLength.Long).Show();
                     cached = new List<ActivityFeedSection>();
+                    dbManager.currentUser.CachedActivitiesJson = null;
+                    dbManager.AddUser(dbManager.currentUser);
                 }
             }
             else
@@ -218,72 +220,79 @@ namespace OurPlace.Android.Fragments
 
         private async void LoadData(bool withLocation = false)
         {
-            loading = true;
-            refresher.Refreshing = true;
-
-            // Default location values, ignored if 0,0
-            double lat = 0;
-            double lon = 0;
-
-            if (googleApiClient != null && withLocation && googleApiClient.IsConnected)
+            try
             {
-                await Task.Run(() => {
+                loading = true;
+                refresher.Refreshing = true;
 
-                    global::Android.Locations.Location lastKnown = LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
-                    if (lastKnown != null)
-                    {
-                        lat = lastKnown.Latitude;
-                        lon = lastKnown.Longitude;
-                    }
+                // Default location values, ignored if 0,0
+                double lat = 0;
+                double lon = 0;
 
-                });
-            }
-
-            Common.ServerResponse<List<ActivityFeedSection>> results =
-                await Common.ServerUtils.Get<List<ActivityFeedSection>>(
-                    string.Format("/api/learningactivities/GetFeed?lat={0}&lon={1}", lat, lon));
-
-            refresher.Refreshing = false;
-
-            if (results == null)
-            {
-                var suppress = AndroidUtils.ReturnToSignIn(Activity);
-                Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
-                return;
-            }
-
-            if (!results.Success && IsAdded && Activity != null)
-            {
-                // if token invalid, return to signin 
-                if(Common.ServerUtils.CheckNeedsLogin(results.StatusCode))
+                if (googleApiClient != null && withLocation && googleApiClient.IsConnected)
                 {
-                    var suppress = AndroidUtils.ReturnToSignIn(this.Activity);
+                    await Task.Run(() => {
+
+                        global::Android.Locations.Location lastKnown = LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
+                        if (lastKnown != null)
+                        {
+                            lat = lastKnown.Latitude;
+                            lon = lastKnown.Longitude;
+                        }
+
+                    });
+                }
+
+                Common.ServerResponse<List<ActivityFeedSection>> results =
+                    await Common.ServerUtils.Get<List<ActivityFeedSection>>(
+                        string.Format("/api/learningactivities/GetFeed?lat={0}&lon={1}", lat, lon));
+
+                refresher.Refreshing = false;
+
+                if (results == null)
+                {
+                    var suppress = AndroidUtils.ReturnToSignIn(Activity);
+                    Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
                     return;
                 }
 
-                Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
-                return;
-            }
-
-            // Save this in the offline cache
-            dbManager.currentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
-                new JsonSerializerSettings
+                if (!results.Success && IsAdded && Activity != null)
                 {
-                    TypeNameHandling = TypeNameHandling.Objects,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                    MaxDepth = 6
-                });
-            dbManager.AddUser(dbManager.currentUser);
+                    // if token invalid, return to signin 
+                    if (Common.ServerUtils.CheckNeedsLogin(results.StatusCode))
+                    {
+                        var suppress = AndroidUtils.ReturnToSignIn(this.Activity);
+                        return;
+                    }
 
-            // Check for recently opened activities
-            ActivityFeedSection recents = LoadRecent();
-            if (recents != null) results.Data.Insert(0, recents);
+                    Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
+                    return;
+                }
 
-            adapter.data = results.Data;
-            adapter.NotifyDataSetChanged();
-            ForceRefresh = false;
-            loaded = true;
-            loading = false;
+                // Save this in the offline cache
+                dbManager.currentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                    new JsonSerializerSettings
+                    {
+                        TypeNameHandling = TypeNameHandling.Objects,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 6
+                    });
+                dbManager.AddUser(dbManager.currentUser);
+
+                // Check for recently opened activities
+                ActivityFeedSection recents = LoadRecent();
+                if (recents != null) results.Data.Insert(0, recents);
+
+                adapter.data = results.Data;
+                adapter.NotifyDataSetChanged();
+                ForceRefresh = false;
+                loaded = true;
+                loading = false;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         /// <summary>

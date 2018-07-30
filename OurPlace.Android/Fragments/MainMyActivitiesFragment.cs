@@ -67,26 +67,35 @@ namespace OurPlace.Android.Fragments
 
         private async Task InitialLoad()
         {
-            dbManager = await Storage.GetDatabaseManager();
-
-            // Load from cached data from the database if available, 
-            // just in case we can't contact the server
-            string jsonCache = dbManager.currentUser.RemoteCreatedActivitiesJson;
-            List<LearningActivity> cached = null;
-
-            if (!string.IsNullOrWhiteSpace(jsonCache))
+            try
             {
-                cached = JsonConvert.DeserializeObject<List<LearningActivity>>(jsonCache,
-                    new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.Objects,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                        MaxDepth = 10
-                    });
-            }
+                dbManager = await Storage.GetDatabaseManager();
 
-            LoadIntoFeed(cached);
-            LoadData();
+                // Load from cached data from the database if available, 
+                // just in case we can't contact the server
+                string jsonCache = dbManager.currentUser.RemoteCreatedActivitiesJson;
+                List<LearningActivity> cached = null;
+
+                if (!string.IsNullOrWhiteSpace(jsonCache))
+                {
+                    cached = JsonConvert.DeserializeObject<List<LearningActivity>>(jsonCache,
+                        new JsonSerializerSettings
+                        {
+                            //TypeNameHandling = TypeNameHandling.Objects,
+                            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                            MaxDepth = 10
+                        });
+                }
+
+                LoadIntoFeed(cached);
+                LoadData();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                dbManager.currentUser.RemoteCreatedActivitiesJson = null;
+                dbManager.AddUser(dbManager.currentUser);
+            }
         }
 
         public override async void OnResume()
@@ -130,38 +139,45 @@ namespace OurPlace.Android.Fragments
 
         private async void LoadData()
         {
-            loading = true;
-            refresher.Refreshing = true;
-            Common.ServerResponse<List<LearningActivity>> results =
-                await Common.ServerUtils.Get<List<LearningActivity>>(
-                    "/api/learningactivities/getfromuser/?creatorId=" + dbManager.currentUser.Id);
-            refresher.Refreshing = false;
-
-            if(results == null)
+            try
             {
-                var suppress = AndroidUtils.ReturnToSignIn(Activity);
-                Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
-                return;
-            }
+                loading = true;
+                refresher.Refreshing = true;
+                Common.ServerResponse<List<LearningActivity>> results =
+                    await Common.ServerUtils.Get<List<LearningActivity>>(
+                        "/api/learningactivities/getfromuser/?creatorId=" + dbManager.currentUser.Id);
+                refresher.Refreshing = false;
 
-            if (!results.Success)
-            {
-                Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
-                return;
-            }
-
-            // Save this in the offline cache
-            dbManager.currentUser.RemoteCreatedActivitiesJson = JsonConvert.SerializeObject(results.Data,
-                new JsonSerializerSettings
+                if (results == null)
                 {
-                    TypeNameHandling = TypeNameHandling.Objects,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                    MaxDepth = 5
-                });
-            dbManager.AddUser(dbManager.currentUser);
+                    var suppress = AndroidUtils.ReturnToSignIn(Activity);
+                    Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                    return;
+                }
 
-            LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
-            loading = false;
+                if (!results.Success)
+                {
+                    Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
+                    return;
+                }
+
+                // Save this in the offline cache
+                dbManager.currentUser.RemoteCreatedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                    new JsonSerializerSettings
+                    {
+                        TypeNameHandling = TypeNameHandling.Objects,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 5
+                    });
+                dbManager.AddUser(dbManager.currentUser);
+
+                LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
+                loading = false;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private void LoadIntoFeed(List<LearningActivity> remoteData)

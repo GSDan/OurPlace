@@ -24,7 +24,6 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
 using FFImageLoading;
@@ -50,8 +49,9 @@ namespace OurPlace.Android.Activities.Create
         global::Android.Net.Uri outputFileUri;
         global::Android.Net.Uri previousFileUri;
         string finalImagePath;
-        int photoRequestCode = 111;
-        int permRequestCode = 222;
+        readonly int photoRequestCode = 111;
+        readonly int permRequestCode = 222;
+        Intent lastReqIntent;
         bool editing = false;
 
         LearningActivity newActivity;
@@ -116,25 +116,23 @@ namespace OurPlace.Android.Activities.Create
 
         private void ImageView_Click(object sender, EventArgs e)
         {
-            string permission = global::Android.Manifest.Permission.Camera;
-            Permission currentPerm = ContextCompat.CheckSelfPermission(this, permission);
-            if (currentPerm != Permission.Granted)
-            {
-                AndroidUtils.CheckGetPermission(permission,
-                this, permRequestCode, Resources.GetString(Resource.String.permissionCameraTitle),
-                Resources.GetString(Resource.String.permissionPhotoExplanation));
-            }
-            else
-            {
-                FirePhotoIntent(currentPerm == Permission.Granted);
-            }
-        }
-
-        private void FirePhotoIntent(bool includeCamera)
-        {
             UpdateFiles();
-            Intent finalIntent = AndroidUtils.CreateMultiSourceImagePickerIntent(includeCamera, outputFileUri, this);
-            StartActivityForResult(finalIntent, photoRequestCode);
+            lastReqIntent = AndroidUtils.CreateMultiSourceImagePickerIntent(true, outputFileUri, this);
+
+            // Requires both camera and storage permissions
+            AndroidUtils.CallWithPermission(new string[]{
+                global::Android.Manifest.Permission.Camera,
+                global::Android.Manifest.Permission.ReadExternalStorage,
+                global::Android.Manifest.Permission.WriteExternalStorage
+            }, new string[] {
+                Resources.GetString(Resource.String.permissionCameraTitle),
+                Resources.GetString(Resource.String.permissionFilesTitle),
+                Resources.GetString(Resource.String.permissionFilesTitle)
+            }, new string[] {
+                Resources.GetString(Resource.String.permissionPhotoExplanation),
+                Resources.GetString(Resource.String.permissionFilesExplanation),
+                Resources.GetString(Resource.String.permissionFilesExplanation)
+            }, lastReqIntent, photoRequestCode, permRequestCode, this);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
@@ -142,7 +140,7 @@ namespace OurPlace.Android.Activities.Create
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == permRequestCode)
             {
-                FirePhotoIntent(grantResults[0] == Permission.Granted);
+                StartActivityForResult(lastReqIntent, photoRequestCode);
             }
         }
 

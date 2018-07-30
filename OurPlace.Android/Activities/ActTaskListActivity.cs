@@ -95,8 +95,8 @@ namespace OurPlace.Android.Activities
                 if (progress != null)
                 {
                     enteredName = progress.EnteredUsername;
-                    appTasks = JsonConvert.DeserializeObject<List<AppTask>>(progress.AppTaskJson,
-                        new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+                    appTasks = JsonConvert.DeserializeObject<List<AppTask>>(progress.AppTaskJson);
+                       // new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
                 }
             }
             catch (Exception e)
@@ -434,63 +434,6 @@ namespace OurPlace.Android.Activities
 
         }
 
-        private async void CallWithPermission(string[] perms, string[] explanationTitles, string[] explanations, Intent toCall, int intentId)
-        {
-            lastReqIntent = toCall;
-            lastReqId = intentId;
-
-            List<string> neededPerms = new List<string>();
-            int accountedFor = 0;
-
-            for (int i = 0; i < perms.Length; i++)
-            {
-                if (ContextCompat.CheckSelfPermission(this, perms[i]) != Permission.Granted)
-                {
-                    // Haven't got the permision yet
-                    string thisPerm = perms[i];
-
-                    // Show an explanation of why it's needed if necessary
-                    if (ActivityCompat.ShouldShowRequestPermissionRationale(this, perms[i]))
-                    {
-                        global::Android.Support.V7.App.AlertDialog dialog = new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                            .SetTitle(explanationTitles[i])
-                            .SetMessage(explanations[i])
-                            .SetPositiveButton("Got it", (s, e) =>
-                            {
-                                neededPerms.Add(thisPerm);
-                                accountedFor++;
-                            })
-                            .Create();
-                        dialog.Show();
-                    }
-                    else
-                    {
-                        // No explanation needed, just ask
-                        neededPerms.Add(perms[i]);
-                        accountedFor++;
-                    }
-                }
-                else
-                {
-                    accountedFor++;
-                }
-            }
-
-            while (accountedFor < perms.Length)
-            {
-                await System.Threading.Tasks.Task.Delay(20);
-            }
-
-            if (neededPerms.Count == 0)
-            {
-                StartActivityForResult(lastReqIntent, lastReqId);
-            }
-            else
-            {
-                ActivityCompat.RequestPermissions(this, neededPerms.ToArray(), permReqId);
-            }
-        }
-
         // Called when the user has given/denied permission
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
@@ -542,14 +485,26 @@ namespace OurPlace.Android.Activities
 
             if (taskType == "TAKE_VIDEO" || taskType == "TAKE_PHOTO" || taskType == "MATCH_PHOTO")
             {
-                Intent camActivity = new Intent(this, typeof(CameraActivity));
-                camActivity.PutExtra("JSON", json);
-                camActivity.PutExtra("ACTID", learningActivity.Id);
-                CallWithPermission(new string[] { global::Android.Manifest.Permission.Camera, global::Android.Manifest.Permission.RecordAudio, global::Android.Manifest.Permission.AccessFineLocation },
-                        new string[] { base.Resources.GetString(Resource.String.permissionCameraTitle), base.Resources.GetString(Resource.String.permissionMicTitle), base.Resources.GetString(Resource.String.permissionLocationTitle) },
-                        new string[] { base.Resources.GetString(Resource.String.permissionPhotoExplanation), base.Resources.GetString(Resource.String.permissionMicExplanation), base.Resources.GetString(Resource.String.permissionLocationExplanation) },
-                        camActivity,
-                        adapter.items[position].Id);
+                lastReqIntent = new Intent(this, typeof(CameraActivity));
+                lastReqIntent.PutExtra("JSON", json);
+                lastReqIntent.PutExtra("ACTID", learningActivity.Id);
+
+                AndroidUtils.CallWithPermission(new string[] {
+                        global::Android.Manifest.Permission.Camera,
+                        global::Android.Manifest.Permission.RecordAudio,
+                        global::Android.Manifest.Permission.AccessFineLocation
+                    },
+                    new string[] {
+                        base.Resources.GetString(Resource.String.permissionCameraTitle),
+                        base.Resources.GetString(Resource.String.permissionMicTitle),
+                        base.Resources.GetString(Resource.String.permissionLocationTitle)
+                    },
+                    new string[] {
+                        base.Resources.GetString(Resource.String.permissionPhotoExplanation),
+                        base.Resources.GetString(Resource.String.permissionMicExplanation),
+                        base.Resources.GetString(Resource.String.permissionLocationExplanation)
+                    },
+                    lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
             else if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
             {
@@ -568,33 +523,33 @@ namespace OurPlace.Android.Activities
             }
             else if (taskType == "MAP_MARK")
             {
-                Intent markerActivity = new Intent(this, typeof(LocationMarkerActivity));
-                markerActivity.PutExtra("JSON", json);
-                CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
-                        new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
-                        new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
-                        markerActivity,
-                        adapter.items[position].Id);
+                lastReqIntent = new Intent(this, typeof(LocationMarkerActivity));
+                lastReqIntent.PutExtra("JSON", json);
+
+                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle)},
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation)},
+                    lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
             else if (taskType == "LOC_HUNT")
             {
-                Intent locHuntActivity = new Intent(this, typeof(LocationHuntActivity));
-                locHuntActivity.PutExtra("JSON", json);
-                CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
-                        new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
-                        new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
-                        locHuntActivity,
-                        adapter.items[position].Id);
+                lastReqIntent = new Intent(this, typeof(LocationHuntActivity));
+                lastReqIntent.PutExtra("JSON", json);
+
+                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
+                    lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
             else if (taskType == "REC_AUDIO")
             {
-                Intent audActivity = new Intent(this, typeof(RecordAudioActivity));
-                audActivity.PutExtra("JSON", json);
-                CallWithPermission(new string[] { global::Android.Manifest.Permission.RecordAudio },
-                        new string[] { base.Resources.GetString(Resource.String.permissionMicTitle) },
-                        new string[] { base.Resources.GetString(Resource.String.permissionMicExplanation) },
-                        audActivity,
-                        adapter.items[position].Id);
+                lastReqIntent = new Intent(this, typeof(RecordAudioActivity));
+                lastReqIntent.PutExtra("JSON", json);
+
+                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.RecordAudio },
+                    new string[] { base.Resources.GetString(Resource.String.permissionMicTitle) },
+                    new string[] { base.Resources.GetString(Resource.String.permissionMicExplanation) },
+                    lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
             else if (taskType == "LISTEN_AUDIO")
             {

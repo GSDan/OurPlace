@@ -161,6 +161,60 @@ namespace OurPlace.Android
             }
         }
 
+        public static async void CallWithPermission(string[] perms, string[] explanationTitles, string[] explanations, Intent toCall, int intentId, int permReqId, Activity activity)
+        {
+            List<string> neededPerms = new List<string>();
+            int accountedFor = 0;
+
+            for (int i = 0; i < perms.Length; i++)
+            {
+                if (ContextCompat.CheckSelfPermission(activity, perms[i]) != Permission.Granted)
+                {
+                    // Haven't got the permision yet
+                    string thisPerm = perms[i];
+
+                    // Show an explanation of why it's needed if necessary
+                    if (ActivityCompat.ShouldShowRequestPermissionRationale(activity, perms[i]))
+                    {
+                        global::Android.Support.V7.App.AlertDialog dialog = new global::Android.Support.V7.App.AlertDialog.Builder(activity)
+                            .SetTitle(explanationTitles[i])
+                            .SetMessage(explanations[i])
+                            .SetPositiveButton("Got it", (s, e) =>
+                            {
+                                neededPerms.Add(thisPerm);
+                                accountedFor++;
+                            })
+                            .Create();
+                        dialog.Show();
+                    }
+                    else
+                    {
+                        // No explanation needed, just ask
+                        neededPerms.Add(perms[i]);
+                        accountedFor++;
+                    }
+                }
+                else
+                {
+                    accountedFor++;
+                }
+            }
+
+            while (accountedFor < perms.Length)
+            {
+                await Task.Delay(20);
+            }
+
+            if (neededPerms.Count == 0)
+            {
+                activity.StartActivityForResult(toCall, intentId);
+            }
+            else
+            {
+                ActivityCompat.RequestPermissions(activity, neededPerms.ToArray(), permReqId);
+            }
+        }
+
         public static bool IsGooglePlayServicesInstalled(Activity context)
         {
             int queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(context);
