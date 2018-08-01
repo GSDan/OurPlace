@@ -380,50 +380,16 @@ namespace OurPlace.Android.Adapters
                     ((TaskViewHolder_RecordVideo)vh).ClearResults();
                 }
             }
-            else if (thisType == typeof(TaskViewHolder_Photo))
+            else if (thisType == typeof(TaskViewHolder_Images))
             {
-                vh = holder as TaskViewHolder_Photo;
+                vh = holder as TaskViewHolder_Images;
 
-                ((TaskViewHolder_Photo)vh).Button.Text = context.Resources.GetString(Resource.String.TakePhotoBtn);
-
-                if (items[position].TaskType.IdName == "PHOTO_MATCH")
-                {
-                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(items[position].JsonData))
-                        .DownSampleInDip(width: 100)
-                        .IntoAsync(((TaskViewHolder_Photo)vh).TaskImage);
-                }
-                else
-                {
-                    ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Photo)vh).TaskImage);
-                }
-
-                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
-                {
-                    List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
-
-                    ((TaskViewHolder_Photo)vh).ShowResults(photoPaths, context);
-                    items[position].IsCompleted = true;
-                }
-                else
-                {
-                    items[position].IsCompleted = false;
-                    ((TaskViewHolder_Photo)vh).ClearResults();
-                }
-            }
-            else if (thisType == typeof(TaskViewHolder_Btn))
-            {
-                vh = holder as TaskViewHolder_Btn;
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Btn)vh).Image);
+                bool btnEnabled = true;
                 string btnText = context.Resources.GetString(Resource.String.TaskBtn);
 
-                if (taskType == "LISTEN_AUDIO")
-                {
-                    btnText = context.Resources.GetString(Resource.String.ListenBtn);
-                }
-                else if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
+                if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
                 {
                     btnText = context.Resources.GetString(Resource.String.StartDrawBtn);
-                    bool btnEnabled = false;
 
                     if (taskType == "DRAW_PHOTO")
                     {
@@ -442,23 +408,39 @@ namespace OurPlace.Android.Adapters
                             btnText = context.Resources.GetString(Resource.String.TaskBtnNotReady);
                         }
                     }
-                    else
-                    {
-                        btnEnabled = true;
-                    }
+                }
+                else
+                {
+                    btnText = context.Resources.GetString(Resource.String.TakePhotoBtn);
+                }
 
-                    ((TaskViewHolder_Btn)vh).Button.Enabled = btnEnabled;
+                ((TaskViewHolder_Images)vh).Button.Text = btnText;
+                ((TaskViewHolder_Images)vh).Button.Enabled = btnEnabled;
 
-                    if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
-                    {
-                        string[] images = JsonConvert.DeserializeObject<string[]>(items[position].CompletionData.JsonData);
+                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Images)vh).TaskImage);
+                
+                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
+                {
+                    List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
 
-                        ImageService.Instance.LoadFile(images[0])
-                            .DownSampleInDip(width: 200)
-                            .IntoAsync(((TaskViewHolder_Btn)vh).Image);
+                    ((TaskViewHolder_Images)vh).ShowResults(photoPaths, context);
+                    items[position].IsCompleted = true;
+                }
+                else
+                {
+                    items[position].IsCompleted = false;
+                    ((TaskViewHolder_Images)vh).ClearResults();
+                }
+            }
+            else if (thisType == typeof(TaskViewHolder_Btn))
+            {
+                vh = holder as TaskViewHolder_Btn;
+                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Btn)vh).Image);
+                string btnText = context.Resources.GetString(Resource.String.TaskBtn);
 
-                        items[position].IsCompleted = true;
-                    }
+                if (taskType == "LISTEN_AUDIO")
+                {
+                    btnText = context.Resources.GetString(Resource.String.ListenBtn);
                 }
 
                 ((TaskViewHolder_Btn)vh).Button.Text = btnText;
@@ -660,7 +642,6 @@ namespace OurPlace.Android.Adapters
             switch (viewType)
             {
                 case TASK_LOCATIONHUNT:
-                case TASK_DRAWING:
                 case TASK_LISTEN:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
                     TaskViewHolder_Btn bvh = new TaskViewHolder_Btn(itemView, OnSpeakClick, OnClick);
@@ -669,9 +650,10 @@ namespace OurPlace.Android.Adapters
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Info, parent, false);
                     TaskViewHolder_Info ivh = new TaskViewHolder_Info(itemView, OnSpeakClick, OnClick);
                     return ivh;
+                case TASK_DRAWING:
                 case TASK_PHOTO:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Photo, parent, false);
-                    TaskViewHolder_Photo pvh = new TaskViewHolder_Photo(itemView, OnSpeakClick, OnClick, OnMediaClick);
+                    TaskViewHolder_Images pvh = new TaskViewHolder_Images(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return pvh;
                 case TASK_MULTIPLECHOICE:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_MultipleChoice, parent, false);

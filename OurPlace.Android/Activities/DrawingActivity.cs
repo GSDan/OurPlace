@@ -231,7 +231,7 @@ namespace OurPlace.Android.Activities
             final = Bitmap.CreateScaledBitmap(final, outWidth, outHeight, false);
 
             string sdCardPath = GetExternalFilesDir(null).AbsolutePath;
-            string filePath = System.IO.Path.Combine(sdCardPath, learningTask.Id + ".jpg");
+            string filePath = System.IO.Path.Combine(sdCardPath, DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".jpg");
 
             var stream = new FileStream(filePath, FileMode.Create);
             final.Compress(Bitmap.CompressFormat.Jpeg, 80, stream);

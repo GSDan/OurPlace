@@ -239,7 +239,7 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Photo : TaskViewHolder
+    public class TaskViewHolder_Images : TaskViewHolder
     {
         public ImageViewAsync TaskImage { get; protected set; }
         public LinearLayout ImageList { get; protected set; }
@@ -248,7 +248,7 @@ namespace OurPlace.Android.Adapters
         protected List<string> addedPhotos;
         protected Action<int, int> onPhotoTap;
 
-        public TaskViewHolder_Photo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> photoTapListener) : base(itemView, ttsAction)
+        public TaskViewHolder_Images(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> photoTapListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             TaskImage = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
@@ -304,7 +304,7 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_RecordVideo : TaskViewHolder_Photo
+    public class TaskViewHolder_RecordVideo : TaskViewHolder_Images
     {
         public TaskViewHolder_RecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener) 
             : base(itemView, ttsAction, btnListener, thumbnailTapListener)
