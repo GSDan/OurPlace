@@ -60,7 +60,7 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<bool> Approved;
         public event EventHandler<int> SpeakText;
         public event EventHandler<int> ChangeName;
-        public Action<int, int> PlayMedia;
+        public Action<int, int> ShowMedia;
         public bool onBind = false;
         public bool curator;
         private bool reqName;
@@ -147,9 +147,9 @@ namespace OurPlace.Android.Adapters
             CheckForChildren(position);
         }
 
-        private void OnPlaybackClick(int taskIndex, int pathIndex)
+        private void OnMediaClick(int taskIndex, int pathIndex)
         {
-            PlayMedia?.Invoke(taskIndex, pathIndex);
+            ShowMedia?.Invoke(taskIndex, pathIndex);
             items[taskIndex].IsCompleted = true;
             CheckForChildren(taskIndex);
         }
@@ -573,6 +573,46 @@ namespace OurPlace.Android.Adapters
             onBind = false;
         }
 
+        public void DeleteFile(int taskId, int fileIndex)
+        {
+            try
+            {
+                AppTask thisTask = GetTaskWithId(taskId);
+                int taskIndex = GetIndexWithId(taskId);
+
+                List<string> paths = JsonConvert.DeserializeObject<List<string>>(thisTask.CompletionData.JsonData);
+                string deletePath = paths[fileIndex];
+
+                FileInfo info = new FileInfo(deletePath);
+
+                if (!info.Exists)
+                {
+                    throw new Exception("File doesn't exist");
+                }
+
+                Console.WriteLine("Deleting file " + info.FullName);
+
+                info.Delete();
+                paths.RemoveAt(fileIndex);
+                items[taskIndex].CompletionData.JsonData = JsonConvert.SerializeObject(paths);
+
+                if (paths.Count == 0)
+                {
+                    items[taskIndex].IsCompleted = false;
+                    CheckForChildren(taskIndex);
+                }
+
+                info.Refresh();
+                Console.WriteLine("Deletion success = " + !info.Exists);
+
+                NotifyItemChanged(taskIndex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         private void HandlePhotoDeletion(int taskIndex, int photoIndex)
         {
             new AlertDialog.Builder(context)
@@ -631,7 +671,7 @@ namespace OurPlace.Android.Adapters
                     return ivh;
                 case TASK_PHOTO:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Photo, parent, false);
-                    TaskViewHolder_Photo pvh = new TaskViewHolder_Photo(itemView, OnSpeakClick, OnClick, HandlePhotoDeletion);
+                    TaskViewHolder_Photo pvh = new TaskViewHolder_Photo(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return pvh;
                 case TASK_MULTIPLECHOICE:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_MultipleChoice, parent, false);
@@ -647,11 +687,11 @@ namespace OurPlace.Android.Adapters
                     return tvh;
                 case TASK_VIDEO:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Video, parent, false);
-                    TaskViewHolder_RecordVideo vvh = new TaskViewHolder_RecordVideo(itemView, OnSpeakClick, OnClick, OnPlaybackClick);
+                    TaskViewHolder_RecordVideo vvh = new TaskViewHolder_RecordVideo(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return vvh;
                 case TASK_AUDIO:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_RecordAudio, parent, false);
-                    TaskViewHolder_RecordAudio avh = new TaskViewHolder_RecordAudio(itemView, OnSpeakClick, OnClick, OnPlaybackClick);
+                    TaskViewHolder_RecordAudio avh = new TaskViewHolder_RecordAudio(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return avh;
                 case FINISH:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);

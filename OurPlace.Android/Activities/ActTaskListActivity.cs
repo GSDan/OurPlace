@@ -117,7 +117,7 @@ namespace OurPlace.Android.Activities
             adapter = new TaskAdapter(this, appTasks, learningActivity.Description, curatorControls, learningActivity.RequireUsername);
             adapter.ItemClick += OnItemClick;
             adapter.TextEntered += Adapter_TextEntered;
-            adapter.PlayMedia += Adapter_PlayMedia;
+            adapter.ShowMedia += ShowMedia;
             adapter.Approved += Adapter_Approved;
             adapter.SpeakText += Adapter_SpeakText;
             adapter.ChangeName += Adapter_EditName;
@@ -390,7 +390,7 @@ namespace OurPlace.Android.Activities
             }
         }
 
-        private void Adapter_PlayMedia(int taskIndex, int pathIndex)
+        private void ShowMedia(int taskIndex, int pathIndex)
         {
             Intent viewActivity = new Intent(this, typeof(MediaViewerActivity));
             viewActivity.PutExtra("RES_INDEX", pathIndex);
@@ -491,21 +491,30 @@ namespace OurPlace.Android.Activities
                 lastReqIntent.PutExtra("JSON", json);
                 lastReqIntent.PutExtra("ACTID", learningActivity.Id);
 
-                AndroidUtils.CallWithPermission(new string[] {
-                        global::Android.Manifest.Permission.Camera,
-                        global::Android.Manifest.Permission.RecordAudio,
-                        global::Android.Manifest.Permission.AccessFineLocation
-                    },
-                    new string[] {
-                        base.Resources.GetString(Resource.String.permissionCameraTitle),
-                        base.Resources.GetString(Resource.String.permissionMicTitle),
-                        base.Resources.GetString(Resource.String.permissionLocationTitle)
-                    },
-                    new string[] {
-                        base.Resources.GetString(Resource.String.permissionPhotoExplanation),
-                        base.Resources.GetString(Resource.String.permissionMicExplanation),
-                        base.Resources.GetString(Resource.String.permissionLocationExplanation)
-                    },
+                List<string> perms = new List<string>
+                {
+                    global::Android.Manifest.Permission.Camera,
+                    global::Android.Manifest.Permission.AccessFineLocation
+                };
+                List<string> titles = new List<string>
+                {
+                    base.Resources.GetString(Resource.String.permissionCameraTitle),
+                    base.Resources.GetString(Resource.String.permissionLocationTitle)
+                };
+                List<string> explanations = new List<string>
+                {
+                    base.Resources.GetString(Resource.String.permissionPhotoExplanation),
+                    base.Resources.GetString(Resource.String.permissionLocationExplanation)
+                };
+
+                if (taskType == "TAKE_VIDEO")
+                {
+                    perms.Add(global::Android.Manifest.Permission.RecordAudio);
+                    titles.Add(base.Resources.GetString(Resource.String.permissionMicTitle));
+                    explanations.Add(base.Resources.GetString(Resource.String.permissionMicExplanation));
+                }
+
+                AndroidUtils.CallWithPermission(perms.ToArray(), titles.ToArray(), explanations.ToArray(),
                     lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
             else if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
@@ -600,6 +609,15 @@ namespace OurPlace.Android.Activities
             if (data == null || resultCode != Result.Ok) return;
 
             int taskId = data.GetIntExtra("TASK_ID", -1);
+            int resIndex = data.GetIntExtra("RES_INDEX", -1);
+
+            // deleting from MediaViewerActivity
+            if (data.GetBooleanExtra("IS_DELETE", false) && taskId != -1 && resIndex != -1)
+            {
+                adapter.DeleteFile(taskId, resIndex);
+                return;
+            }
+
             string newFile = data.GetStringExtra("FILE_PATH");
             string mapLocs = data.GetStringExtra("LOCATIONS");
             bool isPoly = data.GetBooleanExtra("IS_POLYGON", false);
