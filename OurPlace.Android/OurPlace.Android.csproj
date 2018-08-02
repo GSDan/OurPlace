@@ -270,14 +270,14 @@
     <Compile Include="Adapters\ViewHolders.cs" />
     <Compile Include="AndroidUtils.cs" />
     <Compile Include="Adapters\LearningActivitiesAdapter.cs" />
-    <Compile Include="Components\AlwaysVisibleMediaController.cs" />
-    <Compile Include="Components\AutoFitTextureView.cs" />
+    <Compile Include="Misc\AlwaysVisibleMediaController.cs" />
+    <Compile Include="Misc\AutoFitTextureView.cs" />
     <Compile Include="ColorPicker\AlphaPatternDrawable.cs" />
     <Compile Include="ColorPicker\ColorPanelView.cs" />
     <Compile Include="ColorPicker\ColorPickerDialog.cs" />
     <Compile Include="ColorPicker\ColorPickerPreference.cs" />
     <Compile Include="ColorPicker\ColorPickerView.cs" />
-    <Compile Include="Components\ColourPickerDialog.cs" />
+    <Compile Include="Misc\ColourPickerDialog.cs" />
     <Compile Include="Fragments\Camera1Fragment.cs" />
     <Compile Include="Fragments\Camera1VideoFragment.cs" />
     <Compile Include="Fragments\Camera2Fragment.cs" />

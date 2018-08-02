@@ -30,7 +30,7 @@ using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
-using OurPlace.Android.Components;
+using OurPlace.Android.Misc;
 using OurPlace.Common.Models;
 using System;
 using System.Linq;
