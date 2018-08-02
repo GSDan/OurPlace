@@ -21,20 +21,43 @@
 #endregion
 
 using Android.Content;
+using Android.Views;
 using Android.Widget;
+using System;
 
 namespace OurPlace.Android.Misc
 {
     public class AlwaysVisibleMediaController : MediaController
     {
-        public AlwaysVisibleMediaController(Context context) : base(context)
+        private Action onBackPress;
+
+        public AlwaysVisibleMediaController(Context context, Action onBackPressed) : base(context)
         {
+            onBackPress = onBackPressed;
         }
 
         // Don't hide the controls
         public override void Show(int timeout)
         {
-            base.Show(0);
+            try
+            {
+                base.Show(0);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        // Override back button, otherwise gets absorbed to hide the interface
+        public override bool DispatchKeyEvent(KeyEvent e)
+        {
+            if (e.KeyCode == Keycode.Back)
+            {
+                onBackPress.Invoke();
+                return true;
+            }
+            return base.DispatchKeyEvent(e);
         }
     }
 }

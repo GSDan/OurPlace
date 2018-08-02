@@ -31,10 +31,10 @@ using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
 using OurPlace.Android.Misc;
+using OurPlace.Common;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
-using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace OurPlace.Android.Activities
 {
@@ -55,9 +55,10 @@ namespace OurPlace.Android.Activities
             SetContentView(Resource.Layout.MediaViewerActivity);
 
             string json = Intent.GetStringExtra("JSON") ?? "";
+            int activityId = Intent.GetIntExtra("ACT_ID", -1);
             resIndex = Intent.GetIntExtra("RES_INDEX", -1);
 
-            if (string.IsNullOrWhiteSpace(json) || resIndex == -1) return;
+            if (string.IsNullOrWhiteSpace(json)) return;
 
             AppTask thisTask = JsonConvert.DeserializeObject<AppTask>(json);
 
@@ -66,7 +67,13 @@ namespace OurPlace.Android.Activities
             SupportActionBar.Show();
             SupportActionBar.Title = thisTask.Description;
 
-            string[] results = JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData.JsonData);
+            string[] results = null;
+
+            if(thisTask.CompletionData?.JsonData != null)
+            {
+                JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData?.JsonData);
+            }
+            
             taskType = thisTask.TaskType.IdName;
 
             if (new string[] { "TAKE_VIDEO", "REC_AUDIO", "LISTEN_AUDIO" }.Contains(taskType))
@@ -77,17 +84,30 @@ namespace OurPlace.Android.Activities
                     imageView.Visibility = ViewStates.Visible;
                 }
 
+                global::Android.Net.Uri uri = null;
+
+                if(taskType == "LISTEN_AUDIO")
+                {
+                    string localRes = Storage.GetCacheFilePath(
+                        thisTask.JsonData,
+                        activityId,
+                        ServerUtils.GetFileExtension(taskType));
+                    uri = global::Android.Net.Uri.Parse(localRes);
+                }
+                else
+                {
+                    uri = global::Android.Net.Uri.Parse(results[resIndex]);
+                }
+
                 // easiest way to get audio playback controls is to use a videoview
                 videoView = FindViewById<VideoView>(Resource.Id.videoView);
                 videoView.Visibility = ViewStates.Visible;
-                var uri = global::Android.Net.Uri.Parse(results[resIndex]);
                 videoView.SetOnPreparedListener(this);
                 videoView.SetVideoURI(uri);
 
-                mediaController = new AlwaysVisibleMediaController(this);
+                mediaController = new AlwaysVisibleMediaController(this, Finish);
                 mediaController.SetAnchorView(videoView);
-                videoView.SetMediaController(mediaController);
-                videoView.Start();
+                videoView.SetMediaController(mediaController); 
             }
             else if(new string[] { "DRAW", "DRAW_PHOTO", "TAKE_PHOTO", "MATCH_PHOTO" }.Contains(taskType))
             {
@@ -164,12 +184,12 @@ namespace OurPlace.Android.Activities
         public void OnPrepared(MediaPlayer mp)
         {
             mp.Looping = true;
+            videoView.Start();
             mediaController.Show(0);
         }
 
         public void ReturnToDelete()
         {
-            // add location to EXIF if it's known
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
             myIntent.PutExtra("IS_DELETE", true);
             myIntent.PutExtra("TASK_ID", taskId);

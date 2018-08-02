@@ -643,8 +643,8 @@ namespace OurPlace.Android.Adapters
 
             switch (viewType)
             {
-                case TASK_LOCATIONHUNT:
                 case TASK_LISTEN:
+                case TASK_LOCATIONHUNT:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
                     TaskViewHolder_Btn bvh = new TaskViewHolder_Btn(itemView, OnSpeakClick, OnClick);
                     return bvh;

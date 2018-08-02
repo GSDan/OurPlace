@@ -54,7 +54,6 @@ namespace OurPlace.Android.Activities
         private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private TaskAdapter adapter;
-        private MediaPlayer player;
         private global::Android.Support.V7.App.AlertDialog playerDialog;
         private DatabaseManager dbManager;
         private readonly int mediaPlayerReqCode = 222;
@@ -238,50 +237,6 @@ namespace OurPlace.Android.Activities
             ShowNameEntry();
         }
 
-        private void Adapter_PlayAudio(string filepath, string description, int taskId)
-        {
-            global::Android.Support.V7.App.AlertDialog.Builder dialog = new global::Android.Support.V7.App.AlertDialog.Builder(this);
-            dialog.SetMessage(description);
-            dialog.SetCancelable(false);
-            dialog.SetNegativeButton(Resource.String.StopBtn, (s, e) =>
-            {
-                Player_Clean();
-            });
-            playerDialog = dialog.Show();
-
-            if (player == null)
-            {
-                player = new MediaPlayer();
-                player.Completion += Player_Completion;
-            }
-            player.SetDataSource(filepath);
-            player.Prepare();
-            player.Start();
-
-            adapter.OnGenericTaskReturned(taskId, true);
-
-        }
-
-        private void Player_Completion(object sender, EventArgs e)
-        {
-            Player_Clean();
-        }
-
-        private void Player_Clean()
-        {
-            if (player != null)
-            {
-                if (player.IsPlaying) player.Stop();
-                player.Release();
-                player.Dispose();
-                player = null;
-            }
-            if (playerDialog != null)
-            {
-                playerDialog.Dismiss();
-            }
-        }
-
         private void Adapter_Approved(object sender, bool activityApproved)
         {
             if (activityApproved)
@@ -394,6 +349,7 @@ namespace OurPlace.Android.Activities
         {
             Intent viewActivity = new Intent(this, typeof(MediaViewerActivity));
             viewActivity.PutExtra("RES_INDEX", pathIndex);
+            viewActivity.PutExtra("ACT_ID", learningActivity.Id);
             viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.items[taskIndex]));
             StartActivityForResult(viewActivity, mediaPlayerReqCode);
         }
@@ -527,20 +483,7 @@ namespace OurPlace.Android.Activities
             }
             else if (taskType == "LISTEN_AUDIO")
             {
-                string localRes = Storage.GetCacheFilePath(
-                    adapter.items[position].JsonData,
-                    learningActivity.Id,
-                    ServerUtils.GetFileExtension(taskType));
-
-                if (File.Exists(localRes))
-                {
-                    Adapter_PlayAudio(localRes, adapter.items[position].Description, adapter.items[position].Id);
-                }
-                else
-                {
-                    Toast.MakeText(this, Resource.String.ErrorTitle, ToastLength.Short).Show();
-                }
-
+                ShowMedia(position, -1);
             }
             else if (taskType == "INFO")
             {
@@ -696,8 +639,6 @@ namespace OurPlace.Android.Activities
         protected override async void OnPause()
         {
             base.OnPause();
-
-            Player_Clean();
 
             if (shouldSave && learningActivity != null && adapter != null && adapter.items != null)
             {
