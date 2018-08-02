@@ -71,7 +71,7 @@ namespace OurPlace.Android.Activities
 
             if(thisTask.CompletionData?.JsonData != null)
             {
-                JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData?.JsonData);
+                results = JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData?.JsonData);
             }
             
             taskType = thisTask.TaskType.IdName;
