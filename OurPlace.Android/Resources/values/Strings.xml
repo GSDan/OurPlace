@@ -201,6 +201,7 @@
   <string name="actEnterUsername">Please enter your name(s):</string>
   <string name="enteredName">Your name(s):</string>
   <string name="editNameBtn">Edit name</string>
+  <string name="openAudioBtn">Open Recording {0}</string>
   <string name="locationHuntArrivedTitle">You\'ve Arrived!</string>
   <string name="locationHuntArrivedMessage">Congratulations! You\'ve arrived at the target location!</string>
   <string name="errorCache">Couldn\'t load cached data</string>

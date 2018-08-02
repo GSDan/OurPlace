@@ -60,7 +60,7 @@
                         android:textSize="15sp"
                         android:paddingBottom="10dp" />
                     <LinearLayout
-                        android:id="@+id/takenPhotoLayout"
+                        android:id="@+id/resultListLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"

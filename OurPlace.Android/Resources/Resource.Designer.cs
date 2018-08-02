@@ -2957,8 +2957,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c00a1
 			public const int container = 2131493025;
 			
-			// aapt resource value: 0x7f0c0132
-			public const int contentFrame = 2131493170;
+			// aapt resource value: 0x7f0c0131
+			public const int contentFrame = 2131493169;
 			
 			// aapt resource value: 0x7f0c0075
 			public const int contentPanel = 2131492981;
@@ -3194,8 +3194,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c00f4
 			public const int markersText = 2131493108;
 			
-			// aapt resource value: 0x7f0c0134
-			public const int masked = 2131493172;
+			// aapt resource value: 0x7f0c0133
+			public const int masked = 2131493171;
 			
 			// aapt resource value: 0x7f0c00cb
 			public const int maxNumMarkers = 2131493067;
@@ -3203,26 +3203,26 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c0108
 			public const int media_actions = 2131493128;
 			
-			// aapt resource value: 0x7f0c013a
-			public const int menudelete = 2131493178;
-			
-			// aapt resource value: 0x7f0c0138
-			public const int menuhelp = 2131493176;
-			
 			// aapt resource value: 0x7f0c0139
-			public const int menulogout = 2131493177;
-			
-			// aapt resource value: 0x7f0c0136
-			public const int menuscan = 2131493174;
-			
-			// aapt resource value: 0x7f0c0135
-			public const int menusearch = 2131493173;
+			public const int menudelete = 2131493177;
 			
 			// aapt resource value: 0x7f0c0137
-			public const int menuuploads = 2131493175;
+			public const int menuhelp = 2131493175;
 			
-			// aapt resource value: 0x7f0c0130
-			public const int message = 2131493168;
+			// aapt resource value: 0x7f0c0138
+			public const int menulogout = 2131493176;
+			
+			// aapt resource value: 0x7f0c0135
+			public const int menuscan = 2131493173;
+			
+			// aapt resource value: 0x7f0c0134
+			public const int menusearch = 2131493172;
+			
+			// aapt resource value: 0x7f0c0136
+			public const int menuuploads = 2131493174;
+			
+			// aapt resource value: 0x7f0c012f
+			public const int message = 2131493167;
 			
 			// aapt resource value: 0x7f0c0041
 			public const int middle = 2131492929;
@@ -3335,9 +3335,6 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c00a8
 			public const int placesRoot = 2131493032;
 			
-			// aapt resource value: 0x7f0c012e
-			public const int playBackBtn = 2131493166;
-			
 			// aapt resource value: 0x7f0c0020
 			public const int preference_preview_color_panel = 2131492896;
 			
@@ -3373,6 +3370,9 @@ namespace OurPlace.Android
 			
 			// aapt resource value: 0x7f0c00fc
 			public const int refresher = 2131493116;
+			
+			// aapt resource value: 0x7f0c012d
+			public const int resultListLayout = 2131493165;
 			
 			// aapt resource value: 0x7f0c0059
 			public const int right = 2131492953;
@@ -3515,9 +3515,6 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c009e
 			public const int takePictureBtn = 2131493022;
 			
-			// aapt resource value: 0x7f0c012d
-			public const int takenPhotoLayout = 2131493165;
-			
 			// aapt resource value: 0x7f0c009b
 			public const int targetPhoto = 2131493019;
 			
@@ -3542,8 +3539,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c0129
 			public const int taskRadioGroup = 2131493161;
 			
-			// aapt resource value: 0x7f0c012f
-			public const int taskTextEntry = 2131493167;
+			// aapt resource value: 0x7f0c012e
+			public const int taskTextEntry = 2131493166;
 			
 			// aapt resource value: 0x7f0c00b9
 			public const int taskTitle = 2131493049;
@@ -3635,8 +3632,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c00ab
 			public const int uploadBtn = 2131493035;
 			
-			// aapt resource value: 0x7f0c0131
-			public const int uploadsHeaderMessage = 2131493169;
+			// aapt resource value: 0x7f0c0130
+			public const int uploadsHeaderMessage = 2131493168;
 			
 			// aapt resource value: 0x7f0c00fd
 			public const int uploadsHint = 2131493117;
@@ -3662,8 +3659,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c0016
 			public const int view_offset_helper = 2131492886;
 			
-			// aapt resource value: 0x7f0c0133
-			public const int visible = 2131493171;
+			// aapt resource value: 0x7f0c0132
+			public const int visible = 2131493170;
 			
 			// aapt resource value: 0x7f0c002b
 			public const int wide = 2131492907;
@@ -4070,31 +4067,25 @@ namespace OurPlace.Android
 			public const int TaskCard_Name = 2130968687;
 			
 			// aapt resource value: 0x7f040070
-			public const int TaskCard_Photo = 2130968688;
+			public const int TaskCard_ResultList = 2130968688;
 			
 			// aapt resource value: 0x7f040071
-			public const int TaskCard_RecordAudio = 2130968689;
+			public const int TaskCard_TextEntry = 2130968689;
 			
 			// aapt resource value: 0x7f040072
-			public const int TaskCard_TextEntry = 2130968690;
+			public const int tooltip = 2130968690;
 			
 			// aapt resource value: 0x7f040073
-			public const int TaskCard_Video = 2130968691;
+			public const int UploadCard = 2130968691;
 			
 			// aapt resource value: 0x7f040074
-			public const int tooltip = 2130968692;
+			public const int UploadsActivity = 2130968692;
 			
 			// aapt resource value: 0x7f040075
-			public const int UploadCard = 2130968693;
+			public const int zxingscanneractivitylayout = 2130968693;
 			
 			// aapt resource value: 0x7f040076
-			public const int UploadsActivity = 2130968694;
-			
-			// aapt resource value: 0x7f040077
-			public const int zxingscanneractivitylayout = 2130968695;
-			
-			// aapt resource value: 0x7f040078
-			public const int zxingscannerfragmentlayout = 2130968696;
+			public const int zxingscannerfragmentlayout = 2130968694;
 			
 			static Layout()
 			{
@@ -4717,8 +4708,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0a00f1
 			public const int enteredName = 2131362033;
 			
-			// aapt resource value: 0x7f0a00f5
-			public const int errorCache = 2131362037;
+			// aapt resource value: 0x7f0a00f6
+			public const int errorCache = 2131362038;
 			
 			// aapt resource value: 0x7f0a00e9
 			public const int errorCamera = 2131362025;
@@ -4741,29 +4732,29 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0a003c
 			public const int library_name = 2131361852;
 			
-			// aapt resource value: 0x7f0a00f4
-			public const int locationHuntArrivedMessage = 2131362036;
+			// aapt resource value: 0x7f0a00f5
+			public const int locationHuntArrivedMessage = 2131362037;
 			
-			// aapt resource value: 0x7f0a00f3
-			public const int locationHuntArrivedTitle = 2131362035;
+			// aapt resource value: 0x7f0a00f4
+			public const int locationHuntArrivedTitle = 2131362036;
+			
+			// aapt resource value: 0x7f0a00fc
+			public const int loginInfo_howAnswer = 2131362044;
 			
 			// aapt resource value: 0x7f0a00fb
-			public const int loginInfo_howAnswer = 2131362043;
+			public const int loginInfo_howTitle = 2131362043;
 			
 			// aapt resource value: 0x7f0a00fa
-			public const int loginInfo_howTitle = 2131362042;
+			public const int loginInfo_whatAnswer = 2131362042;
 			
 			// aapt resource value: 0x7f0a00f9
-			public const int loginInfo_whatAnswer = 2131362041;
+			public const int loginInfo_whatTitle = 2131362041;
 			
 			// aapt resource value: 0x7f0a00f8
-			public const int loginInfo_whatTitle = 2131362040;
+			public const int loginInfo_whyAnswer = 2131362040;
 			
 			// aapt resource value: 0x7f0a00f7
-			public const int loginInfo_whyAnswer = 2131362039;
-			
-			// aapt resource value: 0x7f0a00f6
-			public const int loginInfo_whyTitle = 2131362038;
+			public const int loginInfo_whyTitle = 2131362039;
 			
 			// aapt resource value: 0x7f0a00ec
 			public const int mapLoadingMessage = 2131362028;
@@ -4773,6 +4764,9 @@ namespace OurPlace.Android
 			
 			// aapt resource value: 0x7f0a00dc
 			public const int noAppErrTitle = 2131362012;
+			
+			// aapt resource value: 0x7f0a00f3
+			public const int openAudioBtn = 2131362035;
 			
 			// aapt resource value: 0x7f0a0034
 			public const int password_toggle_content_description = 2131361844;

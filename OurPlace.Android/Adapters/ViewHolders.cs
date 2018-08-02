@@ -35,6 +35,7 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OurPlace.Android.Adapters
@@ -239,26 +240,26 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Images : TaskViewHolder
+    public class TaskViewHolder_ResultList : TaskViewHolder
     {
         public ImageViewAsync TaskImage { get; protected set; }
-        public LinearLayout ImageList { get; protected set; }
-        public Button Button { get; protected set; }
+        public LinearLayout ItemList { get; protected set; }
+        public Button StartTaskButton { get; protected set; }
 
-        protected List<string> addedPhotos;
-        protected Action<int, int> onPhotoTap;
+        protected List<string> results;
+        protected Action<int, int> onItemTap;
 
-        public TaskViewHolder_Images(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> photoTapListener) : base(itemView, ttsAction)
+        public TaskViewHolder_ResultList(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             TaskImage = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
-            ImageList = itemView.FindViewById<LinearLayout>(Resource.Id.takenPhotoLayout);
-            Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
+            ItemList = itemView.FindViewById<LinearLayout>(Resource.Id.resultListLayout);
+            StartTaskButton = itemView.FindViewById<Button>(Resource.Id.taskBtn);
 
-            addedPhotos = new List<string>();
+            results = new List<string>();
 
-            Button.Click += (sender, e) => btnListener(AdapterPosition);
-            onPhotoTap = photoTapListener;
+            StartTaskButton.Click += (sender, e) => btnListener(AdapterPosition);
+            onItemTap = itemTapListener;
         }
 
         /// <summary>
@@ -277,21 +278,21 @@ namespace OurPlace.Android.Adapters
                 ImageViewAsync newImage = new ImageViewAsync(context);
                 newImage.SetPadding(10, 10, 10, 10);
 
-                ImageList.AddView(newImage);
+                ItemList.AddView(newImage);
                 ImageService.Instance.LoadFile(imagePath)
                     .DownSampleInDip(width: 150)
                     .IntoAsync(newImage);
 
-                newImage.Click += NewImage_Click;
+                newImage.Click += Item_Click;
             }
         }
 
         /// <summary>
         /// Called when an image is clicked
         /// </summary>
-        protected void NewImage_Click(object sender, EventArgs e)
+        protected void Item_Click(object sender, EventArgs e)
         {
-            onPhotoTap(AdapterPosition, ImageList.IndexOfChild((View)sender));
+            onItemTap(AdapterPosition, ItemList.IndexOfChild((View)sender));
         }
 
         /// <summary>
@@ -299,12 +300,12 @@ namespace OurPlace.Android.Adapters
         /// </summary>
         public void ClearResults()
         {
-            addedPhotos.Clear();
-            ImageList.RemoveAllViews();
+            results.Clear();
+            ItemList.RemoveAllViews();
         }
     }
 
-    public class TaskViewHolder_RecordVideo : TaskViewHolder_Images
+    public class TaskViewHolder_RecordVideo : TaskViewHolder_ResultList
     {
         public TaskViewHolder_RecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener) 
             : base(itemView, ttsAction, btnListener, thumbnailTapListener)
@@ -329,63 +330,34 @@ namespace OurPlace.Android.Adapters
             ImageViewAsync newImage = new ImageViewAsync(context);
             newImage.SetPadding(10, 10, 10, 10);
 
-            ImageList.AddView(newImage);
+            ItemList.AddView(newImage);
             newImage.SetImageBitmap(thumb);
 
-            newImage.Click += NewImage_Click;
+            newImage.Click += Item_Click;
         }
     }
 
-    //public class TaskViewHolder_RecordVideo : TaskViewHolder
-    //{
-    //    public ImageViewAsync Image { get; protected set; }
-    //    public ImageViewAsync Overlay { get; protected set; }
-    //    public Button Button { get; protected set; }
-
-    //    public TaskViewHolder_RecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int> launchVideoListener) : base(itemView, ttsAction)
-    //    {
-    //        // Locate and cache view references:
-    //        Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
-    //        Overlay = itemView.FindViewById<ImageViewAsync>(Resource.Id.playIcon);
-    //        Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
-
-    //        Button.Click += (sender, e) => btnListener(AdapterPosition);
-    //        Overlay.Click += (sender, e) => launchVideoListener(AdapterPosition);
-    //    }
-
-    //    public async void ManageVideoThumb(string videoPaths, string defaultImageUrl)
-    //    {
-    //        string[] paths = JsonConvert.DeserializeObject<string[]>(videoPaths);
-
-    //        if(paths != null && paths.Length > 0)
-    //        {
-    //            Bitmap thumb = await ThumbnailUtils.CreateVideoThumbnailAsync(paths[0], ThumbnailKind.MiniKind);
-    //            Image.SetImageBitmap(thumb);
-    //            Overlay.Visibility = ViewStates.Visible;
-    //        }
-    //        else
-    //        {
-    //            ImageService.Instance.LoadUrl(defaultImageUrl).Into(Image);
-    //            Overlay.Visibility = ViewStates.Invisible;
-    //        }
-    //    }
-    //}
-
-    public class TaskViewHolder_RecordAudio : TaskViewHolder
+    public class TaskViewHolder_RecordAudio : TaskViewHolder_ResultList
     {
-        public ImageViewAsync Image { get; protected set; }
-        public Button PlaybackButton { get; protected set; }
-        public Button RecordButton { get; protected set; }
-
-        public TaskViewHolder_RecordAudio(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> playAudioListener) : base(itemView, ttsAction)
+        public TaskViewHolder_RecordAudio(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener)
+            : base(itemView, ttsAction, btnListener, itemTapListener)
         {
-            // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
-            PlaybackButton = itemView.FindViewById<Button>(Resource.Id.playBackBtn);
-            RecordButton = itemView.FindViewById<Button>(Resource.Id.recordBtn);
+        }
 
-            RecordButton.Click += (sender, e) => btnListener(AdapterPosition);
-            PlaybackButton.Click += (sender, e) => playAudioListener(AdapterPosition, 0);
+        public override void ShowResults(IEnumerable<string> files, Activity context)
+        {
+            ClearResults();
+
+            if (files == null) return;
+
+            for(int i = 0; i < files.Count(); i ++)
+            {
+                Button openbtn = new Button(context);
+                openbtn.SetPadding(10, 10, 10, 10);
+                openbtn.Text = string.Format(context.Resources.GetString(Resource.String.openAudioBtn), i + 1);
+                openbtn.Click += Item_Click;
+                ItemList.AddView(openbtn);
+            }
         }
     }
 

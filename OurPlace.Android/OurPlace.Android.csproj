@@ -324,7 +324,7 @@
     <AndroidResource Include="Resources\Layout\CameraActivity.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\Layout\TaskCard_Photo.axml">
+    <AndroidResource Include="Resources\Layout\TaskCard_ResultList.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\Layout\TaskCard_MultipleChoice.axml">
@@ -345,12 +345,6 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\Layout\TaskCard_TextEntry.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\Layout\TaskCard_Video.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\Layout\TaskCard_RecordAudio.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\Layout\RecordAudioActivity.axml">

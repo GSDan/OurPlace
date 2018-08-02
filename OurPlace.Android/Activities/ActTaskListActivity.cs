@@ -396,44 +396,6 @@ namespace OurPlace.Android.Activities
             viewActivity.PutExtra("RES_INDEX", pathIndex);
             viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.items[taskIndex]));
             StartActivityForResult(viewActivity, mediaPlayerReqCode);
-
-            //string[] paths = JsonConvert.DeserializeObject<string[]>(
-            //    adapter.items[taskIndex].CompletionData.JsonData);
-
-            //if (paths == null || paths.Length <= pathIndex || !File.Exists(paths[pathIndex]))
-            //{
-            //    Toast.MakeText(this, "Problem accessing file", ToastLength.Short).Show();
-            //    return;
-            //}
-
-            //try
-            //{
-            //    if (adapter.items[taskIndex].TaskType.IdName == "TAKE_VIDEO")
-            //    {
-            //        global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(paths[pathIndex]);
-            //        Intent intent = new Intent(Intent.ActionView, uri);
-            //        intent.SetDataAndType(uri, "video/mp4");
-            //        StartActivity(intent);
-            //    }
-            //    else if (adapter.items[taskIndex].TaskType.IdName == "REC_AUDIO")
-            //    {
-            //        global::Android.Net.Uri uri = FileProvider.GetUriForFile(this, base.ApplicationContext.PackageName + ".provider", new Java.IO.File(paths[pathIndex]));
-            //        Intent intent = new Intent(Intent.ActionView, uri);
-            //        intent.SetDataAndType(uri, "audio/mp4");
-            //        intent.SetFlags(ActivityFlags.GrantReadUriPermission);
-            //        StartActivity(intent);
-            //    }
-            //}
-            //catch (ActivityNotFoundException)
-            //{
-            //    // The user doesn't have any apps installed to play audio/video files
-            //    new global::Android.Support.V7.App.AlertDialog.Builder(this)
-            //        .SetTitle(Resource.String.noAppErrTitle)
-            //        .SetMessage(Resource.String.noAppErrMessage)
-            //        .SetPositiveButton(Resource.String.dialog_ok, (e, i) => { })
-            //        .Show();
-            //}
-
         }
 
         // Called when the user has given/denied permission
@@ -507,6 +469,7 @@ namespace OurPlace.Android.Activities
                     base.Resources.GetString(Resource.String.permissionLocationExplanation)
                 };
 
+                // Video tasks also require the microphone
                 if (taskType == "TAKE_VIDEO")
                 {
                     perms.Add(global::Android.Manifest.Permission.RecordAudio);

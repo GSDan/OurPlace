@@ -347,24 +347,26 @@ namespace OurPlace.Android.Adapters
             else if (thisType == typeof(TaskViewHolder_RecordAudio))
             {
                 vh = holder as TaskViewHolder_RecordAudio;
-                ((TaskViewHolder_RecordAudio)vh).RecordButton.Text = context.Resources.GetString(Resource.String.StartBtn);
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordAudio)vh).Image);
+                ((TaskViewHolder_RecordAudio)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.StartBtn);
+                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordAudio)vh).TaskImage);
 
-                if (string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
+                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
                 {
-                    items[position].IsCompleted = false;
-                    ((TaskViewHolder_RecordAudio)vh).PlaybackButton.Visibility = ViewStates.Gone;
+                    List<string> audioPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
+
+                    ((TaskViewHolder_RecordAudio)vh).ShowResults(audioPaths, context);
+                    items[position].IsCompleted = true;
                 }
                 else
                 {
-                    items[position].IsCompleted = true;
-                    ((TaskViewHolder_RecordAudio)vh).PlaybackButton.Visibility = ViewStates.Visible;
+                    items[position].IsCompleted = false;
+                    ((TaskViewHolder_RecordAudio)vh).ClearResults();
                 }
             }
             else if (thisType == typeof(TaskViewHolder_RecordVideo))
             {
                 vh = holder as TaskViewHolder_RecordVideo;
-                ((TaskViewHolder_RecordVideo)vh).Button.Text = context.Resources.GetString(Resource.String.RecBtn);
+                ((TaskViewHolder_RecordVideo)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.RecBtn);
                 ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordVideo)vh).TaskImage);
 
                 if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
@@ -380,9 +382,9 @@ namespace OurPlace.Android.Adapters
                     ((TaskViewHolder_RecordVideo)vh).ClearResults();
                 }
             }
-            else if (thisType == typeof(TaskViewHolder_Images))
+            else if (thisType == typeof(TaskViewHolder_ResultList))
             {
-                vh = holder as TaskViewHolder_Images;
+                vh = holder as TaskViewHolder_ResultList;
 
                 bool btnEnabled = true;
                 string btnText = context.Resources.GetString(Resource.String.TaskBtn);
@@ -414,22 +416,22 @@ namespace OurPlace.Android.Adapters
                     btnText = context.Resources.GetString(Resource.String.TakePhotoBtn);
                 }
 
-                ((TaskViewHolder_Images)vh).Button.Text = btnText;
-                ((TaskViewHolder_Images)vh).Button.Enabled = btnEnabled;
+                ((TaskViewHolder_ResultList)vh).StartTaskButton.Text = btnText;
+                ((TaskViewHolder_ResultList)vh).StartTaskButton.Enabled = btnEnabled;
 
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Images)vh).TaskImage);
+                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_ResultList)vh).TaskImage);
                 
                 if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
                 {
                     List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
 
-                    ((TaskViewHolder_Images)vh).ShowResults(photoPaths, context);
+                    ((TaskViewHolder_ResultList)vh).ShowResults(photoPaths, context);
                     items[position].IsCompleted = true;
                 }
                 else
                 {
                     items[position].IsCompleted = false;
-                    ((TaskViewHolder_Images)vh).ClearResults();
+                    ((TaskViewHolder_ResultList)vh).ClearResults();
                 }
             }
             else if (thisType == typeof(TaskViewHolder_Btn))
@@ -652,8 +654,8 @@ namespace OurPlace.Android.Adapters
                     return ivh;
                 case TASK_DRAWING:
                 case TASK_PHOTO:
-                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Photo, parent, false);
-                    TaskViewHolder_Images pvh = new TaskViewHolder_Images(itemView, OnSpeakClick, OnClick, OnMediaClick);
+                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
+                    TaskViewHolder_ResultList pvh = new TaskViewHolder_ResultList(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return pvh;
                 case TASK_MULTIPLECHOICE:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_MultipleChoice, parent, false);
@@ -668,11 +670,11 @@ namespace OurPlace.Android.Adapters
                     TaskViewHolder_TextEntry tvh = new TaskViewHolder_TextEntry(itemView, OnSpeakClick, OnText);
                     return tvh;
                 case TASK_VIDEO:
-                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Video, parent, false);
+                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
                     TaskViewHolder_RecordVideo vvh = new TaskViewHolder_RecordVideo(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return vvh;
                 case TASK_AUDIO:
-                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_RecordAudio, parent, false);
+                    itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
                     TaskViewHolder_RecordAudio avh = new TaskViewHolder_RecordAudio(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return avh;
                 case FINISH:
