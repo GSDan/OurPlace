@@ -270,13 +270,14 @@
     <Compile Include="Adapters\ViewHolders.cs" />
     <Compile Include="AndroidUtils.cs" />
     <Compile Include="Adapters\LearningActivitiesAdapter.cs" />
-    <Compile Include="AutoFitTextureView.cs" />
+    <Compile Include="Components\AlwaysVisibleMediaController.cs" />
+    <Compile Include="Components\AutoFitTextureView.cs" />
     <Compile Include="ColorPicker\AlphaPatternDrawable.cs" />
     <Compile Include="ColorPicker\ColorPanelView.cs" />
     <Compile Include="ColorPicker\ColorPickerDialog.cs" />
     <Compile Include="ColorPicker\ColorPickerPreference.cs" />
     <Compile Include="ColorPicker\ColorPickerView.cs" />
-    <Compile Include="ColourPickerDialog.cs" />
+    <Compile Include="Components\ColourPickerDialog.cs" />
     <Compile Include="Fragments\Camera1Fragment.cs" />
     <Compile Include="Fragments\Camera1VideoFragment.cs" />
     <Compile Include="Fragments\Camera2Fragment.cs" />
@@ -859,6 +860,31 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxxhdpi\baseline_delete_forever_white_24.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\baseline_audiotrack_black_48.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-mdpi\baseline_audiotrack_black_48.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xhdpi\baseline_audiotrack_black_48.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxhdpi\baseline_audiotrack_black_48.png">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxxhdpi\baseline_audiotrack_black_48.png">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
     </AndroidResource>
   </ItemGroup>

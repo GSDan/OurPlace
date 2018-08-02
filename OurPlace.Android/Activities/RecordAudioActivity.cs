@@ -67,7 +67,7 @@ namespace OurPlace.Android.Activities
             taskDesc.Text = learningTask.Description;
 
             string sdCardPath = GetExternalFilesDir(null).AbsolutePath;
-            filePath = System.IO.Path.Combine(sdCardPath, learningTask.Id + ".mp4");
+            filePath = System.IO.Path.Combine(sdCardPath, DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".mp4");
 
             timer = FindViewById<TextView>(Resource.Id.recTime);
             defaultCol = Color.Rgb(

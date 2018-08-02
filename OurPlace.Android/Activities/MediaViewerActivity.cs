@@ -30,8 +30,11 @@ using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Android.Components;
 using OurPlace.Common.Models;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OurPlace.Android.Activities
 {
@@ -40,6 +43,11 @@ namespace OurPlace.Android.Activities
     {
         private int taskId;
         private int resIndex;
+        private string taskType;
+
+        private AlwaysVisibleMediaController mediaController;
+        private VideoView videoView;
+        private bool isPaused;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -59,22 +67,29 @@ namespace OurPlace.Android.Activities
             SupportActionBar.Title = thisTask.Description;
 
             string[] results = JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData.JsonData);
+            taskType = thisTask.TaskType.IdName;
 
-            if(thisTask.TaskType.IdName == "TAKE_VIDEO")
+            if (new string[] { "TAKE_VIDEO", "REC_AUDIO", "LISTEN_AUDIO" }.Contains(taskType))
             {
-                VideoView videoView = FindViewById<VideoView>(Resource.Id.videoView);
+                if(taskType == "LISTEN_AUDIO" || taskType == "REC_AUDIO")
+                {
+                    ImageViewAsync imageView = FindViewById<ImageViewAsync>(Resource.Id.speakerImage);
+                    imageView.Visibility = ViewStates.Visible;
+                }
+
+                // easiest way to get audio playback controls is to use a videoview
+                videoView = FindViewById<VideoView>(Resource.Id.videoView);
                 videoView.Visibility = ViewStates.Visible;
                 var uri = global::Android.Net.Uri.Parse(results[resIndex]);
                 videoView.SetOnPreparedListener(this);
                 videoView.SetVideoURI(uri);
 
-                MediaController mediaController = new MediaController(this);
+                mediaController = new AlwaysVisibleMediaController(this);
                 mediaController.SetAnchorView(videoView);
                 videoView.SetMediaController(mediaController);
-
                 videoView.Start();
             }
-            else if(new string[] { "DRAW", "DRAW_PHOTO", "TAKE_PHOTO", "MATCH_PHOTO" }.Contains(thisTask.TaskType.IdName))
+            else if(new string[] { "DRAW", "DRAW_PHOTO", "TAKE_PHOTO", "MATCH_PHOTO" }.Contains(taskType))
             {
                 ImageViewAsync imageView = FindViewById<ImageViewAsync>(Resource.Id.imageView);
                 imageView.Visibility = ViewStates.Visible;
@@ -82,9 +97,45 @@ namespace OurPlace.Android.Activities
             }
         }
 
+        protected override void OnPause()
+        {
+            base.OnPause();
+            if(videoView != null && videoView.CanPause())
+            {
+                videoView.Pause();
+                isPaused = true;
+            }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            if (videoView != null && isPaused)
+            {
+                videoView.Resume();
+                isPaused = false;
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if(videoView != null)
+            {
+                if (videoView.IsPlaying)
+                {
+                    videoView.StopPlayback();
+                }
+                videoView = null;
+            }
+        }
+
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.MediaViewerMenu, menu);
+            if(taskType != "LISTEN_AUDIO")
+            {
+                MenuInflater.Inflate(Resource.Menu.MediaViewerMenu, menu);
+            }
             return base.OnPrepareOptionsMenu(menu);
         }
 
@@ -113,6 +164,7 @@ namespace OurPlace.Android.Activities
         public void OnPrepared(MediaPlayer mp)
         {
             mp.Looping = true;
+            mediaController.Show(0);
         }
 
         public void ReturnToDelete()
