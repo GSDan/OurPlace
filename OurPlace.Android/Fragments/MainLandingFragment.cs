@@ -19,11 +19,13 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+using Android.Content;
 using Android.Content.PM;
 using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Gms.Location;
 using Android.OS;
+using Android.Preferences;
 using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
@@ -187,20 +189,25 @@ namespace OurPlace.Android.Fragments
                 // Show an explanation of why it's needed if necessary
                 if (ActivityCompat.ShouldShowRequestPermissionRationale(Activity, permission))
                 {
-                    global::Android.Support.V7.App.AlertDialog dialog = new global::Android.Support.V7.App.AlertDialog.Builder(Activity)
-                        .SetTitle(Resources.GetString(Resource.String.permissionLocationActivitiesTitle))
-                        .SetMessage(Resources.GetString(Resource.String.permissionLocationActivitiesExplanation))
-                        .SetPositiveButton("Got it", (s, o) =>
-                        {
-                            RequestPermissions(new string[] { permission }, permReqId);
-                        })
-                        .Create();
-                    dialog.Show();
+                    ShowLocationPermExplanation(permission);
                 }
                 else
                 {
-                    // No explanation needed, just ask
-                    RequestPermissions(new string[] { permission }, permReqId);
+                    // Check if we've asked before:
+                    ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Activity);
+                    bool hasAsked = prefs.GetBoolean("has_asked_loc_perm", false);
+                    
+                    if(!hasAsked)
+                    {
+                        // We've not asked before, show an explanation
+                        ShowLocationPermExplanation(permission);
+                    }
+                    else
+                    {
+                        // We've asked before, and they declined. Might be set to 'never ask again',
+                        // so don't show explanation                     
+                        RequestPermissions(new string[] { permission }, permReqId);
+                    }
                 }
             }
             else
@@ -209,11 +216,30 @@ namespace OurPlace.Android.Fragments
             }
         }
 
+        private void ShowLocationPermExplanation(string permission)
+        {
+            global::Android.Support.V7.App.AlertDialog dialog = new global::Android.Support.V7.App.AlertDialog.Builder(Activity)
+                        .SetTitle(Resources.GetString(Resource.String.permissionLocationActivitiesTitle))
+                        .SetMessage(Resources.GetString(Resource.String.permissionLocationActivitiesExplanation))
+                        .SetPositiveButton("Got it", (s, o) =>
+                        {
+                            RequestPermissions(new string[] { permission }, permReqId);
+                        })
+                        .Create();
+            dialog.Show();
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == permReqId)
             {
+                // Save that we have already asked permission for location
+                ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Activity);
+                ISharedPreferencesEditor editor = prefs.Edit();
+                editor.PutBoolean("has_asked_loc_perm", true);
+                editor.Apply();
+
                 LoadData(grantResults[0] == Permission.Granted);
             }
         }

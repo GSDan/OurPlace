@@ -78,8 +78,8 @@
   <string name="permissionMicExplanation">Please give this app permission to access the microphone in order to record audio!</string>
   <string name="permissionLocationTitle">Location access required</string>
   <string name="permissionLocationExplanation">This type of task requires access to your device\'s location in order to function.</string>
-  <string name="permissionLocationActivitiesTitle">Please Grant Location Access</string>
-  <string name="permissionLocationActivitiesExplanation">Grant Park:Learn permission to access your location to see what activities are available nearby!</string>
+  <string name="permissionLocationActivitiesTitle">Want to see nearby activities?</string>
+  <string name="permissionLocationActivitiesExplanation">Grant OurPlace permission to access your location to see what activities are available nearby!</string>
   <string name="permissionRefused">Please give permissions in order to continue!</string>
   <string name="createNewActivityPrompt">Tap to create your first activity!</string>
   <string name="createNewActivityTitleView">What\'s the title of your new activity?</string>
