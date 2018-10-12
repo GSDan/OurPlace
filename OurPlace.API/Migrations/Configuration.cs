@@ -161,6 +161,16 @@ namespace OurPlace.API.Migrations
                      new Models.TaskType
                      {
                          Order = 10,
+                         ReqResponse = false,
+                         IdName = "QR_SCAN",
+                         ReqFileUpload = false,
+                         DisplayName = "Scan the QR Code",
+                         Description = "Find and scan the correct QR code",
+                         IconUrl = ConfidentialData.storage + "icons/locationHunt.png"
+                     },
+                     new Models.TaskType
+                     {
+                         Order = 11,
                          ReqResponse = true,
                          IdName = "MULT_CHOICE",
                          ReqFileUpload = false,
@@ -170,7 +180,7 @@ namespace OurPlace.API.Migrations
                      },
                       new Models.TaskType
                       {
-                          Order = 11,
+                          Order = 12,
                           ReqResponse = true,
                           IdName = "ENTER_TEXT",
                           ReqFileUpload = false,

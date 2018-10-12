@@ -25,6 +25,7 @@ namespace OurPlace.API.Models
 {
     public class LearningTask : Model
     {
+        public string ImageUrl { get; set; }
         public string Description { get; set; }
         public int Order { get; set; }
         public string JsonData { get; set; }
