@@ -102,7 +102,7 @@ namespace OurPlace.Android.Activities.Create
             }
 
             FindViewById<TextView>(Resource.Id.taskTypeNameText).Text = taskType.DisplayName;
-            ImageService.Instance.LoadUrl(taskType.IconUrl).IntoAsync(image);
+            ImageService.Instance.LoadUrl(taskType.IconUrl).Into(image);
         }
 
         private void UpdateFiles()

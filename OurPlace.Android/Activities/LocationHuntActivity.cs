@@ -33,9 +33,11 @@ using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace OurPlace.Android.Activities
@@ -239,6 +241,12 @@ namespace OurPlace.Android.Activities
 
         private void Arrived()
         {
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", learningTask?.Id.ToString() }
+            };
+            Analytics.TrackEvent("LocationHuntActivity_Arrived", properties);
+
             new global::Android.Support.V7.App.AlertDialog.Builder(this)
                 .SetTitle(base.Resources.GetString(Resource.String.locationHuntArrivedTitle))
                 .SetMessage(base.Resources.GetString(Resource.String.locationHuntArrivedMessage))

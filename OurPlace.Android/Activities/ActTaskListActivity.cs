@@ -565,9 +565,7 @@ namespace OurPlace.Android.Activities
 
                 preppedTasks.Add(Storage.PrepForUpload(t));
             }
-
-            await ImageService.Instance.InvalidateCacheAsync(FFImageLoading.Cache.CacheType.All);
-
+         
             // Skip packaging the upload if there is no entered data
             bool anyData = false;
             foreach (AppTask t in preppedTasks)
@@ -582,6 +580,8 @@ namespace OurPlace.Android.Activities
                 Finish();
                 return;
             }
+
+            // ImageService.Instance.InvalidateCacheAsync(FFImageLoading.Cache.CacheType.All);
 
             ApplicationUser creator = learningActivity.Author;
             if (creator != null && creator.Id != dbManager.currentUser.Id)

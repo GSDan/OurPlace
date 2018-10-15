@@ -33,6 +33,8 @@ using Newtonsoft.Json;
 using System;
 using System.Threading;
 using OurPlace.Common.Models;
+using System.Collections.Generic;
+using Microsoft.AppCenter.Analytics;
 
 namespace OurPlace.Android.Activities
 {
@@ -216,6 +218,12 @@ namespace OurPlace.Android.Activities
 
         public void ReturnWithFile()
         {
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", learningTask?.Id.ToString() }
+            };
+            Analytics.TrackEvent("RecordAudioActivity_ReturnWithFile", properties);
+
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
             myIntent.PutExtra("TASK_ID", learningTask.Id);
             myIntent.PutExtra("FILE_PATH", filePath);

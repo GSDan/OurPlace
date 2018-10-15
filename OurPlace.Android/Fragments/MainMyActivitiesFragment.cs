@@ -43,6 +43,7 @@ using Android.Text;
 using System.Linq;
 using OurPlace.Common.LocalData;
 using System.Threading.Tasks;
+using Microsoft.AppCenter.Analytics;
 
 namespace OurPlace.Android.Fragments
 {
@@ -317,6 +318,7 @@ namespace OurPlace.Android.Fragments
 
         private void StartCreate()
         {
+            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
             Intent intent = new Intent(this.Activity, typeof(CreateNewActivity));
             StartActivity(intent);
         }
@@ -372,6 +374,8 @@ namespace OurPlace.Android.Fragments
 
         private void DeleteLocalActivity(LearningActivity chosen)
         {
+            Analytics.TrackEvent("MainMyActivitiesFragment_DeleteLocalActivity");
+
             new AlertDialog.Builder(Activity)
             .SetTitle(Resource.String.deleteTitle)
             .SetMessage(Resource.String.deleteMessage)

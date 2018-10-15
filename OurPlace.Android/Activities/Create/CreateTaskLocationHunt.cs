@@ -82,7 +82,7 @@ namespace OurPlace.Android.Activities.Create
 
             FindViewById<TextView>(Resource.Id.taskTypeNameText).Text = taskType.DisplayName;
             ImageViewAsync image = FindViewById<ImageViewAsync>(Resource.Id.taskIcon);
-            ImageService.Instance.LoadUrl(taskType.IconUrl).IntoAsync(image);
+            ImageService.Instance.LoadUrl(taskType.IconUrl).Into(image);
 
             TouchableMapFragment mapFrag = (TouchableMapFragment)FragmentManager.FindFragmentById(Resource.Id.map);
             mapFrag.TouchUp += (sender, args) => scrollView.RequestDisallowInterceptTouchEvent(false);

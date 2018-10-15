@@ -112,7 +112,7 @@ namespace OurPlace.Android.Activities.Create
 
             if (selectedImage == null)
             {
-                await ImageService.Instance.LoadUrl(taskType.IconUrl).IntoAsync(imageView);
+                ImageService.Instance.LoadUrl(taskType.IconUrl).Into(imageView);
             }
         }
 

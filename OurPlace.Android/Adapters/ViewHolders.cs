@@ -281,7 +281,7 @@ namespace OurPlace.Android.Adapters
                 ItemList.AddView(newImage);
                 ImageService.Instance.LoadFile(imagePath)
                     .DownSampleInDip(width: 150)
-                    .IntoAsync(newImage);
+                    .Into(newImage);
 
                 newImage.Click += Item_Click;
             }

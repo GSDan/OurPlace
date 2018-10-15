@@ -95,7 +95,7 @@ namespace OurPlace.Android.Activities
                 updatedUser.AccessExpiresAt = tempUser.AccessExpiresAt;
                 updatedUser.RefreshToken = tempUser.RefreshToken;
                 updatedUser.RefreshExpiresAt = tempUser.RefreshExpiresAt;
-
+               
                 (await GetDatabaseManager()).AddUser(updatedUser);
                 Intent intent = new Intent(this, typeof(MainActivity));
                 intent.AddFlags(ActivityFlags.ClearTop);

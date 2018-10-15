@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using ParkLearn.PCL.Models;
+using Microsoft.AppCenter.Analytics;
 
 namespace OurPlace.Common
 {
@@ -107,6 +108,7 @@ namespace OurPlace.Common
                                     ErrorResponse errResp = JsonConvert.DeserializeObject<ErrorResponse>(json);
                                     if (errResp != null && errResp.Error == "invalid_grant")
                                     {
+                                        Analytics.TrackEvent("ServerUtils_GetAccessToken_RefreshTokenInvalid");
                                         // token invalid, prompt new sign-in
                                         return null;
                                     }
@@ -122,6 +124,7 @@ namespace OurPlace.Common
 
                             if (refResp != null && !string.IsNullOrWhiteSpace(refResp.Access_token))
                             {
+                                Analytics.TrackEvent("ServerUtils_GetAccessToken_SuccessfulRefresh");
                                 // success! Save the new access token and its expiry time
                                 dbManager.currentUser.AccessToken = refResp.Access_token;
                                 dbManager.currentUser.AccessExpiresAt = DateTime.UtcNow.AddSeconds(refResp.Expires_in);

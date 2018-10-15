@@ -29,13 +29,16 @@ using Android.Support.V7.App;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities.Create;
 using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
 using OurPlace.Common;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ZXing.Mobile;
 
@@ -70,9 +73,12 @@ namespace OurPlace.Android.Activities
             if (!await Common.LocalData.Storage.InitializeLogin())
             {
                 // Login invalid
+                Analytics.TrackEvent("MainActivity_InvalidLogin");
                 var suppress = AndroidUtils.ReturnToSignIn(this);
                 return;
             }
+
+            Analytics.TrackEvent("MainActivity_ValidLogin");
 
             UpdateTaskTypes();
 
@@ -246,6 +252,7 @@ namespace OurPlace.Android.Activities
         public async void LaunchActivity(LearningActivity activity)
         {
             int thisVersion = PackageManager.GetPackageInfo(PackageName, 0).VersionCode;
+            DatabaseManager dbManager = await Common.LocalData.Storage.GetDatabaseManager();
 
             if (activity.AppVersionNumber > thisVersion)
             {
@@ -256,6 +263,13 @@ namespace OurPlace.Android.Activities
                     .Show();
                 return;
             }
+
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                { "UserId", dbManager.currentUser.Id},
+                { "ActivityId", activity.Id.ToString() }
+            };
+            Analytics.TrackEvent("MainActivity_LaunchActivity", properties);
 
             Intent performActivityIntent = new Intent(this, typeof(ActTaskListActivity));
 

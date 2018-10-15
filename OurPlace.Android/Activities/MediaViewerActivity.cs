@@ -29,11 +29,13 @@ using Android.Views;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Android.Misc;
 using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OurPlace.Android.Activities
@@ -75,6 +77,13 @@ namespace OurPlace.Android.Activities
             }
             
             taskType = thisTask.TaskType.IdName;
+
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", taskId.ToString() },
+                {"TaskType", taskType }
+            };
+            Analytics.TrackEvent("MediaViewerActivity", properties);
 
             if (new string[] { "TAKE_VIDEO", "REC_AUDIO", "LISTEN_AUDIO" }.Contains(taskType))
             {

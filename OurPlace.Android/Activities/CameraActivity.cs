@@ -39,6 +39,8 @@ using Android.Gms.Common;
 using Android.Locations;
 using System.Threading.Tasks;
 using static OurPlace.Common.LocalData.Storage;
+using Microsoft.AppCenter.Analytics;
+using System.Collections.Generic;
 
 namespace OurPlace.Android.Activities
 {
@@ -111,15 +113,15 @@ namespace OurPlace.Android.Activities
                 if (!File.Exists(localRes))
                 {
                     Toast.MakeText(this, Resource.String.PleaseWait, ToastLength.Long).Show();
-                    await ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
+                    ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
                         .DownSample(width: 500)
-                        .IntoAsync(targetImageView);
+                        .Into(targetImageView);
                 }
                 else
                 {
                     // Load the local file
-                    await ImageService.Instance.LoadFile(localRes).DownSample(width: 500)
-                        .IntoAsync(targetImageView);
+                    ImageService.Instance.LoadFile(localRes).DownSample(width: 500)
+                        .Into(targetImageView);
                 }
 
                 targetImageView.Visibility = ViewStates.Visible;
@@ -128,6 +130,12 @@ namespace OurPlace.Android.Activities
 
         public void ReturnWithFile(string filePath)
         {
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", learningTask.Id.ToString() }
+            };
+            Analytics.TrackEvent("CameraActivity_ReturnWithFile", properties);
+
             // add location to EXIF if it's known
             global::Android.Locations.Location loc = GetLastLocation();
             if (loc != null)

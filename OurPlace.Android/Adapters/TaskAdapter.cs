@@ -25,6 +25,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using FFImageLoading;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Common;
 using OurPlace.Common.Models;
@@ -574,7 +575,11 @@ namespace OurPlace.Android.Adapters
                     throw new Exception("File doesn't exist");
                 }
 
-                Console.WriteLine("Deleting file " + info.FullName);
+                Dictionary<string, string> properties = new Dictionary<string, string>
+                {
+                    {"TaskId", taskId.ToString() }
+                };
+                Analytics.TrackEvent("TaskAdapter_DeleteFile", properties);
 
                 info.Delete();
                 paths.RemoveAt(fileIndex);

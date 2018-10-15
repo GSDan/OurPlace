@@ -22,6 +22,9 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace OurPlace.Android.Activities
 {
@@ -31,6 +34,8 @@ namespace OurPlace.Android.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            AppCenter.Start("4b34939c-d3b8-4b89-8ba4-0355c4a4732b", typeof(Analytics), typeof(Crashes));
+
             Init();
         }
 

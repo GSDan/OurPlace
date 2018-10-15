@@ -27,6 +27,7 @@ using Android.Gms.Maps.Model;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
 using System.Collections.Generic;
@@ -227,7 +228,14 @@ namespace OurPlace.Android.Activities
 
            if (progDialog != null) progDialog.Dismiss();
 
-           Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", learningTask.Id.ToString() },
+                {"NumLocs", locs.Length.ToString()}
+            };
+            Analytics.TrackEvent("LocationMarkerActivity_Finish", properties);
+
+            Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
            myIntent.PutExtra("TASK_ID", learningTask.Id);
            myIntent.PutExtra("LOCATIONS", locJson);
             SetResult(global::Android.App.Result.Ok, myIntent);

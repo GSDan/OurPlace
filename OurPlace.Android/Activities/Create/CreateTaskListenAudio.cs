@@ -75,7 +75,7 @@ namespace OurPlace.Android.Activities.Create
             Prepare();
         }
 
-        private async void Prepare()
+        private void Prepare()
         {
             // Check if this is editing an existing task: if so, populate fields
             string editJson = Intent.GetStringExtra("EDIT") ?? "";
@@ -105,7 +105,7 @@ namespace OurPlace.Android.Activities.Create
 
             FindViewById<TextView>(Resource.Id.taskTypeNameText).Text = taskType.DisplayName;
             ImageViewAsync image = FindViewById<ImageViewAsync>(Resource.Id.taskIcon);
-            await ImageService.Instance.LoadUrl(taskType.IconUrl).IntoAsync(image);
+            ImageService.Instance.LoadUrl(taskType.IconUrl).Into(image);
         }
 
         protected override void OnResume()

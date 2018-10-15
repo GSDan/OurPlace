@@ -30,9 +30,11 @@ using Android.Widget;
 using ColorPicker;
 using FFImageLoading;
 using FFImageLoading.Views;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace OurPlace.Android.Activities
@@ -168,13 +170,13 @@ namespace OurPlace.Android.Activities
                 {
                     ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
                         .DownSample(width: 500)
-                        .IntoAsync(bgImage);
+                        .Into(bgImage);
                 }
                 else
                 {
                     ImageService.Instance.LoadFile(previousImage)
                         .DownSample(width: 500)
-                        .IntoAsync(bgImage);
+                        .Into(bgImage);
                 }
             }
             else
@@ -191,6 +193,12 @@ namespace OurPlace.Android.Activities
 
         public void ReturnWithImage(string imagePath)
         {
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                {"TaskId", learningTask?.Id.ToString() }
+            };
+            Analytics.TrackEvent("DrawingActivity", properties);
+
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
             myIntent.PutExtra("TASK_ID", learningTask.Id);
             myIntent.PutExtra("FILE_PATH", imagePath);
