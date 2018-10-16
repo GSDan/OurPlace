@@ -22,13 +22,13 @@
                 <h4>@ViewData["actShare"]</h4>
 
                 @if (ViewData["qrCode"] != null)
-    {
-            <!-- Open the QR Code in new tab when clicked for easy viewing/saving/printing -->
-            <a href='@ViewData["qrCode"]' target="_blank">
-                <img width="35%" src='@ViewData["qrCode"]' />
-                <p style="margin-top:0px;padding-top:0px"><i><small>Click to enlarge QR code</small></i></p>
-            </a>
-}
+                {
+                    <!-- Open the QR Code in new tab when clicked for easy viewing/saving/printing -->
+                    <a href='@ViewData["qrCode"]' target="_blank">
+                        <img width="35%" src='@ViewData["qrCode"]' />
+                        <p style="margin-top:0px;padding-top:0px"><i><small>Click to enlarge QR code</small></i></p>
+                    </a>
+                }
 
                 <p>This page has been visited @ViewData["viewCount"] times</p>
 
@@ -43,6 +43,18 @@
                     <p>Download the OurPlace app to try out this activity!</p>
                 </div>
                 <br />
+
+                @if (((List<KeyValuePair<string, string>>)ViewData["scanTasks"]).Count > 0)
+                {
+                    <h4>QR Codes for this Activity's Tasks:</h4>
+                    foreach (var item in (List<KeyValuePair<string, string>>)ViewData["scanTasks"])
+                    {
+                        <a href="@item.Key">@item.Value</a> <br />
+                    }
+                }
+
+
+
             </div>
         </div>
     </div>

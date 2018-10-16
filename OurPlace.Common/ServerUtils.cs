@@ -179,6 +179,11 @@ namespace OurPlace.Common
             return ConfidentialData.storage + data;
         }
 
+        public static string GetTaskQRCodeData(int taskId)
+        {
+            return ConfidentialData.api + "app/task?id=" + taskId;
+        }
+
         public static async Task<ServerResponse<TaskType[]>> GetTaskTypes()
         {
             ServerResponse<TaskType[]> response = await Get<TaskType[]>("/api/tasktypes");
@@ -494,6 +499,14 @@ namespace OurPlace.Common
                     }
                 }
             }
+
+            // clean up json
+            activity.Author.AccessToken = null;
+            activity.Author.RefreshToken = null;
+            activity.Author.CachedActivitiesJson = null;
+            activity.Author.RemoteCreatedActivitiesJson = null;
+            activity.Author.LocalCreatedActivitiesJson = null; 
+
             return Post<string>(upload.UploadRoute, activity);
         }
 

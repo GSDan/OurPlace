@@ -245,7 +245,21 @@ namespace OurPlace.Android.Activities
 
             if (response.Success)
             {
-                (await Common.LocalData.Storage.GetDatabaseManager()).AddTaskTypes(response.Data);
+                // TODO make sure to remove this after updating the iOS version!!
+
+                List<TaskType> tempTypes = new List<TaskType>(response.Data);
+                tempTypes.Add(new TaskType
+                {
+                    Id = 14,
+                    Order = 10,
+                    IdName = "SCAN_QR",
+                    ReqFileUpload = false,
+                    DisplayName = "Scan the QR Code",
+                    Description = "Find and scan the correct QR code",
+                    IconUrl = ConfidentialData.storage + "icons/scanQR.png"
+                });
+
+                (await Common.LocalData.Storage.GetDatabaseManager()).AddTaskTypes(tempTypes);
             }
         }
 

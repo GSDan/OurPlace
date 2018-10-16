@@ -127,6 +127,7 @@
   <string name="createNewListenExisting">Choose Existing</string>
   <string name="createNewListenNew">Record New</string>
   <string name="createNewListenNoFile">Please choose or record an audio file!</string>
+  <string name="createNewQrHint">This QR code will be automatically created when you upload your activity. You\'ll be able to find and print it from www.ourplace.app</string>
   <string name="createTaskChildrenAdd">Add Follow-Up Tasks</string>
   <string name="createTaskChildrenManage">Manage Follow-Up Tasks</string>
   <string name="createTaskChildrenDesc">These tasks will become available to the learner once they have completed your \'{0}\' task.</string>
@@ -211,4 +212,8 @@
   <string name="loginInfo_whatAnswer">We take the minimum amount of information from your social media account in order to provide a good service. We don\'t have access to your friends lists, and we can\'t and won\'t post things on your behalf. We simply store your name, date of birth, a link to your profile picture and your email address.</string>
   <string name="loginInfo_howTitle">Why do you need this information and how will it be used?</string>
   <string name="loginInfo_howAnswer">We need an email address to be able to identify you across services. If, for example, you signed into OurPlace with a Google account and then the next week signed in using Facebook, we could see that you\'re the same person thanks to the matching email address. We will not share any of your details with third parties and we will not spam your email account. The other basic profile information is used to personalise your OurPlace experience and help us keep track of how the service is being used.</string>
+  <string name="scanningActivity_cancelled">Cancelled scanning</string>
+  <string name="scanningActivity_success">You got it!</string>
+  <string name="scanningActivity_title">Find and scan the QR code</string>
+  <string name="scanningActivity_wrong">That\'s not it!</string>
 </resources>

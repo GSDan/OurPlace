@@ -23,6 +23,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
+using OurPlace.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -418,19 +419,28 @@ namespace OurPlace.API.Controllers
                     for (int j = 0; j < thisTask.ChildTasks.Count(); j++)
                     {
                         LearningTask thisChild = thisTask.ChildTasks.ElementAt(j);
-                        finalChildTasks.Add(db.LearningActivityTasks.Add(new LearningTask
+                        LearningTask dbChildTask = db.LearningActivityTasks.Add(new LearningTask
                         {
                             Author = thisUser,
                             Description = thisChild.Description,
                             JsonData = thisChild.JsonData,
                             TaskType = await db.TaskTypes.SingleAsync(tt => tt.Id == thisChild.TaskType.Id),
                             Order = orderCount++
-                        }));
+                        });
+
+                        if (dbChildTask.TaskType.IdName == "SCAN_QR")
+                        {
+                            await db.SaveChangesAsync();
+                            dbChildTask.JsonData = await GenerateQR(string.Format("task-{0}", dbChildTask.Id),
+                                Common.ServerUtils.GetTaskQRCodeData(dbChildTask.Id));
+                        }
+
+                        finalChildTasks.Add(dbChildTask);
                     }
                     thisTask.ChildTasks = finalChildTasks;
                 }
 
-                finalTasks.Add(db.LearningActivityTasks.Add(new LearningTask
+                LearningTask dbTask = db.LearningActivityTasks.Add(new LearningTask
                 {
                     Author = thisUser,
                     Description = thisTask.Description,
@@ -438,7 +448,16 @@ namespace OurPlace.API.Controllers
                     TaskType = await db.TaskTypes.SingleAsync(tt => tt.Id == thisTask.TaskType.Id),
                     ChildTasks = thisTask.ChildTasks,
                     Order = thisTask.Order
-                }));
+                });
+
+                if(dbTask.TaskType.IdName == "SCAN_QR")
+                {
+                    await db.SaveChangesAsync();
+                    dbTask.JsonData = await GenerateQR(string.Format("task-{0}", dbTask.Id),
+                        Common.ServerUtils.GetTaskQRCodeData(dbTask.Id));
+                }
+
+                finalTasks.Add(dbTask);
             }
 
             learningActivity.LearningTasks = finalTasks;
@@ -468,21 +487,10 @@ namespace OurPlace.API.Controllers
 
             string qrCodeUrl = "qrCodes/" + finalAct.InviteCode + ".png";
             string shareAddress = ServerUtils.GetActivityShareUrl(finalAct.InviteCode);
-            Bitmap qrCode = ServerUtils.GenerateQRCode(shareAddress, true);
-            CloudBlobContainer appContainer = ServerUtils.GetCloudBlobContainer();
-            CloudBlockBlob blob = appContainer.GetBlockBlobReference(qrCodeUrl);
-            using (MemoryStream stream = new MemoryStream())
-            {
-                qrCode.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                blob.Properties.ContentType = "image/png";
-                stream.Seek(0, SeekOrigin.Begin);
-                blob.UploadFromStream(stream);
-            }
 
-            finalAct.QRCodeUrl = qrCodeUrl;
+            finalAct.QRCodeUrl = await GenerateQR(finalAct.InviteCode, shareAddress);
 
             await db.SaveChangesAsync();
-
 
             Common.Models.LimitedLearningActivity limitedVersion = GetAllWhere(a => a.Id == finalAct.Id).FirstOrDefault();
 
@@ -491,6 +499,23 @@ namespace OurPlace.API.Controllers
             var resp = Request.CreateResponse(HttpStatusCode.OK);
             resp.Content = new StringContent(JsonConvert.SerializeObject(limitedVersion, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }), Encoding.UTF8, "application/json");
             return resp;
+        }
+
+        private async Task<string> GenerateQR(string codeName, string codeData)
+        {
+            string qrCodeUrl = "qrCodes/" + codeName + ".png";
+            Bitmap qrCode = ServerUtils.GenerateQRCode(codeData, true);
+            CloudBlobContainer appContainer = ServerUtils.GetCloudBlobContainer();
+            CloudBlockBlob blob = appContainer.GetBlockBlobReference(qrCodeUrl);
+            using (MemoryStream stream = new MemoryStream())
+            {
+                qrCode.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                blob.Properties.ContentType = "image/png";
+                stream.Seek(0, SeekOrigin.Begin);
+                await blob.UploadFromStreamAsync(stream);
+            }
+
+            return qrCodeUrl;
         }
 
         // DELETE: api/LearningActivities/5

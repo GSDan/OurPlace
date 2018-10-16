@@ -19,13 +19,11 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Microsoft.AspNet.Identity.Owin;
 using OurPlace.API.Models;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 
 namespace OurPlace.API.Controllers.Site

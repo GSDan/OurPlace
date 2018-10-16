@@ -43,17 +43,30 @@ namespace OurPlace.Android.Activities.Create
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.CreateTask);
+
+            // Check if this is editing an existing task: if so, populate fields
+            string editJson = Intent.GetStringExtra("EDIT") ?? "";
+            newTask = JsonConvert.DeserializeObject<LearningTask>(editJson);
+
+            // otherwise, we'll use basic tasktype info
+            string jsonData = Intent.GetStringExtra("JSON") ?? "";
+            taskType = JsonConvert.DeserializeObject<TaskType>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+
+            if((taskType != null && taskType.IdName == "SCAN_QR") || 
+                (newTask != null && newTask.TaskType.IdName == "SCAN_QR"))
+            {
+                SetContentView(Resource.Layout.CreateTaskScanQR);
+            }
+            else
+            {
+                SetContentView(Resource.Layout.CreateTask);
+            }
 
             TextView taskTypeName = FindViewById<TextView>(Resource.Id.taskTypeNameText);
             ImageViewAsync image = FindViewById<ImageViewAsync>(Resource.Id.taskIcon);
             Button addTaskBtn = FindViewById<Button>(Resource.Id.addTaskBtn);
             addTaskBtn.Click += AddTaskBtn_Click;
             instructions = FindViewById<EditText>(Resource.Id.taskInstructions);
-
-            // Check if this is editing an existing task: if so, populate fields
-            string editJson = Intent.GetStringExtra("EDIT") ?? "";
-            newTask = JsonConvert.DeserializeObject<LearningTask>(editJson);
 
             if (newTask != null)
             {
@@ -64,8 +77,7 @@ namespace OurPlace.Android.Activities.Create
             }
             else
             {
-                // If edit is null, get the tasktype from JSON
-                string jsonData = Intent.GetStringExtra("JSON") ?? "";
+                // If edit is null just use the tasktype JSON
                 taskType = JsonConvert.DeserializeObject<TaskType>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
                 newTask = new LearningTask();
                 newTask.TaskType = taskType;

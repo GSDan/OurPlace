@@ -162,11 +162,11 @@ namespace OurPlace.API.Migrations
                      {
                          Order = 10,
                          ReqResponse = false,
-                         IdName = "QR_SCAN",
+                         IdName = "SCAN_QR",
                          ReqFileUpload = false,
                          DisplayName = "Scan the QR Code",
                          Description = "Find and scan the correct QR code",
-                         IconUrl = ConfidentialData.storage + "icons/locationHunt.png"
+                         IconUrl = ConfidentialData.storage + "icons/scanQR.png"
                      },
                      new Models.TaskType
                      {

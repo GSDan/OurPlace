@@ -35,7 +35,7 @@ namespace OurPlace.API.Controllers
             ApplicationUser thisUser = await GetUser();
             await MakeLog();
 
-            return db.TaskTypes;
+            return db.TaskTypes.Where(taskType =>  taskType.IdName != "SCAN_QR" );
         }
 
         // GET: api/TaskTypes/5

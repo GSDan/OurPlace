@@ -49,9 +49,10 @@ namespace OurPlace.Android.Adapters
         const int TASK_LOCATIONMARKER = 8;
         const int TASK_INFO = 9;
         const int TASK_LISTEN = 10;
-        const int FINISH = 11;
-        const int CURATE = 12;
-        const int NAMES = 13;
+        const int TASK_SCAN = 11;
+        const int FINISH = 12;
+        const int CURATE = 13;
+        const int NAMES = 14;
 
         public List<AppTask> items;
         private readonly Dictionary<int, List<AppTask>> hiddenChildren;
@@ -114,7 +115,8 @@ namespace OurPlace.Android.Adapters
                 {"LOC_HUNT", TASK_LOCATIONHUNT },
                 {"MAP_MARK", TASK_LOCATIONMARKER },
                 {"INFO", TASK_INFO },
-                {"LISTEN_AUDIO", TASK_LISTEN }
+                {"LISTEN_AUDIO", TASK_LISTEN },
+                {"SCAN_QR", TASK_SCAN }
             };
         }
 
@@ -648,6 +650,7 @@ namespace OurPlace.Android.Adapters
 
             switch (viewType)
             {
+                case TASK_SCAN:
                 case TASK_LISTEN:
                 case TASK_LOCATIONHUNT:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);

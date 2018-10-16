@@ -471,6 +471,12 @@ namespace OurPlace.Android.Activities
                     new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
                     lastReqIntent, adapter.items[position].Id, permReqId, this);
             }
+            else if(taskType == "SCAN_QR")
+            {
+                lastReqIntent = new Intent(this, typeof(ScanningActivity));
+                lastReqIntent.PutExtra("JSON", json);
+                StartActivityForResult(lastReqIntent, adapter.items[position].Id);
+            }
             else if (taskType == "REC_AUDIO")
             {
                 lastReqIntent = new Intent(this, typeof(RecordAudioActivity));

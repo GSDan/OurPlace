@@ -273,6 +273,7 @@
     <Compile Include="Activities\MediaViewerActivity.cs" />
     <Compile Include="Activities\RecordAudioActivity.cs" />
     <Compile Include="Activities\LoginInfoActivity.cs" />
+    <Compile Include="Activities\ScanningActivity.cs" />
     <Compile Include="Activities\SplashActivity.cs" />
     <Compile Include="Activities\UploadsActivity.cs" />
     <Compile Include="Adapters\ChapterAdapter.cs" />
@@ -288,6 +289,7 @@
     <Compile Include="Adapters\ViewHolders.cs" />
     <Compile Include="AndroidUtils.cs" />
     <Compile Include="Adapters\LearningActivitiesAdapter.cs" />
+    <Compile Include="Fragments\CustomScannerFragment.cs" />
     <Compile Include="Misc\AlwaysVisibleMediaController.cs" />
     <Compile Include="Misc\AutoFitTextureView.cs" />
     <Compile Include="ColorPicker\AlphaPatternDrawable.cs" />
@@ -329,7 +331,7 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\Layout\TaskCard.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\actionbarOverlay.axml">
       <SubType>AndroidResource</SubType>
@@ -905,6 +907,14 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\baseline_audiotrack_black_48.png">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
     </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Layout\CreateTaskScanQR.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Layout\ScanningActivity.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

@@ -19,7 +19,6 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -27,6 +26,7 @@ using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
 using Newtonsoft.Json;
+using OurPlace.Android.Fragments;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
@@ -59,7 +59,7 @@ namespace OurPlace.Android.Activities
 
             if (scanFragment == null)
             {
-                scanFragment = new ZXingScannerFragment
+                scanFragment = new CustomScannerFragment
                 {
                     BottomText = learningTask.Description
                 };
@@ -76,7 +76,7 @@ namespace OurPlace.Android.Activities
             }
             else
             {
-                Scan();
+                scanFragment.StartScanning(OnScanResult, GetOptions());
             }
         }
 
@@ -85,33 +85,32 @@ namespace OurPlace.Android.Activities
             PermissionsHandler.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        private void Scan()
+        public MobileBarcodeScanningOptions GetOptions()
         {
-            MobileBarcodeScanningOptions options = new MobileBarcodeScanningOptions
+            return new MobileBarcodeScanningOptions
             {
                 PossibleFormats = new List<ZXing.BarcodeFormat>
                 {
                     ZXing.BarcodeFormat.QR_CODE
                 }
             };
+        }
 
-            scanFragment.StartScanning(res =>
+        public void OnScanResult(ZXing.Result res)
+        {
+            if (res == null || string.IsNullOrEmpty(res.Text))
             {
-                if(res == null || string.IsNullOrEmpty(res.Text))
-                {
-                    Toast.MakeText(this, Resource.String.scanningActivity_cancelled, ToastLength.Short).Show();
-                    return;
-                }
+                Toast.MakeText(this, Resource.String.scanningActivity_cancelled, ToastLength.Short).Show();
+                return;
+            }
 
-                if(res.Text == learningTask.JsonData)
-                {
-                    RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_success, ToastLength.Long).Show());
-                    ReturnSuccess();
-                }
+            if (res.Text == Common.ServerUtils.GetTaskQRCodeData(learningTask.Id))
+            {
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_success, ToastLength.Short).Show());
+                ReturnSuccess();
+            }
 
-                RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_wrong, ToastLength.Short).Show());
-
-            }, options);
+            RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_wrong, ToastLength.Short).Show());
         }
 
         protected override void OnPause()
@@ -125,6 +124,7 @@ namespace OurPlace.Android.Activities
         {
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
             myIntent.PutExtra("TASK_ID", learningTask.Id);
+            myIntent.PutExtra("COMPLETE", true);
             SetResult(Result.Ok, myIntent);
             Finish();
         }
