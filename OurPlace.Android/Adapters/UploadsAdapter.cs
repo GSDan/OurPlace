@@ -74,7 +74,7 @@ namespace OurPlace.Android.Adapters
             vh.Title.Text = data[position].Name;
             vh.Description.Text = data[position].Description;
             ImageService.Instance.LoadFile(data[position].ImageUrl)
-                    .Into(vh.Image);
+                    .Into(vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

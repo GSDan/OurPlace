@@ -216,4 +216,6 @@
   <string name="scanningActivity_success">You got it!</string>
   <string name="scanningActivity_title">Find and scan the QR code</string>
   <string name="scanningActivity_wrong">That\'s not it!</string>
+  <string name="pref_cacheNumber_title">Offline activity limit</string>
+  <string name="pref_cacheNumber_summary">The maximum number of activities to be stored at once for offline use</string>
 </resources>

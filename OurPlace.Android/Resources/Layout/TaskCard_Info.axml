@@ -13,44 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <FFImageLoading.Views.ImageViewAsync
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:id="@+id/taskImage"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="-35dp"
-                android:visibility="gone" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#333333"
-                android:id="@+id/taskTitle"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="4dp"
-                android:textSize="0sp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#333333"
-                android:text="Four"
-                android:id="@+id/taskDesc"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="4dp"
-                android:textSize="15sp"
-                android:padding="16dp" />
-            <Button
-                android:id="@+id/taskBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ExternalBtn"
-                android:layout_gravity="right"
-                android:layout_marginTop="12dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginBottom="24dp"
-                android:padding="10dp"
-                android:visibility="gone" />
+            <include
+                layout="@layout/taskcard_icontitledesc_component" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

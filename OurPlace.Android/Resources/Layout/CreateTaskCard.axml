@@ -22,7 +22,7 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:src="@mipmap/ic_launcher"
-                    android:id="@+id/taskImage"
+                    android:id="@+id/taskTypeIcon"
                     android:scaleType="centerCrop"
                     android:padding="8dp" />
                 <LinearLayout
@@ -49,7 +49,7 @@
                         android:id="@+id/taskDesc"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginLeft="4dp"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:paddingBottom="10dp" />
                     <LinearLayout
                         android:layout_width="wrap_content"

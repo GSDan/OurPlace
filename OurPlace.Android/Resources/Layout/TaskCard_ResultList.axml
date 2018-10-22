@@ -21,59 +21,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <include
+                layout="@layout/taskcard_icontitledesc_component" />
             <LinearLayout
+                android:id="@+id/resultListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp">
-                <FFImageLoading.Views.ImageViewAsync
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:id="@+id/taskImage"
-                    android:scaleType="centerCrop"
-                    android:padding="8dp" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="#333333"
-                        android:text="Caption"
-                        android:id="@+id/taskTitle"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginLeft="4dp"
-                        android:textSize="18sp" />
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="#333333"
-                        android:text="Caption"
-                        android:id="@+id/taskDesc"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginLeft="4dp"
-                        android:textSize="15sp"
-                        android:paddingBottom="10dp" />
-                    <LinearLayout
-                        android:id="@+id/resultListLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp" />
-                    <Button
-                        android:id="@+id/taskBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/TaskBtn"
-                        android:layout_gravity="right"
-                        android:padding="10dp" />
-                </LinearLayout>
-            </LinearLayout>
+                android:orientation="vertical"
+                android:padding="12dp" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

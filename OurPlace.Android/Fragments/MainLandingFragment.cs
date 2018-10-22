@@ -61,16 +61,13 @@ namespace OurPlace.Android.Fragments
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-        }
 
-        private async Task InitialLoad()
-        {
-            dbManager = await GetDatabaseManager();
+            dbManager = GetDatabaseManager().Result;
 
-            if (dbManager.currentUser == null)
+            if (dbManager == null || dbManager.currentUser == null)
             {
                 // Something bad has happened, log out
-                await AndroidUtils.ReturnToSignIn(Activity);
+                var suppress = AndroidUtils.ReturnToSignIn(Activity);
                 return;
             }
 
@@ -118,11 +115,15 @@ namespace OurPlace.Android.Fragments
 
             adapter = new LearningActivitiesAdapter(cached, dbManager);
             adapter.ItemClick += OnItemClick;
+
+            if (savedInstanceState != null)
+            {
+                adapter.data = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
+                adapter.NotifyDataSetChanged();
+            }
+
             layoutManager = new GridLayoutManager(Activity, cols);
             layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
-
-            recyclerView.SetLayoutManager(layoutManager);
-            recyclerView.SetAdapter(adapter);
 
             if (AndroidUtils.IsGooglePlayServicesInstalled(Activity) && googleApiClient == null)
             {
@@ -131,9 +132,8 @@ namespace OurPlace.Android.Fragments
                     .AddOnConnectionFailedListener(this)
                     .AddApi(LocationServices.API)
                     .Build();
+                googleApiClient?.Connect();
             }
-
-            CheckLocationPermission();
         }
 
         public override void OnStop()
@@ -145,14 +145,9 @@ namespace OurPlace.Android.Fragments
             base.OnStop();
         }
 
-        public override async void OnResume()
+        public override void OnResume()
         {
             base.OnResume();
-
-            if(dbManager == null)
-            {
-                await InitialLoad();
-            }
 
             if (!loaded && !loading)
             {
@@ -357,33 +352,26 @@ namespace OurPlace.Android.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.MainLanding, container, false);
-            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
-            refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
             return view;
         }
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
+            refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+            refresher.Refresh += Refresher_Refresh;
             refresher.SetColorSchemeResources(
                 Resource.Color.app_darkgreen,
                 Resource.Color.app_green,
                 Resource.Color.app_purple
                 );
 
-            refresher.Refresh += Refresher_Refresh;
+            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView.SetLayoutManager(layoutManager);
+            recyclerView.SetAdapter(adapter);
 
-            await InitialLoad();
-            if (googleApiClient != null)
-            {
-                googleApiClient.Connect();
-            }
+            loaded = true;
 
-            if (savedInstanceState != null && adapter != null)
-            {
-                adapter.data = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
-                adapter.NotifyDataSetChanged();
-                loaded = true;
-            }
+            CheckLocationPermission();
 
             base.OnViewCreated(view, savedInstanceState);
         }

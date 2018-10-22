@@ -24,6 +24,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Gms.Maps;
 using Android.OS;
+using Android.Preferences;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Util;
@@ -133,6 +134,12 @@ namespace OurPlace.Android.Activities
             if (item.ItemId == Resource.Id.menuuploads)
             {
                 Intent intent = new Intent(this, typeof(UploadsActivity));
+                StartActivity(intent);
+                return true;
+            }
+            if(item.ItemId == Resource.Id.menusettings)
+            {
+                Intent intent = new Intent(this, typeof(PreferencesActivity));
                 StartActivity(intent);
                 return true;
             }
@@ -289,8 +296,10 @@ namespace OurPlace.Android.Activities
 
             activity.LearningTasks = activity.LearningTasks.OrderBy(t => t.Order).ToList();
 
+            ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(this);
+
             // Save this activity to the database for showing in the 'recent' feed section
-            (await Common.LocalData.Storage.GetDatabaseManager()).AddActivity(activity);
+            (await Storage.GetDatabaseManager()).AddActivity(activity, int.Parse(prefs.GetString("pref_cacheNumber", "4")));
 
             string json = JsonConvert.SerializeObject(activity, new JsonSerializerSettings
             {

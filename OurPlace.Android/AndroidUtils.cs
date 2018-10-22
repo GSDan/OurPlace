@@ -80,7 +80,7 @@ namespace OurPlace.Android
             loadingDialog.Dismiss();
         }
 
-        public static async Task ReturnToSignIn(Activity context)
+        public static async Task ReturnToSignIn(Activity activity)
         {
             DatabaseManager dbManager = await GetDatabaseManager();
 
@@ -89,11 +89,12 @@ namespace OurPlace.Android
                 dbManager.CleanDatabase();
             }
 
-            if (context == null) return;
+            if (activity == null) return;
 
+            Context context = activity.ApplicationContext;
             Intent intent = new Intent(context, typeof(LoginActivity));
             context.StartActivity(intent);
-            context.Finish();
+            activity.Finish();
         }
 
         public static void LocationToEXIF(string filePath, global::Android.Locations.Location loc)

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <FFImageLoading.Views.ImageViewAsync
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:id="@+id/taskImage"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="-35dp"
+        android:visibility="gone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+        <FFImageLoading.Views.ImageViewAsync
+            android:layout_width="85dp"
+            android:layout_height="85dp"
+            android:src="@mipmap/ic_launcher"
+            android:id="@+id/taskTypeIcon"
+            android:scaleType="centerCrop"
+            android:padding="4dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#333333"
+                android:text="Caption"
+                android:id="@+id/taskTitle"
+                android:layout_gravity="center_horizontal"
+                android:textSize="18sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#333333"
+                android:text="Caption"
+                android:id="@+id/taskDesc"
+                android:layout_gravity="center_horizontal"
+                android:textSize="16sp"
+                android:paddingBottom="10dp" />
+            <Button
+                android:id="@+id/taskBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/TaskBtn"
+                android:layout_gravity="right"
+                android:padding="10dp" />
+        </LinearLayout>
+    </LinearLayout>
+</merge>

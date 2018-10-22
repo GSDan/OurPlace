@@ -24,7 +24,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="0.35" />
                 <FFImageLoading.Views.ImageViewAsync
-                    android:id="@+id/activityIcon"
+                    android:id="@+id/taskTypeIcon"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
                     android:layout_weight="0.3"

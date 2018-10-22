@@ -204,7 +204,7 @@ namespace OurPlace.Common.LocalData
         }
 
         // Cached activities
-        public void AddActivity(LearningActivity act)
+        public void AddActivity(LearningActivity act, int maxCacheCount = 4)
         {
             bool exists = connection.Table<ActivityCache>().Where(a => a.ActivityId == act.Id).Any();
 
@@ -212,11 +212,16 @@ namespace OurPlace.Common.LocalData
             if(!exists)
             {
                 int count = connection.Table<ActivityCache>().Count();
-                if(count >= 4)
+                if(count >= maxCacheCount)
                 {
-                    ActivityCache oldest = connection.Table<ActivityCache>().OrderBy(a => a.AddedAt).FirstOrDefault();
-                    DeleteActivityCache(JsonConvert.DeserializeObject<LearningActivity>(oldest.JsonData));
-                    DeleteActivity(oldest.ActivityId);
+                    List<ActivityCache> cached = connection.Table<ActivityCache>().OrderBy(a => a.AddedAt).ToList();
+                    while (cached.Count >= maxCacheCount)
+                    {
+                        ActivityCache thisAct = cached.First();
+                        DeleteActivityCache(JsonConvert.DeserializeObject<LearningActivity>(thisAct.JsonData));
+                        DeleteActivity(thisAct.ActivityId);
+                        cached.RemoveAt(0);
+                    }
                 }
             }
 

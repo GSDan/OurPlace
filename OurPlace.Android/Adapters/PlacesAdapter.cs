@@ -72,11 +72,11 @@ namespace OurPlace.Android.Adapters
             {
                 ImageService.Instance.LoadUrl(
                     string.Format("https://maps.googleapis.com/maps/api/place/photo?photoreference={0}&sensor=false&maxheight={1}&maxwidth={2}&key={3}",
-                    data[position].photos[0].photo_reference, 500, 500, context.Resources.GetString(Resource.String.MapsApiKey))).Into(vh.Image);
+                    data[position].photos[0].photo_reference, 500, 500, context.Resources.GetString(Resource.String.MapsApiKey))).Into(vh.TaskTypeIcon);
             }
             else
             {
-                ImageService.Instance.LoadCompiledResource("OurPlace_logo").Into(vh.Image);
+                ImageService.Instance.LoadCompiledResource("OurPlace_logo").Into(vh.TaskTypeIcon);
             }
         }
 

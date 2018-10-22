@@ -31,6 +31,7 @@ using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Android.Misc;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
@@ -114,9 +115,11 @@ namespace OurPlace.Android.Adapters
 
     public class TaskViewHolder : RecyclerView.ViewHolder
     {
+        public ImageViewAsync TaskTypeIcon { get; protected set; }
         public TextView Title { get; protected set; }
+        public ImageViewAsync TaskImage { get; protected set; }
         public TextView Description { get; protected set; }
-        public View ttsBtn { get; protected set; }
+        public View TtsButton { get; protected set; }
         public TextView LockedChildrenTease { get; protected set; }
 
         public TaskViewHolder(View itemView, Action<int> ttsAction) : base(itemView)
@@ -124,19 +127,21 @@ namespace OurPlace.Android.Adapters
             // Locate and cache view references:
             Description = itemView.FindViewById<TextView>(Resource.Id.taskDesc);
             Title = itemView.FindViewById<TextView>(Resource.Id.taskTitle);
-            ttsBtn = itemView.FindViewById<View>(Resource.Id.ttsBtn);
+            TtsButton = itemView.FindViewById<View>(Resource.Id.ttsBtn);
+            TaskTypeIcon = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskTypeIcon);
+            TaskImage = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             LockedChildrenTease = itemView.FindViewById<TextView>(Resource.Id.taskLockedParent);
 
-            if(ttsBtn != null)
+            if(TtsButton != null)
             {
                 if (ttsAction == null)
                 {
-                    ttsBtn.Visibility = ViewStates.Invisible;
+                    TtsButton.Visibility = ViewStates.Invisible;
                 }
                 else
                 {
-                    ttsBtn.Visibility = ViewStates.Visible;
-                    ttsBtn.Click += (sender, e) => ttsAction(AdapterPosition);
+                    TtsButton.Visibility = ViewStates.Visible;
+                    TtsButton.Click += (sender, e) => ttsAction(AdapterPosition);
                 }
             }
         }
@@ -144,15 +149,12 @@ namespace OurPlace.Android.Adapters
 
     public class ActivityViewHolder : TaskViewHolder
     {
-        public ImageViewAsync Image { get; protected set; }
         public Button Button { get; protected set; }
 
         public ActivityViewHolder(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.activityIcon);
             Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
-
             Button.Click += (sender, e) => btnListener(AdapterPosition);
         }
     }
@@ -175,37 +177,30 @@ namespace OurPlace.Android.Adapters
 
     public class TaskViewHolder_Info : TaskViewHolder
     {
-        public ImageViewAsync Image { get; protected set; }
         public Button Button { get; protected set; }
 
         public TaskViewHolder_Info(View itemView, Action<int> ttsAction, Action<int> listener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
-
             Button.Click += (sender, e) => listener(AdapterPosition);
         }
     }
 
     public class TaskViewHolder_Btn : TaskViewHolder
     {
-        public ImageViewAsync Image { get; protected set; }
         public Button Button { get; protected set; }
 
         public TaskViewHolder_Btn(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
-
             Button.Click += (sender, e) => btnListener(AdapterPosition);
         }
     }
 
     public class TaskViewHolder_CreatedTask : TaskViewHolder
     {
-        public ImageViewAsync Image { get; protected set; }
         public Button EditBtn { get; protected set; }
         public Button DeleteBtn { get; protected set; }
         public Button ManageChildrenBtn { get; protected set; }
@@ -213,7 +208,6 @@ namespace OurPlace.Android.Adapters
         public TaskViewHolder_CreatedTask(View itemView, Action<int> ttsAction, Action<int> deleteListener, Action<int> editListener, Action<int> manageChildListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             EditBtn = itemView.FindViewById<Button>(Resource.Id.editTaskBtn);
             EditBtn.Click += (sender, e) => editListener(AdapterPosition);
             DeleteBtn = itemView.FindViewById<Button>(Resource.Id.deleteTaskBtn);
@@ -225,14 +219,12 @@ namespace OurPlace.Android.Adapters
 
     public class TaskViewHolder_UploadCard : TaskViewHolder
     {
-        public ImageViewAsync Image { get; protected set; }
         public Button UploadBtn { get; protected set; }
         public Button DeleteBtn { get; protected set; }
 
         public TaskViewHolder_UploadCard(View itemView, Action<int> ttsAction, Action<int> btnListener1, Action<int> btnListener2) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            Image = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             UploadBtn = itemView.FindViewById<Button>(Resource.Id.uploadBtn);
             UploadBtn.Click += (sender, e) => btnListener1(AdapterPosition);
             DeleteBtn = itemView.FindViewById<Button>(Resource.Id.deleteBtn);
@@ -242,7 +234,6 @@ namespace OurPlace.Android.Adapters
 
     public class TaskViewHolder_ResultList : TaskViewHolder
     {
-        public ImageViewAsync TaskImage { get; protected set; }
         public LinearLayout ItemList { get; protected set; }
         public Button StartTaskButton { get; protected set; }
 
@@ -252,14 +243,11 @@ namespace OurPlace.Android.Adapters
         public TaskViewHolder_ResultList(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
-            TaskImage = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             ItemList = itemView.FindViewById<LinearLayout>(Resource.Id.resultListLayout);
             StartTaskButton = itemView.FindViewById<Button>(Resource.Id.taskBtn);
-
-            results = new List<string>();
-
             StartTaskButton.Click += (sender, e) => btnListener(AdapterPosition);
             onItemTap = itemTapListener;
+            results = new List<string>();
         }
 
         /// <summary>

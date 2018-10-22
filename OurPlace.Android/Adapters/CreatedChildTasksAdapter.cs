@@ -119,7 +119,7 @@ namespace OurPlace.Android.Adapters
                 avh.Description.Text = string.Format(context.Resources.GetString(Resource.String.createTaskChildrenDesc),
                     parentTask.TaskType.DisplayName);
 
-                LoadImage(parentTask.TaskType, avh.Image);
+                LoadImage(parentTask.TaskType, avh.TaskTypeIcon);
                 return;
             }
             else if (position > data.Count)
@@ -139,7 +139,7 @@ namespace OurPlace.Android.Adapters
             vh.ManageChildrenBtn.Visibility = ViewStates.Gone;
 
             vh.DeleteBtn.Text = context.Resources.GetString(Resource.String.RemoveBtn);
-            LoadImage(data[position]?.TaskType, vh.Image);
+            LoadImage(data[position]?.TaskType, vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

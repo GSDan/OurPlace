@@ -330,18 +330,10 @@ namespace OurPlace.Android.Adapters
                 AdditionalInfoData taskInfo = JsonConvert.DeserializeObject<AdditionalInfoData>(items[position].JsonData);
                 vh = holder as TaskViewHolder_Info;
                 items[position].IsCompleted = true;
+
                 if (!string.IsNullOrWhiteSpace(taskInfo.ImageUrl))
                 {
-                    ((TaskViewHolder_Info)vh).Image.Visibility = ViewStates.Visible;
-                    ((TaskViewHolder_Info)vh).Description.SetPadding(16, 16, 16, 16);
-                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(taskInfo.ImageUrl))
-                        .DownSampleInDip(300)
-                        .Into(((TaskViewHolder_Info)vh).Image);
-                }
-                else
-                {
-                    ((TaskViewHolder_Info)vh).Image.Visibility = ViewStates.Gone;
-                    ((TaskViewHolder_Info)vh).Description.SetPadding(16, 16, 150, 16); //make room for TTS button
+                    items[position].ImageUrl = taskInfo.ImageUrl;
                 }
 
                 ((TaskViewHolder_Info)vh).Button.Visibility =
@@ -351,7 +343,6 @@ namespace OurPlace.Android.Adapters
             {
                 vh = holder as TaskViewHolder_RecordAudio;
                 ((TaskViewHolder_RecordAudio)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.StartBtn);
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordAudio)vh).TaskImage);
 
                 if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
                 {
@@ -370,8 +361,7 @@ namespace OurPlace.Android.Adapters
             {
                 vh = holder as TaskViewHolder_RecordVideo;
                 ((TaskViewHolder_RecordVideo)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.RecBtn);
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_RecordVideo)vh).TaskImage);
-
+                
                 if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
                 {
                     List<string> videoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
@@ -422,8 +412,6 @@ namespace OurPlace.Android.Adapters
                 ((TaskViewHolder_ResultList)vh).StartTaskButton.Text = btnText;
                 ((TaskViewHolder_ResultList)vh).StartTaskButton.Enabled = btnEnabled;
 
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_ResultList)vh).TaskImage);
-                
                 if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
                 {
                     List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
@@ -440,7 +428,6 @@ namespace OurPlace.Android.Adapters
             else if (thisType == typeof(TaskViewHolder_Btn))
             {
                 vh = holder as TaskViewHolder_Btn;
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Btn)vh).Image);
                 string btnText = context.Resources.GetString(Resource.String.TaskBtn);
 
                 if (taskType == "LISTEN_AUDIO")
@@ -455,7 +442,6 @@ namespace OurPlace.Android.Adapters
                 vh = holder as TaskViewHolder_TextEntry;
                 ((TaskViewHolder_TextEntry)vh).TextField.Text = items[position].CompletionData.JsonData;
                 items[position].IsCompleted = !string.IsNullOrWhiteSpace(((TaskViewHolder_TextEntry)vh).TextField.Text);
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_TextEntry)vh).Image);
             }
             else if (thisType == typeof(TaskViewHolder_MultipleChoice))
             {
@@ -499,14 +485,11 @@ namespace OurPlace.Android.Adapters
                     items[position].CompletionData.JsonData = idx.ToString();
                     NotifyItemChanged(items.Count - 1);
                 };
-
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_MultipleChoice)vh).Image);
             }
             else if (thisType == typeof(TaskViewHolder_Map))
             {
                 vh = holder as TaskViewHolder_Map;
                 TaskViewHolder_Map mapHolder = ((TaskViewHolder_Map)vh);
-                ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder_Map)vh).Image);
 
                 if (taskType == "MAP_MARK")
                 {
@@ -531,6 +514,22 @@ namespace OurPlace.Android.Adapters
             else
             {
                 vh = holder as TaskViewHolder;
+            }
+
+            // These apply to all task types:
+
+            ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder)holder).TaskTypeIcon);
+
+            if (!string.IsNullOrWhiteSpace(items[position].ImageUrl))
+            {
+                vh.TaskImage.Visibility = ViewStates.Visible;
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(items[position].ImageUrl))
+                    .DownSampleInDip(300)
+                    .Into(vh.TaskImage);
+            }
+            else
+            {
+                vh.TaskImage.Visibility = ViewStates.Gone;
             }
 
             vh.Description.Text = items[position].Description;

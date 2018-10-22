@@ -137,7 +137,7 @@ namespace OurPlace.Android.Adapters
                 {
                     ImageService.Instance.LoadFile(learningActivity.ImageUrl)
                         .Transform(new CircleTransformation())
-                        .Into(avh.Image);
+                        .Into(avh.TaskTypeIcon);
                 }
                 return;
             }
@@ -165,7 +165,7 @@ namespace OurPlace.Android.Adapters
             }
 
             vh.DeleteBtn.Text = context.Resources.GetString(Resource.String.RemoveBtn);
-            LoadImage(position, vh.Image);
+            LoadImage(position, vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

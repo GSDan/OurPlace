@@ -20,20 +20,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+            <FFImageLoading.Views.ImageViewAsync
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:id="@+id/taskImage"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="-35dp"
+                android:visibility="gone" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="8dp">
                 <FFImageLoading.Views.ImageViewAsync
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
                     android:src="@mipmap/ic_launcher"
-                    android:id="@+id/taskImage"
+                    android:id="@+id/taskTypeIcon"
                     android:scaleType="centerCrop"
-                    android:padding="8dp" />
+                    android:padding="4dp" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -58,15 +64,22 @@
                         android:id="@+id/taskDesc"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginLeft="4dp"
-                        android:textSize="15sp"
-                        android:paddingBottom="5dp" />
+                        android:textSize="16sp"
+                        android:paddingBottom="10dp" />
+                    <Button
+                        android:id="@+id/taskBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/TaskBtn"
+                        android:layout_gravity="right"
+                        android:padding="10dp" />
                 </LinearLayout>
             </LinearLayout>
-          <LinearLayout
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:layout_width="0px"
-    android:layout_height="0px"/>
+            <LinearLayout
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="0px"
+                android:layout_height="0px" />
             <EditText
                 android:id="@+id/taskTextEntry"
                 android:inputType="textMultiLine"
@@ -75,27 +88,27 @@
                 android:layout_height="wrap_content"
                 android:layout_width="fill_parent"
                 android:isScrollContainer="true"
-                android:nextFocusUp="@id/taskTextEntry" 
-    android:nextFocusLeft="@id/taskTextEntry"
+                android:nextFocusUp="@id/taskTextEntry"
+                android:nextFocusLeft="@id/taskTextEntry"
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp" />
-          <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textStyle="bold|italic"
-    android:textColor="@color/app_darkgreen"
-    android:text="@string/taskLockedParent"
-    android:id="@+id/taskLockedParent"
-    android:gravity="center"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
-    android:layout_marginRight="5dp"
-    android:layout_marginLeft="5dp"
-    android:textSize="15sp"
-    android:paddingBottom="10dp"
-    android:visibility="gone" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold|italic"
+                android:textColor="@color/app_darkgreen"
+                android:text="@string/taskLockedParent"
+                android:id="@+id/taskLockedParent"
+                android:gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:textSize="15sp"
+                android:paddingBottom="10dp"
+                android:visibility="gone" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </FrameLayout>

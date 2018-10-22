@@ -45,8 +45,8 @@ namespace OurPlace.Common.LocalData
 
         public static async Task<DatabaseManager> GetDatabaseManager(bool runLogin = true)
         {
-            if (dbManager != null) return dbManager;
             InitializeFolders();
+            if (dbManager != null) return dbManager;
             dbManager = new DatabaseManager(fileCacheFolder);
             if (runLogin) await InitializeLogin(dbManager);
             return dbManager;
@@ -75,6 +75,7 @@ namespace OurPlace.Common.LocalData
             ApplicationUser foundUser = passedManager.GetUser();
             if (foundUser == null
                 || string.IsNullOrWhiteSpace(foundUser.RefreshToken)
+                || foundUser.RefreshExpiresAt == null
                 || foundUser.RefreshExpiresAt < DateTime.UtcNow)
             {
                 return false;
