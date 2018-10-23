@@ -217,9 +217,8 @@ namespace OurPlace.Common.LocalData
                     List<ActivityCache> cached = connection.Table<ActivityCache>().OrderBy(a => a.AddedAt).ToList();
                     while (cached.Count >= maxCacheCount)
                     {
-                        ActivityCache thisAct = cached.First();
-                        DeleteActivityCache(JsonConvert.DeserializeObject<LearningActivity>(thisAct.JsonData));
-                        DeleteActivity(thisAct.ActivityId);
+                        LearningActivity thisAct = JsonConvert.DeserializeObject<LearningActivity>(cached.First().JsonData);
+                        DeleteCachedActivity(thisAct);
                         cached.RemoveAt(0);
                     }
                 }
@@ -236,6 +235,30 @@ namespace OurPlace.Common.LocalData
                 }),
                 AddedAt = DateTime.UtcNow
             });
+        }
+
+        public void DeleteLearnerCacheAndProgress()
+        {
+            List<ActivityProgress> allProgress = GetProgress();
+            foreach(ActivityProgress prog in allProgress)
+            {
+                // Delete any created response files 
+                List<AppTask> tasks = JsonConvert.DeserializeObject<List<AppTask>>(prog.AppTaskJson);
+                foreach(AppTask task in tasks)
+                {
+                    DeleteLearnerProgress(task);
+                }
+           
+                DeleteProgress(prog.ActivityId);
+            }
+
+            List<ActivityCache> allCached = connection.Table<ActivityCache>().ToList();
+            foreach(ActivityCache cache in allCached)
+            {
+                DeleteCachedActivity(JsonConvert.DeserializeObject<LearningActivity>(cache.JsonData));
+            }
+
+            ShouldRefreshFeed = true;
         }
 
         public List<LearningActivity> GetActivities()
@@ -272,14 +295,10 @@ namespace OurPlace.Common.LocalData
             return JsonConvert.DeserializeObject<LearningActivity>(found.JsonData);
         }
 
-        public void DeleteActivity(int activityId)
+        public void DeleteCachedActivity(LearningActivity act)
         {
-            connection.Delete<ActivityCache>(activityId);
-        }
-
-        public void DeleteAllActivities()
-        {
-            connection.DeleteAll<ActivityCache>();
+            DeleteActivityFileCache(act);
+            connection.Delete<ActivityCache>(act.Id);
         }
     }
 }

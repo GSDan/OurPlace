@@ -28,7 +28,6 @@ using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Fragments;
 using OurPlace.Common.Models;
-using System;
 using System.Collections.Generic;
 using ZXing.Mobile;
 using ZXing.Net.Mobile.Android;
@@ -104,13 +103,15 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            if (res.Text == Common.ServerUtils.GetTaskQRCodeData(learningTask.Id))
+            if (res.Text != Common.ServerUtils.GetTaskQRCodeData(learningTask.Id))
+            {
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_wrong, ToastLength.Short).Show());
+            }
+            else
             {
                 RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_success, ToastLength.Short).Show());
                 ReturnSuccess();
-            }
-
-            RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_wrong, ToastLength.Short).Show());
+            }            
         }
 
         protected override void OnPause()

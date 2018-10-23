@@ -151,11 +151,6 @@ namespace OurPlace.Android.Activities
                 StartActivity(browserIntent);
                 return true;
             }
-            if (item.ItemId == Resource.Id.menulogout)
-            {
-                LogOut();
-                return true;
-            }
 
             return base.OnOptionsItemSelected(item);
         }
@@ -223,19 +218,6 @@ namespace OurPlace.Android.Activities
                     Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show();
                 }
             }
-        }
-
-        private void LogOut()
-        {
-            new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                .SetTitle(Resource.String.MenuLogout)
-                .SetMessage(Resource.String.LogoutConfirm)
-                .SetPositiveButton(Resource.String.MenuLogout, (a, b) =>
-                {
-                    var suppress = AndroidUtils.ReturnToSignIn(this);
-                })
-                .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
-                .Show();
         }
 
         // Update the TaskTypes available in the background

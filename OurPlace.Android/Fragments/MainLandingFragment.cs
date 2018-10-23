@@ -149,7 +149,7 @@ namespace OurPlace.Android.Fragments
         {
             base.OnResume();
 
-            if (!loaded && !loading)
+            if ((!loaded || ForceRefresh) && !loading)
             {
                 LoadData();
             }

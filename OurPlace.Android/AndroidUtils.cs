@@ -86,6 +86,7 @@ namespace OurPlace.Android
 
             if (dbManager != null)
             {
+                dbManager.DeleteLearnerCacheAndProgress();
                 dbManager.CleanDatabase();
             }
 

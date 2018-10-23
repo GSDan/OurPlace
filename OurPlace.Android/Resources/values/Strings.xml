@@ -28,8 +28,6 @@
   <string name="MenuHelp">Help</string>
   <string name="MenuUploads">Upload Queue</string>
   <string name="ForceSignOut">Your session has expired, please sign in again!</string>
-  <string name="MenuLogout">Sign out</string>
-  <string name="LogoutConfirm">Are you sure you want to sign out of OurPlace? Any content you haven\'t uploaded will be lost!</string>
   <string name="LoginPrompt">Sign in to start!\nChoose a service to sign in with:</string>
   <string name="LoginTermsTitle">Terms and Privacy Policy</string>
   <string name="LoginTerms">By continuing to use OurPlace, you acknowledge that you have read and agree to both the Terms of Use and Privacy Policy.</string>
@@ -216,6 +214,15 @@
   <string name="scanningActivity_success">You got it!</string>
   <string name="scanningActivity_title">Find and scan the QR code</string>
   <string name="scanningActivity_wrong">That\'s not it!</string>
+  <string name="pref_cache_cat_title">Offline activity storage</string>
   <string name="pref_cacheNumber_title">Offline activity limit</string>
   <string name="pref_cacheNumber_summary">The maximum number of activities to be stored at once for offline use</string>
+  <string name="pref_cacheDelete_title">Clear activity cache</string>
+  <string name="pref_cacheDelete_summary">Delete all downloaded activities from the local storage. They can be downloaded again, but any progress (including created photos, video etc) you have made in them will be lost.</string>
+  <string name="pref_cacheDelete_warning">This will delete any unfinished progress you have made in downloaded activities. Are you sure you want to continue?</string>
+  <string name="pref_cacheDelete_complete">Cleared cache!</string>
+  <string name="pref_account_cat_title">Your Account</string>
+  <string name="pref_accountLogout_title">Sign out of OurPlace</string>
+  <string name="pref_accountLogout_summary">This will delete any progress you haven\'t uploaded yet</string>
+  <string name="pref_accountLogout_warning">This will delete all data and files you haven\'t yet uploaded. Are you sure you want to continue?</string>
 </resources>

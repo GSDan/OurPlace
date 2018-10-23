@@ -27,7 +27,7 @@ using OurPlace.Android.Fragments;
 
 namespace OurPlace.Android.Activities
 {
-    [Activity(Label = "Preferences", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity))]
+    [Activity(Label = "Settings", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity))]
     public class PreferencesActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)

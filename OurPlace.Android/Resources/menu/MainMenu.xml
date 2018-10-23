@@ -45,8 +45,4 @@ app:showAsAction="always"/>
   android:id="@+id/menusettings"
   android:title="@string/MenuSettings"
   app:showAsAction="never"/>
-  <item
-android:id="@+id/menulogout"
-android:title="@string/MenuLogout"
-app:showAsAction="never"/>
 </menu>

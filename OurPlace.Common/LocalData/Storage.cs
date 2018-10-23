@@ -23,9 +23,8 @@ using Newtonsoft.Json;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using OurPlace.Common.LocalData;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace OurPlace.Common.LocalData
 {
@@ -156,7 +155,7 @@ namespace OurPlace.Common.LocalData
             return Path.Combine(folderPath, filename);
         }
 
-        public static void DeleteActivityCache(LearningActivity act)
+        public static void DeleteActivityFileCache(LearningActivity act)
         {
             List<TaskFileInfo> fileUrls = GetFileTasks(act);
 
@@ -248,6 +247,27 @@ namespace OurPlace.Common.LocalData
             }
 
             return given;
+        }
+
+        public static void DeleteLearnerProgress(AppTask given, bool addCache = false)
+        {
+            string cache = GetCacheFolder();
+            string[] theseFiles = GetPathsIfFiles(given);
+
+            if (theseFiles != null)
+            {
+                foreach (string file in theseFiles)
+                {
+                    string fullPath = addCache ? Path.Combine(cache, file) : file;
+
+                    if (!File.Exists(fullPath))
+                    {
+                        continue;
+                    }
+
+                    File.Delete(fullPath);
+                }
+            }
         }
 
         private static string[] GetPathsIfFiles(AppTask t)

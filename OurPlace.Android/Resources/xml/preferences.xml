@@ -19,12 +19,28 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <ListPreference
-      android:key="pref_cacheNumber"
-      android:title="@string/pref_cacheNumber_title"
-      android:dialogTitle="@string/pref_cacheNumber_title"
-      android:summary="@string/pref_cacheNumber_summary"
-      android:entries="@array/cacheNumberEntries"
-      android:entryValues="@array/cacheNumberValues"
-      android:defaultValue="4" />
+  <PreferenceCategory
+        android:title="@string/pref_cache_cat_title"
+        android:key="pref_cache_cat">
+    <ListPreference
+        android:key="pref_cacheNumber"
+        android:title="@string/pref_cacheNumber_title"
+        android:dialogTitle="@string/pref_cacheNumber_title"
+        android:summary="@string/pref_cacheNumber_summary"
+        android:entries="@array/cacheNumberEntries"
+        android:entryValues="@array/cacheNumberValues"
+        android:defaultValue="4" />
+    <Preference
+        android:key="pref_cacheDelete"
+        android:title="@string/pref_cacheDelete_title"
+        android:summary="@string/pref_cacheDelete_summary" />
+  </PreferenceCategory>
+  <PreferenceCategory
+        android:title="@string/pref_cache_cat_title"
+        android:key="pref_cache_cat">
+    <Preference
+        android:key="pref_accountLogout"
+        android:title="@string/pref_accountLogout_title"
+        android:summary="@string/pref_accountLogout_summary" />
+  </PreferenceCategory>
 </PreferenceScreen>
