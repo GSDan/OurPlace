@@ -132,17 +132,13 @@ namespace OurPlace.Android.Activities
 
             SetupContent();
 
-            if (learningActivity.RequireUsername && string.IsNullOrWhiteSpace(enteredName))
-            {
-                ShowNameEntry();
-            }
-            else if (!string.IsNullOrWhiteSpace(enteredName))
+            if (!string.IsNullOrWhiteSpace(enteredName))
             {
                 adapter.UpdateNames(enteredName);
             }
         }
 
-        private void ShowNameEntry()
+        private void ShowNameEntry(bool continueToFinish = false)
         {
             global::Android.Support.V7.App.AlertDialog.Builder builder = new global::Android.Support.V7.App.AlertDialog.Builder(this);
             builder.SetTitle(Resource.String.actEnterUsernameTitle);
@@ -162,10 +158,9 @@ namespace OurPlace.Android.Activities
             dialogLayout.SetPadding(px, px, px, px);
 
             builder.SetView(dialogLayout);
-            builder.SetCancelable(false);
+            builder.SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { });
             builder.SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
             {
-
                 if (string.IsNullOrWhiteSpace(nameInput.Text))
                 {
                     // If nothing has been entered and nothing has been previously
@@ -180,6 +175,11 @@ namespace OurPlace.Android.Activities
                     enteredName = nameInput.Text;
                     adapter.UpdateNames(enteredName);
                     dbManager.SaveActivityProgress(learningActivity, adapter.items, enteredName);
+
+                    if(continueToFinish)
+                    {
+                        PackageForUpload();
+                    }
                 }
             });
 
@@ -389,7 +389,7 @@ namespace OurPlace.Android.Activities
             // If Finish button clicked
             if (position == adapter.ItemCount - 1)
             {
-                await PackageForUpload();
+                PackageForUpload();
                 return;
             }
 
@@ -562,7 +562,7 @@ namespace OurPlace.Android.Activities
         /// <summary>
         /// Package the entered/created data up for storage
         /// </summary>
-        public async Task PackageForUpload()
+        public void PackageForUpload()
         {
             List<AppTask> preppedTasks = new List<AppTask>();
             foreach (AppTask t in adapter.items)
@@ -581,13 +581,18 @@ namespace OurPlace.Android.Activities
                     anyData = true;
                 }
             }
+
             if (!anyData)
             {
                 Finish();
                 return;
             }
 
-            // ImageService.Instance.InvalidateCacheAsync(FFImageLoading.Cache.CacheType.All);
+            if (learningActivity.RequireUsername && string.IsNullOrWhiteSpace(enteredName))
+            {
+                ShowNameEntry(true);
+                return;
+            }
 
             ApplicationUser creator = learningActivity.Author;
             if (creator != null && creator.Id != dbManager.currentUser.Id)
