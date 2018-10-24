@@ -102,32 +102,31 @@ namespace OurPlace.Android.Activities
                 {
                     string buttonText = ((Button)sender).Text;
 
-                    ExternalLogin chosen = providers.Where(prov => prov.Name == buttonText).FirstOrDefault();
+                    ExternalLogin chosen = providers.FirstOrDefault(prov => prov.Name == buttonText);
 
-                    if (chosen != null)
+                    if (chosen == null)
                     {
-                        chromeManager = new CustomTabsActivityManager(this);
-
-                        // build custom tab
-                        var builder = new CustomTabsIntent.Builder(chromeManager.Session)
-                           .SetShowTitle(true)
-                           .EnableUrlBarHiding();
-
-                        var customTabsIntent = builder.Build();
-                        customTabsIntent.Intent.AddFlags(ActivityFlags.NoHistory);
-                        chromeManager.Warmup(0L);
-                        customTabsIntent.LaunchUrl(this, global::Android.Net.Uri.Parse(ConfidentialData.api + chosen.Url));
+                        return;
                     }
+
+                    chromeManager = new CustomTabsActivityManager(this);
+
+                    // build custom tab
+                    var builder = new CustomTabsIntent.Builder(chromeManager.Session)
+                        .SetShowTitle(true)
+                        .EnableUrlBarHiding();
+
+                    var customTabsIntent = builder.Build();
+                    customTabsIntent.Intent.AddFlags(ActivityFlags.NoHistory);
+                    chromeManager.Warmup(0L);
+                    customTabsIntent.LaunchUrl(this, global::Android.Net.Uri.Parse(ConfidentialData.api + chosen.Url));
                 })
                 .Show();
         }
 
         protected override void OnDestroy()
         {
-            if(chromeManager != null)
-            {
-                chromeManager = null;
-            }
+            chromeManager = null;
             UnregisterReceiver(receiver);
             base.OnDestroy();
         }
@@ -146,7 +145,7 @@ namespace OurPlace.Android.Activities
             dialog.SetCancelable(false);
             dialog.Show();
 
-            string fullUrl = "/api/Account/ExternalLogins?returnUrl=/callback&generateState=true";
+            const string fullUrl = "/api/Account/ExternalLogins?returnUrl=/callback&generateState=true";
             ServerResponse< ExternalLogin[]> res = await ServerUtils.Get<ExternalLogin[]>(fullUrl, false);
 
             dialog.Dismiss();
@@ -155,30 +154,31 @@ namespace OurPlace.Android.Activities
             {
                 providers = res.Data;
 
-                if(providers != null && providers.Length > 0)
+                if (providers == null || providers.Length <= 0)
                 {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MatchParent,
-                        ViewGroup.LayoutParams.WrapContent);
-                    layoutParams.SetMargins(5, 15, 5, 15);
+                    return;
+                }
 
-                    foreach (ExternalLogin ext in providers)
-                    {
-                        Button thisButton = new Button(this);
-                        thisButton.Text = ext.Name;
-                        thisButton.SetBackgroundResource(Resource.Color.app_purple);
-                        thisButton.SetTextColor(Color.White);
-                        thisButton.LayoutParameters = layoutParams;
-                        thisButton.Click += LoginActivity_Click;
-                        buttonLayout.AddView(thisButton);
-                    }
-                }        
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MatchParent,
+                    ViewGroup.LayoutParams.WrapContent);
+                layoutParams.SetMargins(5, 15, 5, 15);
+
+                foreach (ExternalLogin ext in providers)
+                {
+                    Button thisButton = new Button(this) { Text = ext.Name };
+                    thisButton.SetBackgroundResource(Resource.Color.app_purple);
+                    thisButton.SetTextColor(Color.White);
+                    thisButton.LayoutParameters = layoutParams;
+                    thisButton.Click += LoginActivity_Click;
+                    buttonLayout.AddView(thisButton);
+                }
             }
             else
             {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)
                     .SetTitle(Resource.String.ErrorTitle)
-                    .SetMessage(res.Message)
+                    .SetMessage(res?.Message)
                     .Show();
             }            
         }

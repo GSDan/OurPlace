@@ -19,45 +19,42 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OurPlace.Android.Adapters
 {
     public class TaskTypeAdapter : RecyclerView.Adapter
     {
         public event EventHandler<int> ItemClick;
-        public List<TaskType> data;
-        public Context context;
+        public List<TaskType> Data;
+        public Context Context;
 
-        public TaskTypeAdapter(Context _context, List<TaskType> _data)
+        public TaskTypeAdapter(Context context, List<TaskType> data)
         {
-            data = _data;
-            context = _context;
+            Data = data;
+            Context = context;
 
-            data = data.OrderBy(tt => tt.Order).ToList();
+            Data = Data.OrderBy(tt => tt.Order).ToList();
         }
 
-        public override int ItemCount
-        {
-            get
-            {
-                if (data == null) return 0;
-                return data.Count;
-            }
-        }
+        public override int ItemCount => Data?.Count ?? 0;
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0) return 0;
-            if (position >= data.Count) return 2;
-            return 1;
+            if (position == 0)
+            {
+                return 0;
+            }
+
+            return position >= Data.Count ? 2 : 1;
         }
 
         private void OnClick(int position)
@@ -67,18 +64,24 @@ namespace OurPlace.Android.Adapters
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            TaskViewHolder_Btn vh = holder as TaskViewHolder_Btn;
-            vh.Title.Text = data[position].DisplayName;
-            vh.Description.Text = data[position].Description;
-            ImageService.Instance.LoadUrl(data[position].IconUrl)
-                    .Into(vh.TaskTypeIcon);
+            if (!(holder is TaskViewHolderBtn vh))
+            {
+                return;
+            }
+
+            vh.Title.Text = Data[position].DisplayName;
+            vh.Description.Text = Data[position].Description;
+            ImageService.Instance.LoadUrl(Data[position].IconUrl)
+                .Into(vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
-            TaskViewHolder_Btn vh = new TaskViewHolder_Btn(itemView, null, OnClick);
-            vh.Button.Text = context.Resources.GetString(Resource.String.ChooseBtn);
+            TaskViewHolderBtn vh = new TaskViewHolderBtn(itemView, null, OnClick)
+            {
+                Button = { Text = Context.Resources.GetString(Resource.String.ChooseBtn) }
+            };
             return vh;
         }
     }

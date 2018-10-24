@@ -19,25 +19,25 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Android.App;
+
+using System;
+using System.Collections.Generic;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using FFImageLoading.Work;
-using OurPlace.Common.Models;
-using SectionedRecyclerview.Droid;
-using System;
-using System.Collections.Generic;
 using OurPlace.Common;
 using OurPlace.Common.LocalData;
-using Java.Lang;
+using OurPlace.Common.Models;
+using SectionedRecyclerview.Droid;
+using Object = Java.Lang.Object;
 
 namespace OurPlace.Android.Adapters
 {
     public class GridSpanner : GridLayoutManager.SpanSizeLookup
     {
-        private SectionedRecyclerViewAdapter adapter;
-        private int totalCols;
+        private readonly SectionedRecyclerViewAdapter adapter;
+        private readonly int totalCols;
 
         public GridSpanner(SectionedRecyclerViewAdapter adapt, int totalCols)
         {
@@ -47,49 +47,40 @@ namespace OurPlace.Android.Adapters
 
         public override int GetSpanSize(int position)
         {
-            if(adapter.IsHeader(position))
-            {
-                return totalCols;
-            }
-            return 1;
+            return adapter.IsHeader(position) ? totalCols : 1;
         }
     }
 
     public class LearningActivitiesAdapter : SectionedRecyclerViewAdapter
     {
-        public List<ActivityFeedSection> data;
+        public List<ActivityFeedSection> Data;
         public event EventHandler<int> ItemClick;
-        private DatabaseManager dbManager;
+        private readonly DatabaseManager dbManager;
 
-        const int HEADER = -2;
-        const int ITEM = -1;
+        private const int Header = -2;
 
-        public LearningActivitiesAdapter(List<ActivityFeedSection> data, DatabaseManager dbManager) : base()
+        public LearningActivitiesAdapter(List<ActivityFeedSection> data, DatabaseManager dbManager)
         {
-            this.data = data;
+            Data = data;
             this.dbManager = dbManager;
         }
 
-        public override int SectionCount
-        {
-            get
-            {
-                if(data != null) return data.Count;
-                return 0;
-            }
-        }
+        public override int SectionCount => Data?.Count ?? 0;
 
         private void OnClick(int position)
         {
-            if (ItemClick != null)
-                ItemClick(this, position);
+            ItemClick?.Invoke(this, position);
         }
 
         public LearningActivity GetItem(int position)
         {
-            if (position < 0) return null;
+            if (position < 0)
+            {
+                return null;
+            }
+
             int checkedItems = 0;
-            foreach(ActivityFeedSection section in data)
+            foreach(ActivityFeedSection section in Data)
             {
                 checkedItems++; //include header
                 if(section.Activities.Count + checkedItems > position)
@@ -103,7 +94,7 @@ namespace OurPlace.Android.Adapters
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            if (viewType == HEADER)
+            if (viewType == Header)
             {
                 View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.GridHeader, parent, false);
                 GridHeaderViewHolder vh = new GridHeaderViewHolder(itemView);
@@ -124,33 +115,37 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemCount(int sectionInd)
         {
-            if(data != null && 
-                data.Count > sectionInd &&
-                data[sectionInd].Activities != null)
+            if(Data != null && 
+                Data.Count > sectionInd &&
+                Data[sectionInd].Activities != null)
             {
-                return data[sectionInd].Activities.Count;
+                return Data[sectionInd].Activities.Count;
             }
             return 0;
         }
 
-        public override void OnBindFooterViewHolder(Java.Lang.Object p0, int p1)
+        public override void OnBindFooterViewHolder(Object p0, int p1)
         {
             // Not needed
         }
 
-        public override void OnBindHeaderViewHolder(Java.Lang.Object holder, int sectionInd, bool p2)
+        public override void OnBindHeaderViewHolder(Object holder, int sectionInd, bool p2)
         {
-            GridHeaderViewHolder vh = holder as GridHeaderViewHolder;
-            vh.Title.Text = data[sectionInd].Title;
-            vh.Description.Text = data[sectionInd].Description;
+            if (!(holder is GridHeaderViewHolder vh))
+            {
+                return;
+            }
+
+            vh.Title.Text = Data[sectionInd].Title;
+            vh.Description.Text = Data[sectionInd].Description;
         }
 
-        public override void OnBindViewHolder(Java.Lang.Object holder, int sectionInd, int relativePos, int absPos)
+        public override void OnBindViewHolder(Object holder, int sectionInd, int relativePos, int absPos)
         {
             LearningActivityViewHolder vh = holder as LearningActivityViewHolder;
-            TaskParameter imTask = null;
+            TaskParameter imTask;
 
-            LearningActivity thisAct = data[sectionInd].Activities[relativePos];
+            LearningActivity thisAct = Data[sectionInd].Activities[relativePos];
 
             if (string.IsNullOrWhiteSpace(thisAct.ImageUrl))
             {
@@ -162,12 +157,16 @@ namespace OurPlace.Android.Adapters
             }
             else
             {
-                imTask = ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(thisAct.ImageUrl));
+                imTask = ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(thisAct.ImageUrl));
             }
 
             imTask.DownSampleInDip(width: 150);
-            imTask.Into(vh.Image);
+            if (vh == null)
+            {
+                return;
+            }
 
+            imTask.Into(vh.Image);
             vh.Name.Text = thisAct.Name;
 
             string truncatedDesc = Helpers.Truncate(thisAct.Description, 100);

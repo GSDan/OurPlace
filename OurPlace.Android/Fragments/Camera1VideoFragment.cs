@@ -60,7 +60,7 @@ namespace OurPlace.Android.Fragments
         {
             View view = inflater.Inflate(Resource.Layout.Camera1Fragment, container, false);
 
-            bool opened = safeCameraOpenInView(view);
+            bool opened = SafeCameraOpenInView(view);
 
             if (!opened)
             {
@@ -74,43 +74,45 @@ namespace OurPlace.Android.Fragments
             return view;
         }
 
-        private bool safeCameraOpenInView(View view)
+        private bool SafeCameraOpenInView(View view)
         {
-            bool opened = false;
-            releaseCameraAndPreview();
+            ReleaseCameraAndPreview();
             camera = Camera1Fragment.GetCameraInstance(1280 * 720, true);
-            opened = camera != null;
 
-            if (opened)
+            if (camera == null)
             {
-                preview = new CameraPreview(Activity.BaseContext, camera, view, true);
-                previewView = view.FindViewById<FrameLayout>(Resource.Id.camera_preview);
-                previewView.AddView(preview, 0);
-                preview.StartCameraPreview();
+                return false;
             }
 
-            return opened;
+            preview = new CameraPreview(Activity.BaseContext, camera, view, true);
+            previewView = view.FindViewById<FrameLayout>(Resource.Id.camera_preview);
+            previewView.AddView(preview, 0);
+            preview.StartCameraPreview();
+
+            return true;
         }
 
         public override void OnResume()
         {
             base.OnResume();
-            if(camera == null)
+            if (camera != null)
             {
-                camera = Camera1Fragment.GetCameraInstance(1280 * 720);
-                preview = new CameraPreview(Activity, camera, View, true);
-                previewView.AddView(preview, 0);
-                preview.StartCameraPreview();
+                return;
             }
+
+            camera = Camera1Fragment.GetCameraInstance(1280 * 720);
+            preview = new CameraPreview(Activity, camera, View, true);
+            previewView.AddView(preview, 0);
+            preview.StartCameraPreview();
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
-            releaseCameraAndPreview();
+            ReleaseCameraAndPreview();
         }
 
-        private void releaseCameraAndPreview()
+        private void ReleaseCameraAndPreview()
         {
             ReleaseMediaRecorder();
             if (camera != null)
@@ -119,37 +121,38 @@ namespace OurPlace.Android.Fragments
                 camera.Release();
                 camera = null;
             }
-            if (preview != null)
+
+            if (preview == null)
             {
-                preview.DestroyDrawingCache();
-                preview.mCamera = null;
+                return;
             }
+
+            preview.DestroyDrawingCache();
+            preview.Camera = null;
         }
 
         private void ReleaseMediaRecorder()
         {
-            if(mediaRecorder != null)
+            if (mediaRecorder == null)
             {
-                mediaRecorder.Reset();
-                mediaRecorder.Release();
-                mediaRecorder = null;
-                camera.Lock();
+                return;
             }
+
+            mediaRecorder.Reset();
+            mediaRecorder.Release();
+            mediaRecorder = null;
+            camera.Lock();
         }
 
         private bool PrepareMediaRecorder()
         {
-            string id = null;
-
-            if (((CameraActivity)Activity).activityId != -1)
-            {
-                id = ((CameraActivity)Activity).activityId.ToString();
-            }
-
             outputPath = new Java.IO.File(Activity.GetExternalFilesDir(null),
                          DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".mp4").AbsolutePath;
 
-            if (File.Exists(outputPath)) File.Delete(outputPath);
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
 
             Camera.Parameters parameters = camera.GetParameters();
             camera.Unlock();

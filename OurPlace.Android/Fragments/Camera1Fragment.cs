@@ -43,12 +43,6 @@ namespace OurPlace.Android.Fragments
     {
         private Camera mCamera;
         private CameraPreview mPreview;
-        private View mCameraView;
-
-        public override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-        }
 
         public static Camera1Fragment NewInstance()
         {
@@ -60,7 +54,7 @@ namespace OurPlace.Android.Fragments
         {
             View view = inflater.Inflate(Resource.Layout.Camera1Fragment, container, false);
 
-            bool opened = safeCameraOpenInView(view);
+            bool opened = SafeCameraOpenInView(view);
 
             if (!opened)
             {
@@ -85,23 +79,22 @@ namespace OurPlace.Android.Fragments
             thisAct.LoadIfPhotoMatch(view);
         }
 
-        private bool safeCameraOpenInView(View view)
+        private bool SafeCameraOpenInView(View view)
         {
-            bool opened = false;
-            releaseCameraAndPreview();
+            ReleaseCameraAndPreview();
             mCamera = GetCameraInstance();
-            mCameraView = view;
-            opened = mCamera != null;
 
-            if (opened)
+            if (mCamera == null)
             {
-                mPreview = new CameraPreview(Activity.BaseContext, mCamera, view);
-                FrameLayout preview = view.FindViewById<FrameLayout>(Resource.Id.camera_preview);
-                preview.AddView(mPreview, 0);
-                mPreview.StartCameraPreview();
+                return false;
             }
 
-            return opened;
+            mPreview = new CameraPreview(Activity.BaseContext, mCamera, view);
+            FrameLayout preview = view.FindViewById<FrameLayout>(Resource.Id.camera_preview);
+            preview.AddView(mPreview, 0);
+            mPreview.StartCameraPreview();
+
+            return true;
         }
 
         public static Camera GetCameraInstance(int target = 1600 * 1200, bool video = false) //2mp
@@ -120,11 +113,13 @@ namespace OurPlace.Android.Fragments
                 foreach (Camera.Size thisSize in sizes)
                 {
                     int thisDiff = System.Math.Abs(thisSize.Height * thisSize.Width - target);
-                    if (thisDiff < currentDiff)
+                    if (thisDiff >= currentDiff)
                     {
-                        size = thisSize;
-                        currentDiff = thisDiff;
+                        continue;
                     }
+
+                    size = thisSize;
+                    currentDiff = thisDiff;
                 }
                 camParams.SetPictureSize(size.Width, size.Height);
                 c.SetParameters(camParams);
@@ -139,10 +134,10 @@ namespace OurPlace.Android.Fragments
         public override void OnDestroy()
         {
             base.OnDestroy();
-            releaseCameraAndPreview();
+            ReleaseCameraAndPreview();
         }
 
-        private void releaseCameraAndPreview()
+        private void ReleaseCameraAndPreview()
         {
             if (mCamera != null)
             {
@@ -150,11 +145,14 @@ namespace OurPlace.Android.Fragments
                 mCamera.Release();
                 mCamera = null;
             }
-            if (mPreview != null)
+
+            if (mPreview == null)
             {
-                mPreview.DestroyDrawingCache();
-                mPreview.mCamera = null;
+                return;
             }
+
+            mPreview.DestroyDrawingCache();
+            mPreview.Camera = null;
         }
 
         public static global::Android.Graphics.Bitmap Rotate(global::Android.Graphics.Bitmap bitmap, int degree)
@@ -181,7 +179,6 @@ namespace OurPlace.Android.Fragments
                 Common.LocalData.Storage.GetCacheFolder(id),
                 DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss-fff", CultureInfo.InvariantCulture) + ".jpg");
             File.WriteAllBytes(filename, data);
-            data = null;
 
             global::Android.Graphics.Bitmap bitmap = global::Android.Graphics.BitmapFactory.DecodeFile(filename);
             ExifInterface exif = new ExifInterface(filename);
@@ -206,20 +203,20 @@ namespace OurPlace.Android.Fragments
         }
     }
 
-    public class CameraPreview : SurfaceView, ISurfaceHolderCallback
+    public sealed class CameraPreview : SurfaceView, ISurfaceHolderCallback
     {
-        public Camera mCamera;
-        private Context mContext;
-        private Camera.Size mPreviewSize;
+        public Camera Camera;
+        private readonly Context context;
+        private Camera.Size previewSize;
         private IList<Camera.Size> mSupportedPreviewSizes;
-        private View mCameraView;
-        private bool isVideo;
+        private readonly View cameraView;
+        private readonly bool isVideo;
 
         public CameraPreview(Context context, Camera camera, View cameraView, bool video = false) : base(context)
         {
-            mCameraView = cameraView;
-            mContext = context;
-            setCamera(camera);
+            this.cameraView = cameraView;
+            this.context = context;
+            SetCamera(camera);
             Holder.AddCallback(this);
             Holder.SetKeepScreenOn(true);
             isVideo = video;
@@ -229,8 +226,8 @@ namespace OurPlace.Android.Fragments
         {
             try
             {
-                mCamera.SetPreviewDisplay(Holder);
-                mCamera.StartPreview();
+                Camera.SetPreviewDisplay(Holder);
+                Camera.StartPreview();
             }
             catch (Exception e)
             {
@@ -238,10 +235,10 @@ namespace OurPlace.Android.Fragments
             }
         }
 
-        private void setCamera(Camera camera)
+        private void SetCamera(Camera camera)
         {
-            mCamera = camera;
-            mSupportedPreviewSizes = mCamera.GetParameters().SupportedPreviewSizes;
+            Camera = camera;
+            mSupportedPreviewSizes = Camera.GetParameters().SupportedPreviewSizes;
             RequestLayout();
         }
 
@@ -249,7 +246,7 @@ namespace OurPlace.Android.Fragments
         {
             try
             {
-                mCamera.SetPreviewDisplay(holder);
+                Camera.SetPreviewDisplay(holder);
             }
             catch (Exception e)
             {
@@ -259,30 +256,30 @@ namespace OurPlace.Android.Fragments
 
         public void SurfaceDestroyed(ISurfaceHolder holder)
         {
-            if (mCamera != null)
-            {
-                mCamera.StopPreview();
-            }
+            Camera?.StopPreview();
         }
 
         public void SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] global::Android.Graphics.Format format, int width, int height)
         {
-            if (Holder.Surface == null) return;
+            if (Holder.Surface == null)
+            {
+                return;
+            }
 
             try
             {
-                Camera.Parameters parameters = mCamera.GetParameters();
+                Camera.Parameters parameters = Camera.GetParameters();
                 parameters.FocusMode = Camera.Parameters.FocusModeContinuousPicture;
                 parameters.PreviewFrameRate = 30;
 
-                if (mPreviewSize != null)
+                if (previewSize != null)
                 {
-                    Camera.Size previewSize = mPreviewSize;
-                    parameters.SetPreviewSize(previewSize.Width, previewSize.Height);
+                    Camera.Size tempPreviewSize = previewSize;
+                    parameters.SetPreviewSize(tempPreviewSize.Width, tempPreviewSize.Height);
                 }
 
-                mCamera.SetParameters(parameters);
-                mCamera.StartPreview();
+                Camera.SetParameters(parameters);
+                Camera.StartPreview();
             }
             catch (Exception e)
             {
@@ -298,60 +295,63 @@ namespace OurPlace.Android.Fragments
 
             if (mSupportedPreviewSizes != null)
             {
-                mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+                previewSize = GetOptimalPreviewSize(mSupportedPreviewSizes, width, height);
             }
         }
 
         protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
         {
-            if (!changed) return;
+            if (!changed)
+            {
+                return;
+            }
 
             int width = right - left;
             int height = bottom - top;
             int previewWidth = width;
             int previewHeight = height;
 
-            if (mPreviewSize != null)
+            if (previewSize != null)
             {
-                Display display = mContext.GetSystemService(Context.WindowService).JavaCast<IWindowManager>().DefaultDisplay;
+                Display display = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>().DefaultDisplay;
 
                 switch (display.Rotation)
                 {
                     case SurfaceOrientation.Rotation0:
-                        previewWidth = mPreviewSize.Height;
-                        previewHeight = mPreviewSize.Width;
+                        previewWidth = previewSize.Height;
+                        previewHeight = previewSize.Width;
                         break;
                     case SurfaceOrientation.Rotation90:
-                        previewWidth = mPreviewSize.Width;
-                        previewHeight = mPreviewSize.Height;
+                        previewWidth = previewSize.Width;
+                        previewHeight = previewSize.Height;
                         break;
                     case SurfaceOrientation.Rotation180:
-                        previewWidth = mPreviewSize.Height;
-                        previewHeight = mPreviewSize.Width;
+                        previewWidth = previewSize.Height;
+                        previewHeight = previewSize.Width;
                         break;
                     case SurfaceOrientation.Rotation270:
-                        previewWidth = mPreviewSize.Width;
-                        previewHeight = mPreviewSize.Height;
+                        previewWidth = previewSize.Width;
+                        previewHeight = previewSize.Height;
                         break;
                 }
             }
 
             int scaledChildHeight = previewHeight * width / previewWidth;
-            mCameraView.Layout(0, height - scaledChildHeight, width, height);
+            cameraView.Layout(0, height - scaledChildHeight, width, height);
 
-            Camera.Parameters camParams = mCamera.GetParameters();
+            Camera.Parameters camParams = Camera.GetParameters();
 
             if (base.Resources.Configuration.Orientation == global::Android.Content.Res.Orientation.Landscape)
             {
                 camParams.Set("orientation", "landscape");
                 camParams.SetRotation(0);
-                mCamera.SetDisplayOrientation(0);
+                Camera.SetDisplayOrientation(0);
             }
             else
             {
                 camParams.Set("orientation", "portrait");
                 camParams.SetRotation(90);
-                mCamera.SetDisplayOrientation(90);
+                Camera.SetDisplayOrientation(90);
             }
 
             if (isVideo && camParams.SupportedFocusModes.Contains(Camera.Parameters.FocusModeContinuousVideo))
@@ -367,10 +367,10 @@ namespace OurPlace.Android.Fragments
                 camParams.FocusMode = Camera.Parameters.FocusModeAuto;
             }
 
-            mCamera.SetParameters(camParams);
+            Camera.SetParameters(camParams);
         }
 
-        private Camera.Size getOptimalPreviewSize(IList<Camera.Size> sizes, int width, int height)
+        private Camera.Size GetOptimalPreviewSize(IList<Camera.Size> sizes, int width, int height)
         {
             // Collect the supported resolutions that are at least as big as the preview Surface
             var bigEnough = new List<Camera.Size>();
@@ -383,18 +383,20 @@ namespace OurPlace.Android.Fragments
 
             foreach (Camera.Size option in sizes)
             {
-                if ((option.Width <= maxWidth) && (option.Height <= maxHeight) &&
-                       option.Height == option.Width * aspectHeight / aspectWidth)
+                if ((option.Width > maxWidth) || (option.Height > maxHeight) ||
+                    option.Height != option.Width * aspectHeight / aspectWidth)
                 {
-                    if (option.Width >= width &&
-                        option.Height >= height)
-                    {
-                        bigEnough.Add(option);
-                    }
-                    else
-                    {
-                        notBigEnough.Add(option);
-                    }
+                    continue;
+                }
+
+                if (option.Width >= width &&
+                    option.Height >= height)
+                {
+                    bigEnough.Add(option);
+                }
+                else
+                {
+                    notBigEnough.Add(option);
                 }
             }
 
@@ -404,14 +406,13 @@ namespace OurPlace.Android.Fragments
             {
                 return (Camera.Size)Collections.Min(bigEnough, new CompareCamSizesByArea());
             }
-            else if (notBigEnough.Count > 0)
+
+            if (notBigEnough.Count > 0)
             {
                 return (Camera.Size)Collections.Max(notBigEnough, new CompareCamSizesByArea());
             }
-            else
-            {
-                return sizes[0];
-            }
+
+            return sizes[0];
         }
     }
 

@@ -41,20 +41,20 @@ namespace OurPlace.Android.Activities.Create
     [Activity(Label = "Create A New Activity", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity))]
     public class CreateNewActivity : AppCompatActivity
     {
-        EditText titleInput;
-        EditText descInput;
-        Button continueButton;
-        ImageViewAsync imageView;
-        global::Android.Net.Uri selectedImage;
-        global::Android.Net.Uri outputFileUri;
-        global::Android.Net.Uri previousFileUri;
-        string finalImagePath;
-        readonly int photoRequestCode = 111;
-        readonly int permRequestCode = 222;
-        Intent lastReqIntent;
-        bool editing = false;
+        private EditText titleInput;
+        private EditText descInput;
+        private Button continueButton;
+        private ImageViewAsync imageView;
+        private global::Android.Net.Uri selectedImage;
+        private global::Android.Net.Uri outputFileUri;
+        private global::Android.Net.Uri previousFileUri;
+        private string finalImagePath;
+        private const int PhotoRequestCode = 111;
+        private const int PermRequestCode = 222;
+        private Intent lastReqIntent;
+        private bool editing;
 
-        LearningActivity newActivity;
+        private LearningActivity newActivity;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -132,15 +132,15 @@ namespace OurPlace.Android.Activities.Create
                 Resources.GetString(Resource.String.permissionPhotoExplanation),
                 Resources.GetString(Resource.String.permissionFilesExplanation),
                 Resources.GetString(Resource.String.permissionFilesExplanation)
-            }, lastReqIntent, photoRequestCode, permRequestCode, this);
+            }, lastReqIntent, PhotoRequestCode, PermRequestCode, this);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            if (requestCode == permRequestCode)
+            if (requestCode == PermRequestCode)
             {
-                StartActivityForResult(lastReqIntent, photoRequestCode);
+                StartActivityForResult(lastReqIntent, PhotoRequestCode);
             }
         }
 
@@ -148,7 +148,7 @@ namespace OurPlace.Android.Activities.Create
         {
             bool success = resultCode == global::Android.App.Result.Ok;
 
-            if (requestCode == photoRequestCode && success)
+            if (requestCode == PhotoRequestCode && success)
             {
                 if (previousFileUri != null)
                 {
@@ -228,7 +228,10 @@ namespace OurPlace.Android.Activities.Create
             newActivity.Name = titleInput.Text;
             newActivity.Description = descInput.Text;
 
-            if (selectedImage != null) newActivity.ImageUrl = selectedImage.Path;
+            if (selectedImage != null)
+            {
+                newActivity.ImageUrl = selectedImage.Path;
+            }
 
             Intent addTasksActivity = new Intent(this, typeof(CreateManageTasksActivity));
             string json = JsonConvert.SerializeObject(newActivity, new JsonSerializerSettings

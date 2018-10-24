@@ -60,7 +60,10 @@ namespace OurPlace.Android.Activities
             int activityId = Intent.GetIntExtra("ACT_ID", -1);
             resIndex = Intent.GetIntExtra("RES_INDEX", -1);
 
-            if (string.IsNullOrWhiteSpace(json)) return;
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return;
+            }
 
             AppTask thisTask = JsonConvert.DeserializeObject<AppTask>(json);
 
@@ -105,7 +108,10 @@ namespace OurPlace.Android.Activities
                 }
                 else
                 {
-                    uri = global::Android.Net.Uri.Parse(results[resIndex]);
+                    if (results != null)
+                    {
+                        uri = global::Android.Net.Uri.Parse(results[resIndex]);
+                    }
                 }
 
                 // easiest way to get audio playback controls is to use a videoview
@@ -122,41 +128,51 @@ namespace OurPlace.Android.Activities
             {
                 ImageViewAsync imageView = FindViewById<ImageViewAsync>(Resource.Id.imageView);
                 imageView.Visibility = ViewStates.Visible;
-                ImageService.Instance.LoadFile(results[resIndex]).FadeAnimation(true).Into(imageView);
+                if (results != null)
+                {
+                    ImageService.Instance.LoadFile(results[resIndex]).FadeAnimation(true).Into(imageView);
+                }
+
             }
         }
 
         protected override void OnPause()
         {
             base.OnPause();
-            if(videoView != null && videoView.CanPause())
+            if (videoView == null || !videoView.CanPause())
             {
-                videoView.Pause();
-                isPaused = true;
+                return;
             }
+
+            videoView.Pause();
+            isPaused = true;
         }
 
         protected override void OnResume()
         {
             base.OnResume();
-            if (videoView != null && isPaused)
+            if (videoView == null || !isPaused)
             {
-                videoView.Resume();
-                isPaused = false;
+                return;
             }
+
+            videoView.Resume();
+            isPaused = false;
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if(videoView != null)
+            if (videoView == null)
             {
-                if (videoView.IsPlaying)
-                {
-                    videoView.StopPlayback();
-                }
-                videoView = null;
+                return;
             }
+
+            if (videoView.IsPlaying)
+            {
+                videoView.StopPlayback();
+            }
+            videoView = null;
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -170,9 +186,12 @@ namespace OurPlace.Android.Activities
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if(item.ItemId == Resource.Id.menudelete)
+            if (item.ItemId != Resource.Id.menudelete)
             {
-                new global::Android.Support.V7.App.AlertDialog.Builder(this)
+                return base.OnOptionsItemSelected(item);
+            }
+
+            new global::Android.Support.V7.App.AlertDialog.Builder(this)
                 .SetTitle(Resource.String.deleteTitle)
                 .SetMessage(Resource.String.deleteMessage)
                 .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
@@ -184,10 +203,8 @@ namespace OurPlace.Android.Activities
                 })
                 .Show();
 
-                return true;
-            }
+            return true;
 
-            return base.OnOptionsItemSelected(item);
         }
 
         public void OnPrepared(MediaPlayer mp)

@@ -35,7 +35,6 @@ using OurPlace.Common.Models;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -47,12 +46,12 @@ namespace OurPlace.Android.Activities.Create
         private TaskType taskType;
         private Button addTaskBtn;
         private ImageViewAsync imageView;
-        global::Android.Net.Uri selectedImage;
-        global::Android.Net.Uri outputFileUri;
-        global::Android.Net.Uri previousFileUri;
-        string finalImagePath;
-        private int photoRequestCode = 111;
-        private int permRequestCode = 222;
+        private global::Android.Net.Uri selectedImage;
+        private global::Android.Net.Uri outputFileUri;
+        private global::Android.Net.Uri previousFileUri;
+        private string finalImagePath;
+        private const int PhotoRequestCode = 111;
+        private const int PermRequestCode = 222;
 
         private LearningTask newTask;
         private bool editing = false;
@@ -152,7 +151,7 @@ namespace OurPlace.Android.Activities.Create
             if (currentPerm != Permission.Granted)
             {
                 AndroidUtils.CheckGetPermission(permission,
-                this, permRequestCode, Resources.GetString(Resource.String.permissionCameraTitle),
+                this, PermRequestCode, Resources.GetString(Resource.String.permissionCameraTitle),
                 Resources.GetString(Resource.String.permissionPhotoExplanation));
             }
             else
@@ -164,13 +163,13 @@ namespace OurPlace.Android.Activities.Create
         private void FirePhotoIntent(bool includeCamera)
         {
             Intent finalIntent = AndroidUtils.CreateMultiSourceImagePickerIntent(includeCamera, outputFileUri, this);
-            StartActivityForResult(finalIntent, photoRequestCode);
+            StartActivityForResult(finalIntent, PhotoRequestCode);
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            if (requestCode == permRequestCode)
+            if (requestCode == PermRequestCode)
             {
                 FirePhotoIntent(grantResults[0] == Permission.Granted);
             }
@@ -180,7 +179,7 @@ namespace OurPlace.Android.Activities.Create
         {
             bool success = resultCode == global::Android.App.Result.Ok;
 
-            if (requestCode == photoRequestCode && success)
+            if (requestCode == PhotoRequestCode && success)
             {
                 if (previousFileUri != null)
                 {

@@ -38,10 +38,10 @@ namespace OurPlace.Android.Activities.Create
     [Activity(Label = "New Task", Theme = "@style/OurPlaceActionBar")]
     public class CreateChooseTaskTypeActivity : AppCompatActivity
     {
-        RecyclerView recyclerView;
-        RecyclerView.LayoutManager layoutManager;
-        TaskTypeAdapter adapter;
-        List<TaskType> taskTypes;
+        private RecyclerView recyclerView;
+        private RecyclerView.LayoutManager layoutManager;
+        private TaskTypeAdapter adapter;
+        private List<TaskType> taskTypes;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -101,7 +101,7 @@ namespace OurPlace.Android.Activities.Create
 
         private void Adapter_ItemClick(object sender, int position)
         {
-            TaskType chosenType = adapter.data[position];
+            TaskType chosenType = adapter.Data[position];
             Type activityType = AndroidUtils.GetTaskCreationActivityType(chosenType.IdName);
 
             Intent myIntent = new Intent(this, activityType);

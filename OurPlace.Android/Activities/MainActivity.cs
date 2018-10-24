@@ -21,7 +21,6 @@
 #endregion
 using Android.App;
 using Android.Content;
-using Android.Content.PM;
 using Android.Gms.Maps;
 using Android.OS;
 using Android.Preferences;
@@ -41,16 +40,20 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Android.Content.PM;
 using ZXing.Mobile;
 
 namespace OurPlace.Android.Activities
 {
-    [Activity(Label = "OurPlace", Theme = "@style/OurPlaceActionBar", Icon = "@mipmap/ic_launcher")]
+    [Activity(Label = "OurPlace", Theme = "@style/OurPlaceActionBar", Icon = "@mipmap/ic_launcher", LaunchMode = LaunchMode.SingleTask)]
     [IntentFilter(new[] { Intent.ActionView }, DataScheme = "https", DataHost = ConfidentialData.hostname, DataPath = "/app/activity", Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault })]
     [IntentFilter(new[] { Intent.ActionView }, DataScheme = "http", DataHost = ConfidentialData.hostname, DataPath = "/app/activity", Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault })]
     [IntentFilter(new[] { Intent.ActionView }, DataScheme = "parklearn", DataHost = "activity", Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault })]
     public class MainActivity : AppCompatActivity
     {
+        private static DatabaseManager dbManager;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -71,7 +74,7 @@ namespace OurPlace.Android.Activities
 
         private async void GetCheckLogin()
         {
-            if (!await Common.LocalData.Storage.InitializeLogin())
+            if (!await Storage.InitializeLogin())
             {
                 // Login invalid
                 Analytics.TrackEvent("MainActivity_InvalidLogin");
@@ -88,13 +91,68 @@ namespace OurPlace.Android.Activities
 
             global::Android.Net.Uri dataUri = base.Intent.Data;
 
-            if (dataUri != null)
+            if (dataUri == null)
             {
-                string activityRef = dataUri.GetQueryParameter("code");
-                if (!string.IsNullOrWhiteSpace(activityRef))
+                return;
+            }
+
+            string activityRef = dataUri.GetQueryParameter("code");
+            if (!string.IsNullOrWhiteSpace(activityRef))
+            {
+                GetAndOpenActivity(activityRef);
+            }
+        }
+
+        public async Task<DatabaseManager> GetDbManager()
+        {
+            return dbManager ?? (dbManager = await Storage.GetDatabaseManager());
+        }
+
+        public async Task<ApplicationUser> GetCurrentUser()
+        {
+            DatabaseManager manager = await GetDbManager();
+
+            if (manager.currentUser == null)
+            {
+                // Something bad has happened, log out
+                var suppress = AndroidUtils.ReturnToSignIn(this);
+            }
+
+            return manager.currentUser;
+        }
+
+        public async Task<List<ActivityFeedSection>> GetCachedActivities(bool ownedOnly)
+        {
+            ApplicationUser currentUser = await GetCurrentUser();
+
+            string jsonCache = (ownedOnly)
+                ? currentUser?.RemoteCreatedActivitiesJson
+                : currentUser?.CachedActivitiesJson;
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(jsonCache)) return new List<ActivityFeedSection>();
+
+                return JsonConvert.DeserializeObject<List<ActivityFeedSection>>(jsonCache,
+                    new JsonSerializerSettings
+                    {
+                        //TypeNameHandling = TypeNameHandling.Objects,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 10
+                    });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Toast.MakeText(this, Resource.String.errorCache, ToastLength.Long).Show();
+
+                if (currentUser != null)
                 {
-                    GetAndOpenActivity(activityRef);
+                    currentUser.CachedActivitiesJson = null;
+                    (await GetDbManager()).AddUser(currentUser);
                 }
+
+                return new List<ActivityFeedSection>();
             }
         }
 
@@ -106,53 +164,57 @@ namespace OurPlace.Android.Activities
 
         private async void GetScan()
         {
-            MobileBarcodeScanner scanner = new ZXing.Mobile.MobileBarcodeScanner();
+            MobileBarcodeScanner scanner = new MobileBarcodeScanner();
             ZXing.Result result = await scanner.Scan();
 
-            if (result == null) return;
+            if (result == null)
+            {
+                return;
+            }
 
             Console.WriteLine("Scanned Barcode: " + result.Text);
             global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(result.Text);
 
-            if (uri == null) return;
+            if (uri == null)
+            {
+                return;
+            }
 
             GetAndOpenActivity(uri.GetQueryParameter("code"));
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            if (item.ItemId == Resource.Id.menuscan)
+            switch (item.ItemId)
             {
-                GetScan();
-                return true;
-            }
-            if (item.ItemId == Resource.Id.menusearch)
-            {
-                StartSearch();
-                return true;
-            }
-            if (item.ItemId == Resource.Id.menuuploads)
-            {
-                Intent intent = new Intent(this, typeof(UploadsActivity));
-                StartActivity(intent);
-                return true;
-            }
-            if(item.ItemId == Resource.Id.menusettings)
-            {
-                Intent intent = new Intent(this, typeof(PreferencesActivity));
-                StartActivity(intent);
-                return true;
-            }
-            if (item.ItemId == Resource.Id.menuhelp)
-            {
-                Intent browserIntent =
+                case Resource.Id.menuscan:
+                    GetScan();
+                    return true;
+
+                case Resource.Id.menusearch:
+                    StartSearch();
+                    return true;
+
+                case Resource.Id.menuuploads:
+                    Intent uploadIntent = new Intent(this, typeof(UploadsActivity));
+                    StartActivity(uploadIntent);
+                    return true;
+                
+                case Resource.Id.menusettings:
+                    Intent settingsIntent = new Intent(this, typeof(PreferencesActivity));
+                    StartActivity(settingsIntent);
+                    return true;
+
+                case Resource.Id.menuhelp:
+                    Intent browserIntent =
                         new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(
                             ConfidentialData.api + "GettingStarted"));
-                StartActivity(browserIntent);
-                return true;
-            }
+                    StartActivity(browserIntent);
+                    return true;
 
-            return base.OnOptionsItemSelected(item);
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
         }
 
         private void StartSearch()
@@ -166,8 +228,7 @@ namespace OurPlace.Android.Activities
             message.SetText(Resource.String.searchAlertMessage);
             EditText codeInput = new EditText(this);
 
-            LinearLayout dialogLayout = new LinearLayout(this);
-            dialogLayout.Orientation = Orientation.Vertical;
+            LinearLayout dialogLayout = new LinearLayout(this) { Orientation = Orientation.Vertical };
             dialogLayout.AddView(message);
             dialogLayout.AddView(codeInput);
             dialogLayout.SetPadding(px, px, px, px);
@@ -184,8 +245,8 @@ namespace OurPlace.Android.Activities
             dialog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
             dialog.Show();
 
-            Common.ServerResponse<LearningActivity> result =
-                await Common.ServerUtils.Get<LearningActivity>("/api/LearningActivities/GetWithCode?code=" + code);
+            ServerResponse<LearningActivity> result =
+                await ServerUtils.Get<LearningActivity>("/api/LearningActivities/GetWithCode?code=" + code);
 
             dialog.Dismiss();
 
@@ -203,7 +264,7 @@ namespace OurPlace.Android.Activities
             else
             {
                 // if token invalid, return to signin 
-                if (Common.ServerUtils.CheckNeedsLogin(result.StatusCode))
+                if (ServerUtils.CheckNeedsLogin(result.StatusCode))
                 {
                     var suppress = AndroidUtils.ReturnToSignIn(this);
                     return;
@@ -223,7 +284,7 @@ namespace OurPlace.Android.Activities
         // Update the TaskTypes available in the background
         public async void UpdateTaskTypes()
         {
-            Common.ServerResponse<TaskType[]> response = await Common.ServerUtils.GetTaskTypes();
+            ServerResponse<TaskType[]> response = await ServerUtils.GetTaskTypes();
 
             if (response == null)
             {
@@ -232,12 +293,16 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            if (response.Success)
+            if (!response.Success)
             {
-                // TODO make sure to remove this after updating the iOS version!!
+                return;
+            }
 
-                List<TaskType> tempTypes = new List<TaskType>(response.Data);
-                tempTypes.Add(new TaskType
+            // TODO make sure to remove this after updating the iOS version!!
+
+            List<TaskType> tempTypes = new List<TaskType>(response.Data)
+            {
+                new TaskType
                 {
                     Id = 14,
                     Order = 10,
@@ -246,17 +311,16 @@ namespace OurPlace.Android.Activities
                     DisplayName = "Scan the QR Code",
                     Description = "Find and scan the correct QR code",
                     IconUrl = ConfidentialData.storage + "icons/scanQR.png"
-                });
+                }
+            };
 
-                (await Common.LocalData.Storage.GetDatabaseManager()).AddTaskTypes(tempTypes);
-            }
+            (await GetDbManager()).AddTaskTypes(tempTypes);
         }
 
         public async void LaunchActivity(LearningActivity activity)
         {
             int thisVersion = PackageManager.GetPackageInfo(PackageName, 0).VersionCode;
-            DatabaseManager dbManager = await Common.LocalData.Storage.GetDatabaseManager();
-
+            
             if (activity.AppVersionNumber > thisVersion)
             {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)
@@ -269,7 +333,7 @@ namespace OurPlace.Android.Activities
 
             Dictionary<string, string> properties = new Dictionary<string, string>
             {
-                { "UserId", dbManager.currentUser.Id},
+                { "UserId", (await GetDbManager()).currentUser.Id},
                 { "ActivityId", activity.Id.ToString() }
             };
             Analytics.TrackEvent("MainActivity_LaunchActivity", properties);
@@ -278,10 +342,10 @@ namespace OurPlace.Android.Activities
 
             activity.LearningTasks = activity.LearningTasks.OrderBy(t => t.Order).ToList();
 
-            ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(this);
+            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(this);
 
             // Save this activity to the database for showing in the 'recent' feed section
-            (await Storage.GetDatabaseManager()).AddActivity(activity, int.Parse(prefs.GetString("pref_cacheNumber", "4")));
+            (await GetDbManager()).AddActivity(activity, int.Parse(preferences.GetString("pref_cacheNumber", "4")));
 
             string json = JsonConvert.SerializeObject(activity, new JsonSerializerSettings
             {
@@ -289,6 +353,7 @@ namespace OurPlace.Android.Activities
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });
+
             performActivityIntent.PutExtra("JSON", json);
             MainLandingFragment.ForceRefresh = true;
             StartActivity(performActivityIntent);

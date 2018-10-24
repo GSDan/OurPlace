@@ -42,29 +42,28 @@ namespace OurPlace.Android.Fragments
 {
     public class Camera2VideoFragment : Fragment, global::Android.Views.View.IOnClickListener, MediaRecorder.IOnInfoListener
     {
-        private const string TAG = "Camera2VideoFragment";
-        private SparseIntArray ORIENTATIONS = new SparseIntArray();
+        private const string FragTag = "Camera2VideoFragment";
+        private readonly SparseIntArray orientations = new SparseIntArray();
         private string videoPath;
 
         // Button to record video
         private Button buttonVideo;
 
         // AutoFitTextureView for camera preview
-        public AutoFitTextureView textureView;
+        public AutoFitTextureView TextureView;
 
-        public CameraDevice cameraDevice;
-        public CameraCaptureSession previewSession;
-        public MediaRecorder mediaRecorder;
+        public CameraDevice CameraDevice;
+        public CameraCaptureSession PreviewSession;
+        public MediaRecorder MediaRecorder;
 
         private bool isRecordingVideo;
-        public Semaphore cameraOpenCloseLock = new Semaphore(1);
+        public Semaphore CameraOpenCloseLock = new Semaphore(1);
 
         // Called when the CameraDevice changes state
-        private MyCameraStateCallback stateListener;
+        private readonly MyCameraStateCallback stateListener;
         // Handles several lifecycle events of a TextureView
-        private MySurfaceTextureListener surfaceTextureListener;
+        private readonly MySurfaceTextureListener surfaceTextureListener;
 
-        public CaptureRequest.Builder builder;
         private CaptureRequest.Builder previewBuilder;
 
         private Size videoSize;
@@ -76,37 +75,40 @@ namespace OurPlace.Android.Fragments
 
         public Camera2VideoFragment()
         {
-            ORIENTATIONS.Append((int)SurfaceOrientation.Rotation0, 90);
-            ORIENTATIONS.Append((int)SurfaceOrientation.Rotation90, 0);
-            ORIENTATIONS.Append((int)SurfaceOrientation.Rotation180, 270);
-            ORIENTATIONS.Append((int)SurfaceOrientation.Rotation270, 180);
+            orientations.Append((int)SurfaceOrientation.Rotation0, 90);
+            orientations.Append((int)SurfaceOrientation.Rotation90, 0);
+            orientations.Append((int)SurfaceOrientation.Rotation180, 270);
+            orientations.Append((int)SurfaceOrientation.Rotation270, 180);
             surfaceTextureListener = new MySurfaceTextureListener(this);
             stateListener = new MyCameraStateCallback(this);
         }
         public static Camera2VideoFragment NewInstance()
         {
-            var fragment = new Camera2VideoFragment();
-            fragment.RetainInstance = true;
+            var fragment = new Camera2VideoFragment { RetainInstance = true };
             return fragment;
         }
 
         public static Size ChooseVideoSize(Size[] choices)
         {
             Size closest = choices[choices.Length - 1];
-            int targetRes = 1280 * 720;
+            const int targetRes = 1280 * 720;
             int currentDiff = System.Math.Abs(closest.Width * closest.Height - targetRes);
 
             foreach (Size size in choices)
             {
-                if (size.Width == size.Height * 4 / 3)
+                if (size.Width != size.Height * 4 / 3)
                 {
-                    int thisDiff = System.Math.Abs(size.Width * size.Height - targetRes);
-                    if (thisDiff < currentDiff)
-                    {
-                        closest = size;
-                        currentDiff = thisDiff;
-                    }
+                    continue;
                 }
+
+                int thisDiff = System.Math.Abs(size.Width * size.Height - targetRes);
+                if (thisDiff >= currentDiff)
+                {
+                    continue;
+                }
+
+                closest = size;
+                currentDiff = thisDiff;
             }
             return closest;
         }
@@ -116,6 +118,7 @@ namespace OurPlace.Android.Fragments
             var bigEnough = new List<Size>();
             int w = aspectRatio.Width;
             int h = aspectRatio.Height;
+
             foreach (Size option in choices)
             {
                 if (option.Height == option.Width * h / w &&
@@ -123,29 +126,28 @@ namespace OurPlace.Android.Fragments
                 {
                     bigEnough.Add(option);
                 }
-
             }
 
             if (bigEnough.Count > 0)
-                return (Size)Collections.Min(bigEnough, new CompareSizesByArea());
-            else
             {
-                Log.Error(TAG, "Couldn't find any suitable preview size");
-                return choices[0];
+                return (Size)Collections.Min(bigEnough, new CompareSizesByArea());
             }
+                
+            Log.Error(FragTag, "Couldn't find any suitable preview size");
+            return choices[0];
         }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            ;
             return inflater.Inflate(Resource.Layout.Camera2VideoFragment, container, false);
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            textureView = (AutoFitTextureView)view.FindViewById(Resource.Id.texture);
+            TextureView = (AutoFitTextureView)view.FindViewById(Resource.Id.texture);
             buttonVideo = (Button)view.FindViewById(Resource.Id.video);
             buttonVideo.SetOnClickListener(this);
-            textureView.KeepScreenOn = true;
+            TextureView.KeepScreenOn = true;
             view.FindViewById(Resource.Id.info).SetOnClickListener(this);
         }
 
@@ -153,11 +155,14 @@ namespace OurPlace.Android.Fragments
         {
             base.OnResume();
             StartBackgroundThread();
-            if (textureView.IsAvailable)
-                openCamera(textureView.Width, textureView.Height);
+            if (TextureView.IsAvailable)
+            {
+                OpenCamera(TextureView.Width, TextureView.Height);
+            }
             else
-                textureView.SurfaceTextureListener = surfaceTextureListener;
-
+            {
+                TextureView.SurfaceTextureListener = surfaceTextureListener;
+            }
         }
 
         public override void OnPause()
@@ -197,7 +202,7 @@ namespace OurPlace.Android.Fragments
                     {
                         if (isRecordingVideo)
                         {
-                            stopRecordingVideo();
+                            StopRecordingVideo();
                         }
                         else
                         {
@@ -221,16 +226,21 @@ namespace OurPlace.Android.Fragments
         }
 
         //Tries to open a CameraDevice
-        public void openCamera(int width, int height)
+        public void OpenCamera(int width, int height)
         {
             if (null == Activity || Activity.IsFinishing)
+            {
                 return;
+            }
 
             CameraManager manager = (CameraManager)Activity.GetSystemService(Context.CameraService);
             try
             {
-                if (!cameraOpenCloseLock.TryAcquire(2500, TimeUnit.Milliseconds))
+                if (!CameraOpenCloseLock.TryAcquire(2500, TimeUnit.Milliseconds))
+                {
                     throw new RuntimeException("Time out waiting to lock camera opening.");
+                }
+
                 string cameraId = manager.GetCameraIdList()[0];
                 CameraCharacteristics characteristics = manager.GetCameraCharacteristics(cameraId);
                 StreamConfigurationMap map = (StreamConfigurationMap)characteristics.Get(CameraCharacteristics.ScalerStreamConfigurationMap);
@@ -239,14 +249,14 @@ namespace OurPlace.Android.Fragments
                 int orientation = (int)Resources.Configuration.Orientation;
                 if (orientation == (int)global::Android.Content.Res.Orientation.Landscape)
                 {
-                    textureView.SetAspectRatio(previewSize.Width, previewSize.Height);
+                    TextureView.SetAspectRatio(previewSize.Width, previewSize.Height);
                 }
                 else
                 {
-                    textureView.SetAspectRatio(previewSize.Height, previewSize.Width);
+                    TextureView.SetAspectRatio(previewSize.Height, previewSize.Width);
                 }
-                configureTransform(width, height);
-                mediaRecorder = new MediaRecorder();
+                ConfigureTransform(width, height);
+                MediaRecorder = new MediaRecorder();
                 manager.OpenCamera(cameraId, stateListener, null);
 
             }
@@ -267,28 +277,30 @@ namespace OurPlace.Android.Fragments
         }
 
         //Start the camera preview
-        public void startPreview()
+        public void StartPreview()
         {
-            if (null == cameraDevice || !textureView.IsAvailable || null == previewSize)
+            if (null == CameraDevice || !TextureView.IsAvailable || null == previewSize)
+            {
                 return;
+            }
 
             try
             {
                 SetUpMediaRecorder();
-                SurfaceTexture texture = textureView.SurfaceTexture;
+                SurfaceTexture texture = TextureView.SurfaceTexture;
                 //Assert.IsNotNull(texture);
                 texture.SetDefaultBufferSize(previewSize.Width, previewSize.Height);
-                previewBuilder = cameraDevice.CreateCaptureRequest(CameraTemplate.Record);
+                previewBuilder = CameraDevice.CreateCaptureRequest(CameraTemplate.Record);
                 var surfaces = new List<Surface>();
                 var previewSurface = new Surface(texture);
                 surfaces.Add(previewSurface);
                 previewBuilder.AddTarget(previewSurface);
 
-                var recorderSurface = mediaRecorder.Surface;
+                var recorderSurface = MediaRecorder.Surface;
                 surfaces.Add(recorderSurface);
                 previewBuilder.AddTarget(recorderSurface);
 
-                cameraDevice.CreateCaptureSession(surfaces, new PreviewCaptureStateCallback(this), backgroundHandler);
+                CameraDevice.CreateCaptureSession(surfaces, new PreviewCaptureStateCallback(this), backgroundHandler);
 
             }
             catch (CameraAccessException e)
@@ -305,16 +317,16 @@ namespace OurPlace.Android.Fragments
         {
             try
             {
-                cameraOpenCloseLock.Acquire();
-                if (null != cameraDevice)
+                CameraOpenCloseLock.Acquire();
+                if (null != CameraDevice)
                 {
-                    cameraDevice.Close();
-                    cameraDevice = null;
+                    CameraDevice.Close();
+                    CameraDevice = null;
                 }
-                if (null != mediaRecorder)
+                if (null != MediaRecorder)
                 {
-                    mediaRecorder.Release();
-                    mediaRecorder = null;
+                    MediaRecorder.Release();
+                    MediaRecorder = null;
                 }
             }
             catch (InterruptedException e)
@@ -324,22 +336,24 @@ namespace OurPlace.Android.Fragments
             }
             finally
             {
-                cameraOpenCloseLock.Release();
+                CameraOpenCloseLock.Release();
             }
         }
 
         //Update the preview
-        public void updatePreview()
+        public void UpdatePreview()
         {
-            if (null == cameraDevice)
+            if (null == CameraDevice)
+            {
                 return;
+            }
 
             try
             {
-                setUpCaptureRequestBuilder(previewBuilder);
+                SetUpCaptureRequestBuilder(previewBuilder);
                 HandlerThread thread = new HandlerThread("CameraPreview");
                 thread.Start();
-                previewSession.SetRepeatingRequest(previewBuilder.Build(), null, backgroundHandler);
+                PreviewSession.SetRepeatingRequest(previewBuilder.Build(), null, backgroundHandler);
             }
             catch (CameraAccessException e)
             {
@@ -347,64 +361,69 @@ namespace OurPlace.Android.Fragments
             }
         }
 
-        private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder)
+        private static void SetUpCaptureRequestBuilder(CaptureRequest.Builder builder)
         {
-            builder.Set(CaptureRequest.ControlMode, new Java.Lang.Integer((int)ControlMode.Auto));
+            builder.Set(CaptureRequest.ControlMode, new Integer((int)ControlMode.Auto));
 
         }
 
-        //Configures the neccesary matrix transformation to apply to the textureView
-        public void configureTransform(int viewWidth, int viewHeight)
+        //Configures the necessary matrix transformation to apply to the textureView
+        public void ConfigureTransform(int viewWidth, int viewHeight)
         {
-            if (null == Activity || null == previewSize || null == textureView)
+            if (null == Activity || null == previewSize || null == TextureView)
+            {
                 return;
+            }
 
             int rotation = (int)Activity.WindowManager.DefaultDisplay.Rotation;
             var matrix = new Matrix();
             var viewRect = new RectF(0, 0, viewWidth, viewHeight);
             var bufferRect = new RectF(0, 0, previewSize.Height, previewSize.Width);
-            float centerX = viewRect.CenterX();
-            float centerY = viewRect.CenterY();
+            float centreX = viewRect.CenterX();
+            float centreY = viewRect.CenterY();
+
             if ((int)SurfaceOrientation.Rotation90 == rotation || (int)SurfaceOrientation.Rotation270 == rotation)
             {
-                bufferRect.Offset((centerX - bufferRect.CenterX()), (centerY - bufferRect.CenterY()));
+                bufferRect.Offset((centreX - bufferRect.CenterX()), (centreY - bufferRect.CenterY()));
                 matrix.SetRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.Fill);
                 float scale = System.Math.Max(
                     (float)viewHeight / previewSize.Height,
                     (float)viewHeight / previewSize.Width);
-                matrix.PostScale(scale, scale, centerX, centerY);
-                matrix.PostRotate(90 * (rotation - 2), centerX, centerY);
+                matrix.PostScale(scale, scale, centreX, centreY);
+                matrix.PostRotate(90 * (rotation - 2), centreX, centreY);
             }
-            textureView.SetTransform(matrix);
+            TextureView.SetTransform(matrix);
         }
 
         private void SetUpMediaRecorder()
         {
             if (null == Activity)
+            {
                 return;
+            }
 
             videoPath = GetVideoFile(Activity).AbsolutePath;
 
-            mediaRecorder.SetAudioSource(AudioSource.Mic);
-            mediaRecorder.SetVideoSource(VideoSource.Surface);
-            mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
-            mediaRecorder.SetOutputFile(videoPath);
-            mediaRecorder.SetVideoEncodingBitRate(5000000);
-            mediaRecorder.SetVideoFrameRate(30);
-            mediaRecorder.SetVideoSize(videoSize.Width, videoSize.Height);
-            mediaRecorder.SetVideoEncoder(VideoEncoder.H264);
-            mediaRecorder.SetAudioEncoder(AudioEncoder.Aac);
-            mediaRecorder.SetAudioSamplingRate(44100);
-            mediaRecorder.SetAudioEncodingBitRate(96000);
-            mediaRecorder.SetMaxDuration(600000); // Ten min
-            mediaRecorder.SetOnInfoListener(this);
+            MediaRecorder.SetAudioSource(AudioSource.Mic);
+            MediaRecorder.SetVideoSource(VideoSource.Surface);
+            MediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
+            MediaRecorder.SetOutputFile(videoPath);
+            MediaRecorder.SetVideoEncodingBitRate(5000000);
+            MediaRecorder.SetVideoFrameRate(30);
+            MediaRecorder.SetVideoSize(videoSize.Width, videoSize.Height);
+            MediaRecorder.SetVideoEncoder(VideoEncoder.H264);
+            MediaRecorder.SetAudioEncoder(AudioEncoder.Aac);
+            MediaRecorder.SetAudioSamplingRate(44100);
+            MediaRecorder.SetAudioEncodingBitRate(96000);
+            MediaRecorder.SetMaxDuration(600000); // Ten min
+            MediaRecorder.SetOnInfoListener(this);
             int rotation = (int)Activity.WindowManager.DefaultDisplay.Rotation;
-            int orientation = ORIENTATIONS.Get(rotation);
-            mediaRecorder.SetOrientationHint(orientation);
-            mediaRecorder.Prepare();
+            int orientation = orientations.Get(rotation);
+            MediaRecorder.SetOrientationHint(orientation);
+            MediaRecorder.Prepare();
         }
 
-        private File GetVideoFile(Context context)
+        private static File GetVideoFile(Context context)
         {
             return new File(context.GetExternalFilesDir(null), DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff") + ".mp4");
         }
@@ -418,7 +437,7 @@ namespace OurPlace.Android.Fragments
                 isRecordingVideo = true;
 
                 //Start recording
-                mediaRecorder.Start();
+                MediaRecorder.Start();
             }
             catch (IllegalStateException e)
             {
@@ -426,7 +445,7 @@ namespace OurPlace.Android.Fragments
             }
         }
 
-        public void stopRecordingVideo()
+        public void StopRecordingVideo()
         {
             //UI
             isRecordingVideo = false;
@@ -440,11 +459,13 @@ namespace OurPlace.Android.Fragments
 
         public void OnInfo(MediaRecorder mr, [GeneratedEnum] MediaRecorderInfo what, int extra)
         {
-            if (what == MediaRecorderInfo.MaxDurationReached)
+            if (what != MediaRecorderInfo.MaxDurationReached)
             {
-                Toast.MakeText(Activity, Resource.String.recordingLimit, ToastLength.Long).Show();
-                stopRecordingVideo();
+                return;
             }
+
+            Toast.MakeText(Activity, Resource.String.recordingLimit, ToastLength.Long).Show();
+            StopRecordingVideo();
         }
 
         public class ErrorDialog : DialogFragment
@@ -460,7 +481,7 @@ namespace OurPlace.Android.Fragments
 
         private class MyDialogOnClickListener : Java.Lang.Object, IDialogInterfaceOnClickListener
         {
-            ErrorDialog er;
+            private readonly ErrorDialog er;
             public MyDialogOnClickListener(ErrorDialog e)
             {
                 er = e;
@@ -477,76 +498,75 @@ namespace OurPlace.Android.Fragments
             public int Compare(Java.Lang.Object lhs, Java.Lang.Object rhs)
             {
                 // We cast here to ensure the multiplications won't overflow
-                if (lhs is Size && rhs is Size)
+                if (lhs is Size left && rhs is Size right)
                 {
-                    var right = (Size)rhs;
-                    var left = (Size)lhs;
                     return Long.Signum((long)left.Width * left.Height -
                         (long)right.Width * right.Height);
                 }
-                else
-                    return 0;
 
+                return 0;
             }
         }
 
         public class MyCameraStateCallback : CameraDevice.StateCallback
         {
-            Camera2VideoFragment fragment;
+            private readonly Camera2VideoFragment fragment;
             public MyCameraStateCallback(Camera2VideoFragment frag)
             {
                 fragment = frag;
             }
             public override void OnOpened(CameraDevice camera)
             {
-                fragment.cameraDevice = camera;
-                fragment.startPreview();
-                fragment.cameraOpenCloseLock.Release();
-                if (null != fragment.textureView)
-                    fragment.configureTransform(fragment.textureView.Width, fragment.textureView.Height);
+                fragment.CameraDevice = camera;
+                fragment.StartPreview();
+                fragment.CameraOpenCloseLock.Release();
+                if (null != fragment.TextureView)
+                {
+                    fragment.ConfigureTransform(fragment.TextureView.Width, fragment.TextureView.Height);
+                }
             }
 
             public override void OnDisconnected(CameraDevice camera)
             {
-                fragment.cameraOpenCloseLock.Release();
+                fragment.CameraOpenCloseLock.Release();
                 camera.Close();
-                fragment.cameraDevice = null;
+                fragment.CameraDevice = null;
             }
 
             public override void OnError(CameraDevice camera, CameraError error)
             {
-                fragment.cameraOpenCloseLock.Release();
+                fragment.CameraOpenCloseLock.Release();
                 camera.Close();
-                fragment.cameraDevice = null;
-                if (null != fragment.Activity)
-                    fragment.Activity.Finish();
+                fragment.CameraDevice = null;
+
+                fragment.Activity?.Finish();
             }
         }
 
         public class MySurfaceTextureListener : Java.Lang.Object, TextureView.ISurfaceTextureListener
         {
-            Camera2VideoFragment fragment;
+            private readonly Camera2VideoFragment fragment;
             public MySurfaceTextureListener(Camera2VideoFragment frag)
             {
                 fragment = frag;
             }
 
-            public void OnSurfaceTextureAvailable(SurfaceTexture surface_texture, int width, int height)
+            public void OnSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height)
             {
-                fragment.openCamera(width, height);
+                fragment.OpenCamera(width, height);
             }
 
-            public void OnSurfaceTextureSizeChanged(SurfaceTexture surface_texture, int width, int height)
+            public void OnSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height)
             {
-                fragment.configureTransform(width, height);
+                fragment.ConfigureTransform(width, height);
             }
 
-            public bool OnSurfaceTextureDestroyed(SurfaceTexture surface_texture)
+            public bool OnSurfaceTextureDestroyed(SurfaceTexture surfaceTexture)
             {
                 return true;
             }
 
-            public void OnSurfaceTextureUpdated(SurfaceTexture surface_texture)
+            public void OnSurfaceTextureUpdated(SurfaceTexture surfaceTexture)
             {
             }
 
@@ -554,22 +574,24 @@ namespace OurPlace.Android.Fragments
 
         public class PreviewCaptureStateCallback : CameraCaptureSession.StateCallback
         {
-            Camera2VideoFragment fragment;
+            private readonly Camera2VideoFragment fragment;
             public PreviewCaptureStateCallback(Camera2VideoFragment frag)
             {
                 fragment = frag;
             }
             public override void OnConfigured(CameraCaptureSession session)
             {
-                fragment.previewSession = session;
-                fragment.updatePreview();
+                fragment.PreviewSession = session;
+                fragment.UpdatePreview();
 
             }
 
             public override void OnConfigureFailed(CameraCaptureSession session)
             {
-                if (null != fragment.Activity)
+                if (fragment.Activity != null)
+                {
                     Toast.MakeText(fragment.Activity, "Failed", ToastLength.Short).Show();
+                }
             }
         }
     }

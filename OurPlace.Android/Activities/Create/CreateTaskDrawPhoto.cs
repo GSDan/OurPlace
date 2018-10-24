@@ -47,10 +47,10 @@ namespace OurPlace.Android.Activities.Create
         private EditText instructions;
         private TaskType taskType;
         private ImageViewAsync chosenImageView;
-        global::Android.Net.Uri selectedImage;
-        global::Android.Net.Uri outputFileUri;
-        global::Android.Net.Uri previousFileUri;
-        string finalImagePath;
+        private global::Android.Net.Uri selectedImage;
+        private global::Android.Net.Uri outputFileUri;
+        private global::Android.Net.Uri previousFileUri;
+        private string finalImagePath;
         private int photoRequestCode = 111;
         private int permRequestCode = 222;
         private LearningTask parentTask;

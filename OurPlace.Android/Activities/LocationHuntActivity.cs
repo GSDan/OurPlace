@@ -27,7 +27,6 @@ using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Gms.Location;
 using Android.Graphics;
-using Android.Locations;
 using Android.Media;
 using Android.OS;
 using Android.Support.V7.App;
@@ -49,13 +48,12 @@ namespace OurPlace.Android.Activities
         private ImageView image;
         private TextView distanceText;
         private TextView accuracyText;
-        private Color defaultCol;
-        private readonly float lowAlpha = 0.1f;
+        private const float LowAlpha = 0.1f;
         private GoogleApiClient googleApiClient;
         private LocationRequest locRequest;
-        private Thread animThread;
-        private volatile int distanceMetres = 0;
-        private volatile bool shouldAnimate = false;
+        private Thread animationThread;
+        private volatile int distanceMetres;
+        private volatile bool shouldAnimate;
         private LocationHuntLocation target;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -76,7 +74,7 @@ namespace OurPlace.Android.Activities
             distanceText = FindViewById<TextView>(Resource.Id.distanceText);
             distanceText.Text = "Please wait";
 
-            defaultCol = Color.Rgb(
+            Color.Rgb(
                 Color.GetRedComponent(distanceText.CurrentTextColor),
                 Color.GetGreenComponent(distanceText.CurrentTextColor),
                 Color.GetBlueComponent(distanceText.CurrentTextColor));
@@ -85,23 +83,24 @@ namespace OurPlace.Android.Activities
             accuracyText.Text = "Connecting";
 
             image = FindViewById<ImageView>(Resource.Id.taskImage);
-            image.Alpha = lowAlpha;
+            image.Alpha = LowAlpha;
 
             Button openMapButton = FindViewById<Button>(Resource.Id.openMapButton);
             openMapButton.Click += OpenMapButton_Click;
             openMapButton.Visibility = (target.MapAvailable == null || target.MapAvailable == true) 
                 ? ViewStates.Visible : ViewStates.Gone;
 
-
-            if(AndroidUtils.IsGooglePlayServicesInstalled(this) && googleApiClient == null)
+            if (!AndroidUtils.IsGooglePlayServicesInstalled(this) || googleApiClient != null)
             {
-                googleApiClient = new GoogleApiClient.Builder(this)
-                    .AddConnectionCallbacks(this)
-                    .AddOnConnectionFailedListener(this)
-                    .AddApi(LocationServices.API)
-                    .Build();
-                locRequest = new LocationRequest();
+                return;
             }
+
+            googleApiClient = new GoogleApiClient.Builder(this)
+                .AddConnectionCallbacks(this)
+                .AddOnConnectionFailedListener(this)
+                .AddApi(LocationServices.API)
+                .Build();
+            locRequest = new LocationRequest();
         }
 
         private async void AnimateImage()
@@ -109,40 +108,45 @@ namespace OurPlace.Android.Activities
             ToneGenerator toneG = new ToneGenerator(Stream.Music, 50);
             while (shouldAnimate)
             {
-                if (googleApiClient.IsConnected)
+                if (!googleApiClient.IsConnected)
                 {
-                    float opacity = 0.1f;
-
-                    if (distanceMetres <= 10)
-                    {
-                        opacity = 1;
-                    }
-                    else if (distanceMetres < 100)
-                    {
-                        float calcOpacity = 1 - (float)distanceMetres / 100;
-                        if (calcOpacity > opacity) opacity = calcOpacity;
-                    }
-
-                    image.Alpha = opacity;
-
-                    long animDuration = Math.Max((long)Math.Min(1000, distanceMetres), 10);
-
-                    ObjectAnimator scaleDown = ObjectAnimator.OfPropertyValuesHolder(image,
-                            PropertyValuesHolder.OfFloat("scaleX", 1.2f),
-                            PropertyValuesHolder.OfFloat("scaleY", 1.2f));
-                    scaleDown.SetDuration(Math.Max(animDuration, 50));
-
-                    scaleDown.RepeatCount = 1;
-                    scaleDown.RepeatMode = ValueAnimatorRepeatMode.Reverse;
-
-                    RunOnUiThread(() =>
-                    {
-                        scaleDown.Start();
-                    });
-
-                    toneG.StartTone(Tone.CdmaAlertCallGuard, 50);
-                    await System.Threading.Tasks.Task.Delay((int)animDuration * 5); 
+                    continue;
                 }
+
+                float opacity = 0.1f;
+
+                if (distanceMetres <= 10)
+                {
+                    opacity = 1;
+                }
+                else if (distanceMetres < 100)
+                {
+                    float finalOpacity = 1 - (float)distanceMetres / 100;
+                    if (finalOpacity > opacity)
+                    {
+                        opacity = finalOpacity;
+                    }
+                }
+
+                image.Alpha = opacity;
+
+                long animationDuration = Math.Max((long)Math.Min(1000, distanceMetres), 10);
+
+                ObjectAnimator scaleDown = ObjectAnimator.OfPropertyValuesHolder(image,
+                    PropertyValuesHolder.OfFloat("scaleX", 1.2f),
+                    PropertyValuesHolder.OfFloat("scaleY", 1.2f));
+                scaleDown.SetDuration(Math.Max(animationDuration, 50));
+
+                scaleDown.RepeatCount = 1;
+                scaleDown.RepeatMode = ValueAnimatorRepeatMode.Reverse;
+
+                RunOnUiThread(() =>
+                {
+                    scaleDown.Start();
+                });
+
+                toneG.StartTone(Tone.CdmaAlertCallGuard, 50);
+                await System.Threading.Tasks.Task.Delay((int)animationDuration * 5);
             }
             toneG.Release();
         }
@@ -168,12 +172,14 @@ namespace OurPlace.Android.Activities
                 googleApiClient.Disconnect();
             }
 
-            if (animThread != null)
+            if (animationThread == null)
             {
-                shouldAnimate = false;
-                animThread.Join();
-                animThread = null;
+                return;
             }
+
+            shouldAnimate = false;
+            animationThread.Join();
+            animationThread = null;
         }
 
         public void OnConnected(Bundle connectionHint)
@@ -214,23 +220,16 @@ namespace OurPlace.Android.Activities
 
             string dist;
 
-            if(distanceMetres > 1000)
-            {
-                dist = string.Format("{0} km", (results[0] / 1000).ToString("n2"));
-            }
-            else
-            {
-                dist = string.Format("{0} metres", distanceMetres);
-            }
+            dist = distanceMetres > 1000 ? $"{(results[0] / 1000):n2} km" : $"{distanceMetres} metres";
 
-            distanceText.Text = string.Format("Distance: {0}", dist);
-            accuracyText.Text = string.Format("Accuracy: {0} metres", location.Accuracy.ToString("n0"));
+            distanceText.Text = $"Distance: {dist}";
+            accuracyText.Text = $"Accuracy: {location.Accuracy:n0} metres";
 
-            if(animThread == null)
+            if(animationThread == null)
             {
                 shouldAnimate = true;
-                animThread = new Thread(AnimateImage);
-                animThread.Start();
+                animationThread = new Thread(AnimateImage);
+                animationThread.Start();
             }
 
             if(distanceMetres < 10)
@@ -254,7 +253,7 @@ namespace OurPlace.Android.Activities
                     Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
                     myIntent.PutExtra("TASK_ID", learningTask.Id);
                     myIntent.PutExtra("COMPLETE", true);
-                    SetResult(global::Android.App.Result.Ok, myIntent);
+                    SetResult(Result.Ok, myIntent);
                     base.Finish();
                 })
                 .SetCancelable(false)

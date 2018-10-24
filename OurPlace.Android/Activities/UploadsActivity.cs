@@ -42,14 +42,14 @@ namespace OurPlace.Android.Activities.Create
     [Activity(Label = "Upload Queue", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity))]
     public class UploadsActivity : AppCompatActivity
     {
-        RecyclerView recyclerView;
-        RecyclerView.LayoutManager layoutManager;
-        UploadsAdapter adapter;
-        List<AppDataUpload> uploads;
-        List<FileUpload> files;
-        TextView headerText;
-        DatabaseManager dbManager;
-        ProgressDialog uploadProgress;
+        private RecyclerView recyclerView;
+        private RecyclerView.LayoutManager layoutManager;
+        private UploadsAdapter adapter;
+        private List<AppDataUpload> uploads;
+        private List<FileUpload> files;
+        private TextView headerText;
+        private DatabaseManager dbManager;
+        private ProgressDialog uploadProgress;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -59,7 +59,7 @@ namespace OurPlace.Android.Activities.Create
 
             headerText = FindViewById<TextView>(Resource.Id.uploadsHeaderMessage);
 
-            LoadQueue();
+            var suppress = LoadQueue();
         }
 
         private async Task LoadQueue()
@@ -84,21 +84,6 @@ namespace OurPlace.Android.Activities.Create
             recyclerView.SetLayoutManager(layoutManager);
         }
 
-        private void HandleProgress(long bytes, long totalBytes, long totalBytesExpected)
-        {
-            Console.WriteLine("Downloading {0}/{1}", totalBytes, totalBytesExpected);
-            if (uploadProgress == null || !uploadProgress.IsShowing) return;
-
-            RunOnUiThread(() =>
-            {
-                uploadProgress.Max = 10000;
-                var progressPercent = (float)totalBytes / (float)totalBytesExpected;
-                var progressOffset = Convert.ToInt32(progressPercent * 10000);
-                Console.WriteLine(progressOffset);
-                uploadProgress.Progress = progressOffset;
-            });
-        }
-
         private void DeleteClick(object sender, int e)
         {
             new global::Android.Support.V7.App.AlertDialog.Builder(this)
@@ -108,9 +93,9 @@ namespace OurPlace.Android.Activities.Create
                 .SetCancelable(true)
                 .SetPositiveButton(Resource.String.DeleteBtn, (a, b) =>
                 {
-                    DeleteFiles(adapter.data[e]);
-                    dbManager.DeleteUpload(adapter.data[e]);
-                    adapter.data.RemoveAt(e);
+                    DeleteFiles(adapter.Data[e]);
+                    dbManager.DeleteUpload(adapter.Data[e]);
+                    adapter.Data.RemoveAt(e);
                     adapter.NotifyDataSetChanged();
                 })
                 .Show();
@@ -254,7 +239,7 @@ namespace OurPlace.Android.Activities.Create
             }
 
             dbManager.DeleteUpload(uploads[position]);
-            adapter.data.RemoveAt(position);
+            adapter.Data.RemoveAt(position);
             adapter.NotifyDataSetChanged();
 
             new global::Android.Support.V7.App.AlertDialog.Builder(this)
@@ -262,7 +247,7 @@ namespace OurPlace.Android.Activities.Create
                 .SetMessage(Resource.String.uploadsUploadSuccessMessage)
                 .SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
                 {
-                    if (adapter.data.Count == 0)
+                    if (adapter.Data.Count == 0)
                     {
                         OnBackPressed();
                     }

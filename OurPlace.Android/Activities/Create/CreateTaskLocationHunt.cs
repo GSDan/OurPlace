@@ -163,7 +163,10 @@ namespace OurPlace.Android.Activities.Create
                 progDialog = null;
             }
 
-            if (alreadyCentered) return;
+            if (alreadyCentered)
+            {
+                return;
+            }
 
             alreadyCentered = true;
             GMap.AnimateCamera(CameraUpdateFactory.NewLatLngZoom(new LatLng(e.Location.Latitude, e.Location.Longitude), 18f));

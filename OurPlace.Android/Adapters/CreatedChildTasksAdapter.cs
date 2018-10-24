@@ -19,16 +19,17 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using FFImageLoading.Transformations;
 using FFImageLoading.Views;
-using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
 using OurPlace.Common;
+using OurPlace.Common.Models;
 
 namespace OurPlace.Android.Adapters
 {
@@ -39,10 +40,10 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> DeleteItemClick;
 
         public List<LearningTask> data;
-        private Context context;
+        private readonly Context context;
         private LearningTask parentTask;
 
-        public CreatedChildTasksAdapter(Context _context, LearningTask parentTask, Action save)
+        public CreatedChildTasksAdapter(Context context, LearningTask parentTask)
         {
             if (parentTask.ChildTasks != null)
             {
@@ -53,30 +54,31 @@ namespace OurPlace.Android.Adapters
                 data = new List<LearningTask>();
             }
 
-            context = _context;
+            this.context = context;
             this.parentTask = parentTask;
-        }
-
-        public void UpdateParent(LearningTask newParent)
-        {
-            parentTask = newParent;
-            NotifyItemChanged(0);
         }
 
         public override int ItemCount
         {
             get
             {
-                if (data == null) return 2;
+                if (data == null)
+                {
+                    return 2;
+                }
+
                 return data.Count + 2;
             }
         }
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0) return 0;
-            if (position > data.Count) return 2;
-            return 1;
+            if (position == 0)
+            {
+                return 0;
+            }
+
+            return position > data.Count ? 2 : 1;
         }
 
         private void OnEditItemClick(int position)
@@ -94,7 +96,7 @@ namespace OurPlace.Android.Adapters
             FinishClick?.Invoke(this, position);
         }
 
-        private void LoadImage(TaskType taskType, ImageViewAsync view)
+        private static void LoadImage(TaskType taskType, ImageViewAsync view)
         {
             if (string.IsNullOrEmpty(taskType.IconUrl))
             {
@@ -122,18 +124,28 @@ namespace OurPlace.Android.Adapters
                 LoadImage(parentTask.TaskType, avh.TaskTypeIcon);
                 return;
             }
-            else if (position > data.Count)
+
+            if (position > data.Count)
             {
                 // Allow the activity to be submitted if there's at least one task
-                ButtonViewHolder bvh = holder as ButtonViewHolder;
+                if (!(holder is ButtonViewHolder bvh))
+                {
+                    return;
+                }
+
                 bvh.Button.Enabled = true;
                 bvh.Button.SetText(Resource.String.createTaskChildrenFinish);
+
                 return;
             }
 
             position--;
 
-            TaskViewHolder_CreatedTask vh = holder as TaskViewHolder_CreatedTask;
+            if (!(holder is TaskViewHolderCreatedTask vh))
+            {
+                return;
+            }
+
             vh.Title.Text = data[position].TaskType.DisplayName;
             vh.Description.Text = data[position].Description;
             vh.ManageChildrenBtn.Visibility = ViewStates.Gone;
@@ -144,23 +156,28 @@ namespace OurPlace.Android.Adapters
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            if (viewType == 0)
+            switch (viewType)
             {
-                // The Activity details at the top of the list
-                View activityView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Activity, parent, false);
-                ActivityViewHolder avh = new ActivityViewHolder(activityView, null, null);
-                return avh;
-            }
-            else if (viewType == 2)
-            {
-                // The finish button at the bottom of the list
-                View finishView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
-                ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
-                return bvh;
+                case 0:
+                {
+                    // The Activity details at the top of the list
+                    View activityView = LayoutInflater.From(parent.Context)
+                        .Inflate(Resource.Layout.TaskCard_Activity, parent, false);
+                    ActivityViewHolder avh = new ActivityViewHolder(activityView, null, null);
+                    return avh;
+                }
+                case 2:
+                {
+                    // The finish button at the bottom of the list
+                    View finishView = LayoutInflater.From(parent.Context)
+                        .Inflate(Resource.Layout.TaskCard_Finish, parent, false);
+                    ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
+                    return bvh;
+                }
             }
 
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.CreateTaskCard, parent, false);
-            TaskViewHolder_CreatedTask vh = new TaskViewHolder_CreatedTask(itemView, null, OnDeleteItemClick, OnEditItemClick, null);
+            TaskViewHolderCreatedTask vh = new TaskViewHolderCreatedTask(itemView, null, OnDeleteItemClick, OnEditItemClick, null);
             return vh;
         }
 
@@ -190,8 +207,15 @@ namespace OurPlace.Android.Adapters
 
         public override long GetItemId(int position)
         {
-            if (position == 0) return -2;
-            if (position >= data.Count) return -1;
+            if (position == 0)
+            {
+                return -2;
+            }
+
+            if (position >= data.Count)
+            {
+                return -1;
+            }
 
             return data[position].Id;
         }

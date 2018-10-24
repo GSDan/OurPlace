@@ -46,7 +46,10 @@ namespace OurPlace.Android.Listeners
 
         private void Speak()
         {
-            if (!ready) return;
+            if (!ready)
+            {
+                return;
+            }
 
             if (currentSpeech == previousSpeech && speaking)
             {
@@ -111,7 +114,11 @@ namespace OurPlace.Android.Listeners
         {
             if(speaker != null)
             {
-                if (speaking) speaker.Stop();
+                if (speaking)
+                {
+                    speaker.Stop();
+                }
+
                 speaker.Shutdown();
             }
         }

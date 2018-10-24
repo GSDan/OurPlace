@@ -158,7 +158,7 @@ namespace OurPlace.Android.Activities.Create
 
         private void Adapter_ItemClick(object sender, int e)
         {
-            GooglePlaceResult res = adapter.data[e];
+            GooglePlaceResult res = adapter.Data[e];
             string json = JsonConvert.SerializeObject(
                     new Place
                     {

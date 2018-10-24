@@ -50,18 +50,22 @@ namespace OurPlace.Android.Fragments
             wrapper.TouchUp = () =>
             {
                 if (TouchUp != null)
+                {
                     TouchUp(this, EventArgs.Empty);
+                }
             };
             wrapper.TouchDown = () =>
             {
                 if (TouchDown != null)
+                {
                     TouchDown(this, EventArgs.Empty);
+                }
             };
 
             return root;
         }
 
-        class TouchableWrapper : FrameLayout
+        private class TouchableWrapper : FrameLayout
         {
             public Action TouchDown;
             public Action TouchUp;
@@ -83,12 +87,18 @@ namespace OurPlace.Android.Fragments
                 {
                     case MotionEventActions.Down:
                         if (TouchDown != null)
+                        {
                             TouchDown();
+                        }
+
                         break;
                     case MotionEventActions.Cancel:
                     case MotionEventActions.Up:
                         if (TouchUp != null)
+                        {
                             TouchUp();
+                        }
+
                         break;
                 }
 

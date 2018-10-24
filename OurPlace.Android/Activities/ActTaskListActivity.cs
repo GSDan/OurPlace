@@ -22,15 +22,11 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Media;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Widget;
-using FFImageLoading;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities.Abstracts;
 using OurPlace.Android.Activities.Create;
@@ -41,8 +37,7 @@ using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace OurPlace.Android.Activities
 {
@@ -54,11 +49,10 @@ namespace OurPlace.Android.Activities
         private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private TaskAdapter adapter;
-        private global::Android.Support.V7.App.AlertDialog playerDialog;
         private DatabaseManager dbManager;
-        private readonly int mediaPlayerReqCode = 222;
+        private const int MediaPlayerReqCode = 222;
+        private const int PermReqId = 111;
         private string enteredName = "";
-        private int permReqId = 111;
         private Intent lastReqIntent;
         private bool shouldSave = true;
 
@@ -75,7 +69,7 @@ namespace OurPlace.Android.Activities
                 global::Android.Support.V7.App.AlertDialog.Builder alert = new global::Android.Support.V7.App.AlertDialog.Builder(this);
                 alert.SetTitle(Resource.String.ErrorTitle);
                 alert.SetMessage(Resource.String.ErrorTitle);
-                alert.SetOnDismissListener(new OnDismissListener(() => { Finish(); }));
+                alert.SetOnDismissListener(new OnDismissListener(Finish));
                 alert.Show();
                 return;
             }
@@ -92,7 +86,6 @@ namespace OurPlace.Android.Activities
                 {
                     enteredName = progress.EnteredUsername;
                     appTasks = JsonConvert.DeserializeObject<List<AppTask>>(progress.AppTaskJson);
-                       // new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
                 }
             }
             catch (Exception e)
@@ -104,11 +97,7 @@ namespace OurPlace.Android.Activities
 
             if (appTasks == null)
             {
-                appTasks = new List<AppTask>();
-                foreach (LearningTask t in learningActivity.LearningTasks)
-                {
-                    appTasks.Add(new AppTask(t));
-                }
+                appTasks = learningActivity.LearningTasks.Select(t => new AppTask(t)).ToList();
             }
 
             bool curatorControls = learningActivity.IsPublic && !learningActivity.Approved && dbManager.currentUser.Trusted;
@@ -148,11 +137,13 @@ namespace OurPlace.Android.Activities
 
             TextView message = new TextView(this);
             message.SetText(Resource.String.actEnterUsername);
-            EditText nameInput = new EditText(this);
-            nameInput.Text = enteredName;
+            EditText nameInput = new EditText(this) {Text = enteredName};
 
-            LinearLayout dialogLayout = new LinearLayout(this);
-            dialogLayout.Orientation = global::Android.Widget.Orientation.Vertical;
+            LinearLayout dialogLayout = new LinearLayout(this)
+            {
+                Orientation = Orientation.Vertical
+            };
+
             dialogLayout.AddView(message);
             dialogLayout.AddView(nameInput);
             dialogLayout.SetPadding(px, px, px, px);
@@ -174,7 +165,7 @@ namespace OurPlace.Android.Activities
                 {
                     enteredName = nameInput.Text;
                     adapter.UpdateNames(enteredName);
-                    dbManager.SaveActivityProgress(learningActivity, adapter.items, enteredName);
+                    dbManager.SaveActivityProgress(learningActivity, adapter.Items, enteredName);
 
                     if(continueToFinish)
                     {
@@ -195,13 +186,19 @@ namespace OurPlace.Android.Activities
         {
             try
             {
-                await AndroidUtils.PrepActivityFiles(this, learningActivity);
+                bool success = await AndroidUtils.PrepActivityFiles(this, learningActivity);
+                if (!success)
+                {
+                    Toast.MakeText(this, $"{GetString(Resource.String.ConnectionError)}", ToastLength.Long).Show();
+                    Finish();
+                    return;
+                }
             }
             catch (Exception e)
             {
-                Toast.MakeText(this, string.Format("{0}: {1}",
-                    GetString(Resource.String.ErrorTitle), e.Message), ToastLength.Long).Show();
+                Toast.MakeText(this, $"{GetString(Resource.String.ErrorTitle)}: {e.Message}", ToastLength.Long).Show();
                 Finish();
+                return;
             }
 
             recyclerView.SetAdapter(adapter);
@@ -216,7 +213,7 @@ namespace OurPlace.Android.Activities
         {
             base.OnResume();
 
-            if (learningActivity == null || adapter == null || adapter.items == null)
+            if (learningActivity == null || adapter?.Items == null)
             {
                 Finish();
             }
@@ -224,10 +221,13 @@ namespace OurPlace.Android.Activities
 
         private void Adapter_SpeakText(object sender, int position)
         {
-            if (adapter.ItemCount <= position) return;
+            if (adapter.ItemCount <= position)
+            {
+                return;
+            }
 
             string toRead = (position > 0) ?
-                adapter.items[position].Description : learningActivity.Description;
+                adapter.Items[position].Description : learningActivity.Description;
 
             tts.ReadText(toRead);
         }
@@ -267,11 +267,11 @@ namespace OurPlace.Android.Activities
 
         private async void ApproveActivity()
         {
-            ProgressDialog prog = new ProgressDialog(this);
-            prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
-            prog.Show();
+            ProgressDialog progress = new ProgressDialog(this);
+            progress.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+            progress.Show();
             ServerResponse<string> resp = await ServerUtils.Post<string>("/api/learningactivities/approve?id=" + learningActivity.Id, null);
-            prog.Dismiss();
+            progress.Dismiss();
 
             if (resp == null)
             {
@@ -292,22 +292,22 @@ namespace OurPlace.Android.Activities
 
             MainLandingFragment.ForceRefresh = true;
 
-            adapter.items.RemoveAt(0);
-            adapter.curator = false;
+            adapter.Items.RemoveAt(0);
+            adapter.Curator = false;
             learningActivity.Approved = true;
 
-            dbManager.SaveActivityProgress(learningActivity, adapter.items, enteredName);
+            dbManager.SaveActivityProgress(learningActivity, adapter.Items, enteredName);
 
             adapter.NotifyDataSetChanged();
         }
 
         private async void DeleteActivity()
         {
-            ProgressDialog prog = new ProgressDialog(this);
-            prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
-            prog.Show();
+            ProgressDialog progress = new ProgressDialog(this);
+            progress.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+            progress.Show();
             ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + learningActivity.Id);
-            prog.Dismiss();
+            progress.Dismiss();
 
             if (resp == null)
             {
@@ -333,15 +333,18 @@ namespace OurPlace.Android.Activities
 
         private void Adapter_TextEntered(object sender, int position)
         {
-            if (adapter.items[position].TaskType.IdName == "ENTER_TEXT")
+            if (adapter.Items[position].TaskType.IdName != "ENTER_TEXT")
             {
-                string entered = ((EditText)sender).Text;
-                adapter.items[position].CompletionData.JsonData = entered;
-                adapter.items[position].IsCompleted = !string.IsNullOrWhiteSpace(entered);
-                if (!adapter.onBind)
-                {
-                    adapter.NotifyItemChanged(adapter.ItemCount - 1);
-                }
+                return;
+            }
+
+            string entered = ((EditText)sender).Text;
+            adapter.Items[position].CompletionData.JsonData = entered;
+            adapter.Items[position].IsCompleted = !string.IsNullOrWhiteSpace(entered);
+
+            if (!adapter.OnBind)
+            {
+                adapter.NotifyItemChanged(adapter.ItemCount - 1);
             }
         }
 
@@ -350,29 +353,20 @@ namespace OurPlace.Android.Activities
             Intent viewActivity = new Intent(this, typeof(MediaViewerActivity));
             viewActivity.PutExtra("RES_INDEX", pathIndex);
             viewActivity.PutExtra("ACT_ID", learningActivity.Id);
-            viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.items[taskIndex]));
-            StartActivityForResult(viewActivity, mediaPlayerReqCode);
+            viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Items[taskIndex]));
+            StartActivityForResult(viewActivity, MediaPlayerReqCode);
         }
 
         // Called when the user has given/denied permission
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
-            if (requestCode != permReqId)
+            if (requestCode != PermReqId)
             {
                 base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
                 return;
             }
 
-            bool hasPerm = true;
-
-            for (int i = 0; i < grantResults.Length; i++)
-            {
-                if (grantResults[i] != Permission.Granted)
-                {
-                    hasPerm = false;
-                    break;
-                }
-            }
+            bool hasPerm = grantResults.All(t => t == Permission.Granted);
 
             if (hasPerm)
             {
@@ -384,7 +378,7 @@ namespace OurPlace.Android.Activities
             }
         }
 
-        private async void OnItemClick(object sender, int position)
+        private void OnItemClick(object sender, int position)
         {
             // If Finish button clicked
             if (position == adapter.ItemCount - 1)
@@ -393,7 +387,7 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            string json = JsonConvert.SerializeObject(adapter.items[position],
+            string json = JsonConvert.SerializeObject(adapter.Items[position],
                 new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Objects,
@@ -401,106 +395,115 @@ namespace OurPlace.Android.Activities
                     MaxDepth = 5
                 });
 
-            string taskType = adapter.items[position].TaskType.IdName;
+            string taskType = adapter.Items[position].TaskType.IdName;
 
-            if (taskType == "TAKE_VIDEO" || taskType == "TAKE_PHOTO" || taskType == "MATCH_PHOTO")
+            switch (taskType)
             {
-                lastReqIntent = new Intent(this, typeof(CameraActivity));
-                lastReqIntent.PutExtra("JSON", json);
-                lastReqIntent.PutExtra("ACTID", learningActivity.Id);
+                case "TAKE_VIDEO":
+                case "TAKE_PHOTO":
+                case "MATCH_PHOTO":
+                {
+                    lastReqIntent = new Intent(this, typeof(CameraActivity));
+                    lastReqIntent.PutExtra("JSON", json);
+                    lastReqIntent.PutExtra("ACTID", learningActivity.Id);
 
-                List<string> perms = new List<string>
-                {
-                    global::Android.Manifest.Permission.Camera,
-                    global::Android.Manifest.Permission.AccessFineLocation
-                };
-                List<string> titles = new List<string>
-                {
-                    base.Resources.GetString(Resource.String.permissionCameraTitle),
-                    base.Resources.GetString(Resource.String.permissionLocationTitle)
-                };
-                List<string> explanations = new List<string>
-                {
-                    base.Resources.GetString(Resource.String.permissionPhotoExplanation),
-                    base.Resources.GetString(Resource.String.permissionLocationExplanation)
-                };
+                    List<string> perms = new List<string>
+                    {
+                        global::Android.Manifest.Permission.Camera,
+                        global::Android.Manifest.Permission.AccessFineLocation
+                    };
+                    List<string> titles = new List<string>
+                    {
+                        base.Resources.GetString(Resource.String.permissionCameraTitle),
+                        base.Resources.GetString(Resource.String.permissionLocationTitle)
+                    };
+                    List<string> explanations = new List<string>
+                    {
+                        base.Resources.GetString(Resource.String.permissionPhotoExplanation),
+                        base.Resources.GetString(Resource.String.permissionLocationExplanation)
+                    };
 
-                // Video tasks also require the microphone
-                if (taskType == "TAKE_VIDEO")
-                {
-                    perms.Add(global::Android.Manifest.Permission.RecordAudio);
-                    titles.Add(base.Resources.GetString(Resource.String.permissionMicTitle));
-                    explanations.Add(base.Resources.GetString(Resource.String.permissionMicExplanation));
+                    // Video tasks also require the microphone
+                    if (taskType == "TAKE_VIDEO")
+                    {
+                        perms.Add(global::Android.Manifest.Permission.RecordAudio);
+                        titles.Add(base.Resources.GetString(Resource.String.permissionMicTitle));
+                        explanations.Add(base.Resources.GetString(Resource.String.permissionMicExplanation));
+                    }
+
+                    AndroidUtils.CallWithPermission(perms.ToArray(), titles.ToArray(), explanations.ToArray(),
+                        lastReqIntent, adapter.Items[position].Id, PermReqId, this);
+                    break;
                 }
 
-                AndroidUtils.CallWithPermission(perms.ToArray(), titles.ToArray(), explanations.ToArray(),
-                    lastReqIntent, adapter.items[position].Id, permReqId, this);
-            }
-            else if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
-            {
-                Intent drawActivity = new Intent(this, typeof(DrawingActivity));
-                drawActivity.PutExtra("JSON", json);
-
-                if (taskType == "DRAW_PHOTO" && adapter.items[position].JsonData.StartsWith("TASK::", StringComparison.OrdinalIgnoreCase))
+                case "DRAW":
+                case "DRAW_PHOTO":
                 {
-                    int id = -1;
-                    int.TryParse(adapter.items[position].JsonData.Substring(6), out id);
-                    string[] paths = JsonConvert.DeserializeObject<string[]>(adapter.GetTaskWithId(id).CompletionData.JsonData);
-                    drawActivity.PutExtra("PREVIOUS_PHOTO", paths[0]);
+                    Intent drawActivity = new Intent(this, typeof(DrawingActivity));
+                    drawActivity.PutExtra("JSON", json);
+
+                    if (taskType == "DRAW_PHOTO" && adapter.Items[position].JsonData.StartsWith("TASK::", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int id = -1;
+                        int.TryParse(adapter.Items[position].JsonData.Substring(6), out id);
+                        string[] paths = JsonConvert.DeserializeObject<string[]>(adapter.GetTaskWithId(id).CompletionData.JsonData);
+                        drawActivity.PutExtra("PREVIOUS_PHOTO", paths[0]);
+                    }
+
+                    StartActivityForResult(drawActivity, adapter.Items[position].Id);
+                    break;
                 }
 
-                StartActivityForResult(drawActivity, adapter.items[position].Id);
-            }
-            else if (taskType == "MAP_MARK")
-            {
-                lastReqIntent = new Intent(this, typeof(LocationMarkerActivity));
-                lastReqIntent.PutExtra("JSON", json);
+                case "MAP_MARK":
+                    lastReqIntent = new Intent(this, typeof(LocationMarkerActivity));
+                    lastReqIntent.PutExtra("JSON", json);
 
-                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
-                    new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle)},
-                    new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation)},
-                    lastReqIntent, adapter.items[position].Id, permReqId, this);
-            }
-            else if (taskType == "LOC_HUNT")
-            {
-                lastReqIntent = new Intent(this, typeof(LocationHuntActivity));
-                lastReqIntent.PutExtra("JSON", json);
+                    AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
+                        new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
+                        new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
+                        lastReqIntent, adapter.Items[position].Id, PermReqId, this);
+                    break;
 
-                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
-                    new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
-                    new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
-                    lastReqIntent, adapter.items[position].Id, permReqId, this);
-            }
-            else if(taskType == "SCAN_QR")
-            {
-                lastReqIntent = new Intent(this, typeof(ScanningActivity));
-                lastReqIntent.PutExtra("JSON", json);
-                StartActivityForResult(lastReqIntent, adapter.items[position].Id);
-            }
-            else if (taskType == "REC_AUDIO")
-            {
-                lastReqIntent = new Intent(this, typeof(RecordAudioActivity));
-                lastReqIntent.PutExtra("JSON", json);
+                case "LOC_HUNT":
+                    lastReqIntent = new Intent(this, typeof(LocationHuntActivity));
+                    lastReqIntent.PutExtra("JSON", json);
 
-                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.RecordAudio },
-                    new string[] { base.Resources.GetString(Resource.String.permissionMicTitle) },
-                    new string[] { base.Resources.GetString(Resource.String.permissionMicExplanation) },
-                    lastReqIntent, adapter.items[position].Id, permReqId, this);
-            }
-            else if (taskType == "LISTEN_AUDIO")
-            {
-                ShowMedia(position, -1);
-            }
-            else if (taskType == "INFO")
-            {
-                AdditionalInfoData data = JsonConvert.DeserializeObject<AdditionalInfoData>(adapter.items[position].JsonData);
-                global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(data.ExternalUrl);
-                Intent intent = new Intent(Intent.ActionView, uri);
-                StartActivity(intent);
-            }
-            else
-            {
-                Toast.MakeText(this, "Unknown task type! :(", ToastLength.Short).Show();
+                    AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
+                        new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
+                        new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
+                        lastReqIntent, adapter.Items[position].Id, PermReqId, this);
+                    break;
+
+                case "SCAN_QR":
+                    lastReqIntent = new Intent(this, typeof(ScanningActivity));
+                    lastReqIntent.PutExtra("JSON", json);
+                    StartActivityForResult(lastReqIntent, adapter.Items[position].Id);
+                    break;
+
+                case "REC_AUDIO":
+                    lastReqIntent = new Intent(this, typeof(RecordAudioActivity));
+                    lastReqIntent.PutExtra("JSON", json);
+
+                    AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.RecordAudio },
+                        new string[] { base.Resources.GetString(Resource.String.permissionMicTitle) },
+                        new string[] { base.Resources.GetString(Resource.String.permissionMicExplanation) },
+                        lastReqIntent, adapter.Items[position].Id, PermReqId, this);
+                    break;
+
+                case "LISTEN_AUDIO":
+                    ShowMedia(position, -1);
+                    break;
+
+                case "INFO":
+                    AdditionalInfoData data = JsonConvert.DeserializeObject<AdditionalInfoData>(adapter.Items[position].JsonData);
+                    global::Android.Net.Uri uri = global::Android.Net.Uri.Parse(data.ExternalUrl);
+                    Intent intent = new Intent(Intent.ActionView, uri);
+                    StartActivity(intent);
+                    break;
+
+                default:
+                    Toast.MakeText(this, "Unknown task type! :(", ToastLength.Short).Show();
+                    break;
             }
         }
 
@@ -518,7 +521,10 @@ namespace OurPlace.Android.Activities
         {
             base.OnActivityResult(requestCode, resultCode, data);
 
-            if (data == null || resultCode != Result.Ok) return;
+            if (data == null || resultCode != Result.Ok)
+            {
+                return;
+            }
 
             int taskId = data.GetIntExtra("TASK_ID", -1);
             int resIndex = data.GetIntExtra("RES_INDEX", -1);
@@ -531,20 +537,20 @@ namespace OurPlace.Android.Activities
             }
 
             string newFile = data.GetStringExtra("FILE_PATH");
-            string mapLocs = data.GetStringExtra("LOCATIONS");
+            string mapLocations = data.GetStringExtra("LOCATIONS");
             bool isPoly = data.GetBooleanExtra("IS_POLYGON", false);
             bool complete = data.GetBooleanExtra("COMPLETE", false);
 
-            if (resultCode == global::Android.App.Result.Ok && taskId != -1 && !string.IsNullOrWhiteSpace(newFile))
+            if (resultCode == Result.Ok && taskId != -1 && !string.IsNullOrWhiteSpace(newFile))
             {
                 string taskType = adapter.GetTaskWithId(taskId).TaskType.IdName;
 
                 adapter.OnFileReturned(taskId, newFile,
                     (taskType == "TAKE_PHOTO" || taskType == "MATCH_PHOTO"));
             }
-            else if (!string.IsNullOrWhiteSpace(mapLocs))
+            else if (!string.IsNullOrWhiteSpace(mapLocations))
             {
-                adapter.OnMapReturned(taskId, mapLocs, isPoly);
+                adapter.OnMapReturned(taskId, mapLocations, isPoly);
             }
             else if (complete)
             {
@@ -556,7 +562,7 @@ namespace OurPlace.Android.Activities
                 Toast.MakeText(this, "Error: Unknown task type", ToastLength.Short).Show();
             }
 
-            dbManager.SaveActivityProgress(learningActivity, adapter.items, enteredName);
+            dbManager.SaveActivityProgress(learningActivity, adapter.Items, enteredName);
         }
 
         /// <summary>
@@ -565,9 +571,12 @@ namespace OurPlace.Android.Activities
         public void PackageForUpload()
         {
             List<AppTask> preppedTasks = new List<AppTask>();
-            foreach (AppTask t in adapter.items)
+            foreach (AppTask t in adapter.Items)
             {
-                if (t == null) continue;
+                if (t == null)
+                {
+                    continue;
+                }
 
                 preppedTasks.Add(Storage.PrepForUpload(t));
             }
@@ -619,8 +628,7 @@ namespace OurPlace.Android.Activities
             AppDataUpload uploadData = new AppDataUpload
             {
                 ItemId = rand.Next(),
-                UploadRoute = string.Format("api/CompletedTasks/Submit?activityId={0}&shareWithCreator={1}&enteredName={2}",
-                                            learningActivity.Id, shareWithCreator, enteredName),
+                UploadRoute = $"api/CompletedTasks/Submit?activityId={learningActivity.Id}&shareWithCreator={shareWithCreator}&enteredName={enteredName}",
                 Name = learningActivity.Name,
                 Description = learningActivity.Description,
                 ImageUrl = learningActivity.ImageUrl,
@@ -651,9 +659,9 @@ namespace OurPlace.Android.Activities
         {
             base.OnPause();
 
-            if (shouldSave && learningActivity != null && adapter != null && adapter.items != null)
+            if (shouldSave && learningActivity != null && adapter != null && adapter.Items != null)
             {
-                (await Storage.GetDatabaseManager()).SaveActivityProgress(learningActivity, adapter.items, enteredName);
+                (await Storage.GetDatabaseManager()).SaveActivityProgress(learningActivity, adapter.Items, enteredName);
             }
         }
     }

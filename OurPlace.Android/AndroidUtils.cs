@@ -48,7 +48,7 @@ namespace OurPlace.Android
 {
     public static class AndroidUtils
     {
-        public static async Task PrepActivityFiles(Context context, LearningActivity act)
+        public static async Task<bool> PrepActivityFiles(Context context, LearningActivity act)
         {
             ProgressDialog loadingDialog = new ProgressDialog(context);
             loadingDialog.SetTitle(Resource.String.PleaseWait);
@@ -67,17 +67,29 @@ namespace OurPlace.Android
                 // Loop over and pre-prepare listed files
                 for (int i = 0; i < fileUrls.Count; i++)
                 {
-                    // Update loading dialog with current progress
                     loadingDialog.SetMessage(string.Format(baseMessage, i + 1, fileUrls.Count));
                     string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
                     string cachePath = GetCacheFilePath(thisUrl, act.Id, fileUrls[i].extension);
-                    if (File.Exists(cachePath)) continue;
+                    if (File.Exists(cachePath))
+                    {
+                        continue;
+                    }
 
-                    await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
+                    try
+                    {
+                        await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
+                    }
+                    catch (System.Exception e)
+                    {
+                        File.Delete(cachePath);
+                        Console.WriteLine(e.Message);
+                        return false;
+                    }
                 }
             }
 
             loadingDialog.Dismiss();
+            return true;
         }
 
         public static async Task ReturnToSignIn(Activity activity)
@@ -90,7 +102,10 @@ namespace OurPlace.Android
                 dbManager.CleanDatabase();
             }
 
-            if (activity == null) return;
+            if (activity == null)
+            {
+                return;
+            }
 
             Context context = activity.ApplicationContext;
             Intent intent = new Intent(context, typeof(LoginActivity));

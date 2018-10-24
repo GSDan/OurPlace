@@ -22,6 +22,7 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Gms.Location;
 using Android.OS;
@@ -29,18 +30,15 @@ using Android.Views;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Android.Fragments;
 using OurPlace.Common;
 using OurPlace.Common.Models;
-using System.IO;
 using System;
-using Android.Gms.Common;
-using Android.Locations;
-using System.Threading.Tasks;
-using static OurPlace.Common.LocalData.Storage;
-using Microsoft.AppCenter.Analytics;
 using System.Collections.Generic;
+using System.IO;
+using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities
 {
@@ -88,44 +86,49 @@ namespace OurPlace.Android.Activities
                 }
             }
 
-            if (AndroidUtils.IsGooglePlayServicesInstalled(this) && googleApiClient == null)
+            if (!AndroidUtils.IsGooglePlayServicesInstalled(this) || googleApiClient != null)
             {
-                googleApiClient = new GoogleApiClient.Builder(this)
-                    .AddConnectionCallbacks(this)
-                    .AddOnConnectionFailedListener(this)
-                    .AddApi(LocationServices.API)
-                    .Build();
-                locRequest = new LocationRequest();
+                return;
             }
+
+            googleApiClient = new GoogleApiClient.Builder(this)
+                .AddConnectionCallbacks(this)
+                .AddOnConnectionFailedListener(this)
+                .AddApi(LocationServices.API)
+                .Build();
+
+            locRequest = new LocationRequest();
         }
 
-        public async void LoadIfPhotoMatch(View view)
+        public void LoadIfPhotoMatch(View view)
         {
-            if (learningTask.TaskType.IdName == "MATCH_PHOTO")
+            if (learningTask.TaskType.IdName != "MATCH_PHOTO")
             {
-                ImageViewAsync targetImageView = view.FindViewById<ImageViewAsync>(Resource.Id.targetPhoto);
-                string imageUrl = learningTask.JsonData;
-                string localRes = GetCacheFilePath(imageUrl,
-                    activityId,
-                    ServerUtils.GetFileExtension(learningTask.TaskType.IdName));
-
-                // Image hasn't been locally cached, try to download remote version
-                if (!File.Exists(localRes))
-                {
-                    Toast.MakeText(this, Resource.String.PleaseWait, ToastLength.Long).Show();
-                    ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
-                        .DownSample(width: 500)
-                        .Into(targetImageView);
-                }
-                else
-                {
-                    // Load the local file
-                    ImageService.Instance.LoadFile(localRes).DownSample(width: 500)
-                        .Into(targetImageView);
-                }
-
-                targetImageView.Visibility = ViewStates.Visible;
+                return;
             }
+
+            ImageViewAsync targetImageView = view.FindViewById<ImageViewAsync>(Resource.Id.targetPhoto);
+            string imageUrl = learningTask.JsonData;
+            string localRes = GetCacheFilePath(imageUrl,
+                activityId,
+                ServerUtils.GetFileExtension(learningTask.TaskType.IdName));
+
+            // Image hasn't been locally cached, try to download remote version
+            if (!File.Exists(localRes))
+            {
+                Toast.MakeText(this, Resource.String.PleaseWait, ToastLength.Long).Show();
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(learningTask.JsonData))
+                    .DownSample(500)
+                    .Into(targetImageView);
+            }
+            else
+            {
+                // Load the local file
+                ImageService.Instance.LoadFile(localRes).DownSample(500)
+                    .Into(targetImageView);
+            }
+
+            targetImageView.Visibility = ViewStates.Visible;
         }
 
         public void ReturnWithFile(string filePath)
@@ -154,10 +157,7 @@ namespace OurPlace.Android.Activities
         {
             base.OnResume();
 
-            if (googleApiClient != null)
-            {
-                googleApiClient.Connect();
-            }
+            googleApiClient?.Connect();
         }
 
         protected override void OnPause()
@@ -192,10 +192,8 @@ namespace OurPlace.Android.Activities
             {
                 return LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

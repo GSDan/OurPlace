@@ -19,6 +19,7 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
 using Android.Content;
 using Android.Graphics;
 using Android.Support.V7.Widget;
@@ -29,7 +30,7 @@ namespace OurPlace.Android.Adapters
 {
     public class ChildItemDecoration : RecyclerView.ItemDecoration
     {
-        private int margin;
+        private readonly int margin;
 
         public ChildItemDecoration(Context context, int marginDips)
         {
@@ -43,11 +44,13 @@ namespace OurPlace.Android.Adapters
 
             TaskAdapter adapter = (TaskAdapter)parent.GetAdapter();
 
-            if(adapter.IsPositionAChildView(itemPos))
+            if (!adapter.IsPositionAChildView(itemPos))
             {
-                outRect.Right = margin;
-                outRect.Left = margin;
+                return;
             }
+
+            outRect.Right = margin;
+            outRect.Left = margin;
         }
     }
 }

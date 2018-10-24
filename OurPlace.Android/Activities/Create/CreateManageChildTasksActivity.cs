@@ -24,37 +24,36 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static OurPlace.Common.LocalData.Storage;
-using System.Threading.Tasks;
-using OurPlace.Common.LocalData;
 
 namespace OurPlace.Android.Activities.Create
 {
     [Activity(Label = "Manage Follow-Up Tasks", Theme = "@style/OurPlaceActionBarAlt")]
     public class CreateManageChildTasksActivity : AppCompatActivity
     {
-        LearningActivity learningActivity;
-        LearningTask parentTask;
-        RecyclerView recyclerView;
-        RecyclerView.LayoutManager layoutManager;
-        CreatedChildTasksAdapter adapter;
-        TextView fabPrompt;
-        DatabaseManager dbManager;
-        int editTaskIntent = 198;
-        int addTaskIntent = 200;
-        int parentInd;
+        private LearningActivity learningActivity;
+        private LearningTask parentTask;
+        private RecyclerView recyclerView;
+        private RecyclerView.LayoutManager layoutManager;
+        private CreatedChildTasksAdapter adapter;
+        private TextView fabPrompt;
+        private DatabaseManager dbManager;
+        private const int EditTaskIntent = 198;
+        private const int AddTaskIntent = 200;
+        private int parentInd;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -68,7 +67,7 @@ namespace OurPlace.Android.Activities.Create
             learningActivity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
             parentTask = learningActivity.LearningTasks.ElementAt(parentInd);
 
-            adapter = new CreatedChildTasksAdapter(this, parentTask, SaveProgress);
+            adapter = new CreatedChildTasksAdapter(this, parentTask);
             adapter.FinishClick += Adapter_FinishClick;
             adapter.EditItemClick += Adapter_EditItemClick;
             adapter.DeleteItemClick += Adapter_DeleteItemClick;
@@ -109,7 +108,10 @@ namespace OurPlace.Android.Activities.Create
         private void Adapter_EditItemClick(object sender, int position)
         {
             LearningTask thisTask = adapter.data[position - 1];
-            if (thisTask == null || thisTask.TaskType == null) return;
+            if (thisTask == null || thisTask.TaskType == null)
+            {
+                return;
+            }
 
             Type activityType = AndroidUtils.GetTaskCreationActivityType(thisTask.TaskType.IdName);
             Intent intent = new Intent(this, activityType);
@@ -117,7 +119,7 @@ namespace OurPlace.Android.Activities.Create
             intent.PutExtra("EDIT", json);
             intent.PutExtra("PARENT", JsonConvert.SerializeObject(parentTask));
 
-            StartActivityForResult(intent, editTaskIntent);
+            StartActivityForResult(intent, EditTaskIntent);
         }
 
         private void Adapter_FinishClick(object sender, int e)
@@ -179,7 +181,7 @@ namespace OurPlace.Android.Activities.Create
 
             dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
             dbManager.AddUser(dbManager.currentUser);
-            MainMyActivitiesFragment.Loaded = false;
+            MainMyActivitiesFragment.ForceRefresh = true;
         }
 
         protected override void OnResume()
@@ -192,20 +194,20 @@ namespace OurPlace.Android.Activities.Create
         {
             Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
             intent.PutExtra("PARENT", JsonConvert.SerializeObject(parentTask));
-            StartActivityForResult(intent, addTaskIntent);
+            StartActivityForResult(intent, AddTaskIntent);
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
         {
             if (resultCode == Result.Ok)
             {
-                if (requestCode == addTaskIntent)
+                if (requestCode == AddTaskIntent)
                 {
                     LearningTask newTask = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
                     adapter.data.Add(newTask);
                     adapter.NotifyDataSetChanged();
                 }
-                else if (requestCode == editTaskIntent)
+                else if (requestCode == EditTaskIntent)
                 {
                     LearningTask returned = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
                     int foundIndex = adapter.data.FindIndex(t => t.Id == returned.Id);

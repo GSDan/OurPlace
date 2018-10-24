@@ -19,9 +19,12 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Android.App;
-using Android.Gms.Maps;
-using Android.Gms.Maps.Model;
 using Android.Graphics;
 using Android.Media;
 using Android.Provider;
@@ -30,20 +33,13 @@ using Android.Views;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
-using Newtonsoft.Json;
-using OurPlace.Android.Misc;
-using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using SectionedRecyclerview.Droid;
 
 namespace OurPlace.Android.Adapters
 {
     public class BaseViewHolder : RecyclerView.ViewHolder
     {
-        public TextView Description { get; private set; }
+        public TextView Description { get; }
 
         public BaseViewHolder(View itemView) : base(itemView)
         {
@@ -54,8 +50,8 @@ namespace OurPlace.Android.Adapters
 
     public class CuratorViewHolder : RecyclerView.ViewHolder
     {
-        public Button ApproveBtn { get; private set; }
-        public Button DeleteBtn { get; private set; }
+        public Button ApproveBtn { get; }
+        public Button DeleteBtn { get; }
 
         public CuratorViewHolder(View itemView, Action<bool> listener) : base(itemView)
         {
@@ -67,13 +63,13 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class LearningActivityViewHolder : SectionedRecyclerview.Droid.SectionedViewHolder
+    public class LearningActivityViewHolder : SectionedViewHolder
     {
-        public ImageViewAsync Image { get; private set; }
-        public TextView Name { get; private set; }
-        public TextView Description { get; private set; }
-        public ImageView TickIcon { get; private set; }
-        public TextView StatusText { get; private set; }
+        public ImageViewAsync Image { get; }
+        public TextView Name { get; }
+        public TextView Description { get; }
+        public ImageView TickIcon { get; }
+        public TextView StatusText { get; }
 
         public LearningActivityViewHolder(View itemView, Action<int> listener) : base(itemView)
         {
@@ -88,10 +84,10 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class GridHeaderViewHolder : SectionedRecyclerview.Droid.SectionedViewHolder
+    public class GridHeaderViewHolder : SectionedViewHolder
     {
-        public TextView Title { get; private set; }
-        public TextView Description { get; private set; }
+        public TextView Title { get; }
+        public TextView Description { get; }
 
         public GridHeaderViewHolder(View itemView) : base(itemView)
         {
@@ -103,7 +99,7 @@ namespace OurPlace.Android.Adapters
 
     public class ButtonViewHolder : RecyclerView.ViewHolder
     {
-        public Button Button { get; private set; }
+        public Button Button { get; }
 
         public ButtonViewHolder(View itemView, Action<int> listener) : base(itemView)
         {
@@ -132,17 +128,19 @@ namespace OurPlace.Android.Adapters
             TaskImage = itemView.FindViewById<ImageViewAsync>(Resource.Id.taskImage);
             LockedChildrenTease = itemView.FindViewById<TextView>(Resource.Id.taskLockedParent);
 
-            if(TtsButton != null)
+            if (TtsButton == null)
             {
-                if (ttsAction == null)
-                {
-                    TtsButton.Visibility = ViewStates.Invisible;
-                }
-                else
-                {
-                    TtsButton.Visibility = ViewStates.Visible;
-                    TtsButton.Click += (sender, e) => ttsAction(AdapterPosition);
-                }
+                return;
+            }
+
+            if (ttsAction == null)
+            {
+                TtsButton.Visibility = ViewStates.Invisible;
+            }
+            else
+            {
+                TtsButton.Visibility = ViewStates.Visible;
+                TtsButton.Click += (sender, e) => ttsAction(AdapterPosition);
             }
         }
     }
@@ -159,13 +157,13 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Name : TaskViewHolder
+    public class TaskViewHolderName : TaskViewHolder
     {
         public LinearLayout NameSection { get; protected set; }
         public TextView EnteredNames { get; protected set; }
         public Button EditNameBtn { get; protected set; }
 
-        public TaskViewHolder_Name(View itemView, Action<int> ttsAction, Action changeNameAction) : base(itemView, ttsAction)
+        public TaskViewHolderName(View itemView, Action<int> ttsAction, Action changeNameAction) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             NameSection = itemView.FindViewById<LinearLayout>(Resource.Id.nameSection);
@@ -175,11 +173,11 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Info : TaskViewHolder
+    public class TaskViewHolderInfo : TaskViewHolder
     {
         public Button Button { get; protected set; }
 
-        public TaskViewHolder_Info(View itemView, Action<int> ttsAction, Action<int> listener) : base(itemView, ttsAction)
+        public TaskViewHolderInfo(View itemView, Action<int> ttsAction, Action<int> listener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
@@ -187,11 +185,11 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Btn : TaskViewHolder
+    public class TaskViewHolderBtn : TaskViewHolder
     {
         public Button Button { get; protected set; }
 
-        public TaskViewHolder_Btn(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction)
+        public TaskViewHolderBtn(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             Button = itemView.FindViewById<Button>(Resource.Id.taskBtn);
@@ -199,13 +197,13 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_CreatedTask : TaskViewHolder
+    public class TaskViewHolderCreatedTask : TaskViewHolder
     {
         public Button EditBtn { get; protected set; }
         public Button DeleteBtn { get; protected set; }
         public Button ManageChildrenBtn { get; protected set; }
 
-        public TaskViewHolder_CreatedTask(View itemView, Action<int> ttsAction, Action<int> deleteListener, Action<int> editListener, Action<int> manageChildListener) : base(itemView, ttsAction)
+        public TaskViewHolderCreatedTask(View itemView, Action<int> ttsAction, Action<int> deleteListener, Action<int> editListener, Action<int> manageChildListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             EditBtn = itemView.FindViewById<Button>(Resource.Id.editTaskBtn);
@@ -217,12 +215,12 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_UploadCard : TaskViewHolder
+    public class TaskViewHolderUploadCard : TaskViewHolder
     {
         public Button UploadBtn { get; protected set; }
         public Button DeleteBtn { get; protected set; }
 
-        public TaskViewHolder_UploadCard(View itemView, Action<int> ttsAction, Action<int> btnListener1, Action<int> btnListener2) : base(itemView, ttsAction)
+        public TaskViewHolderUploadCard(View itemView, Action<int> ttsAction, Action<int> btnListener1, Action<int> btnListener2) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             UploadBtn = itemView.FindViewById<Button>(Resource.Id.uploadBtn);
@@ -232,22 +230,22 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_ResultList : TaskViewHolder
+    public class TaskViewHolderResultList : TaskViewHolder
     {
         public LinearLayout ItemList { get; protected set; }
         public Button StartTaskButton { get; protected set; }
 
-        protected List<string> results;
-        protected Action<int, int> onItemTap;
+        protected List<string> Results;
+        protected Action<int, int> OnItemTap;
 
-        public TaskViewHolder_ResultList(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener) : base(itemView, ttsAction)
+        public TaskViewHolderResultList(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             ItemList = itemView.FindViewById<LinearLayout>(Resource.Id.resultListLayout);
             StartTaskButton = itemView.FindViewById<Button>(Resource.Id.taskBtn);
             StartTaskButton.Click += (sender, e) => btnListener(AdapterPosition);
-            onItemTap = itemTapListener;
-            results = new List<string>();
+            OnItemTap = itemTapListener;
+            Results = new List<string>();
         }
 
         /// <summary>
@@ -259,7 +257,10 @@ namespace OurPlace.Android.Adapters
         {
             ClearResults();
 
-            if (files == null) return;
+            if (files == null)
+            {
+                return;
+            }
 
             foreach (string imagePath in files)
             {
@@ -280,7 +281,7 @@ namespace OurPlace.Android.Adapters
         /// </summary>
         protected void Item_Click(object sender, EventArgs e)
         {
-            onItemTap(AdapterPosition, ItemList.IndexOfChild((View)sender));
+            OnItemTap(AdapterPosition, ItemList.IndexOfChild((View)sender));
         }
 
         /// <summary>
@@ -288,14 +289,14 @@ namespace OurPlace.Android.Adapters
         /// </summary>
         public void ClearResults()
         {
-            results.Clear();
+            Results.Clear();
             ItemList.RemoveAllViews();
         }
     }
 
-    public class TaskViewHolder_RecordVideo : TaskViewHolder_ResultList
+    public class TaskViewHolderRecordVideo : TaskViewHolderResultList
     {
-        public TaskViewHolder_RecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener) 
+        public TaskViewHolderRecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener) 
             : base(itemView, ttsAction, btnListener, thumbnailTapListener)
         {
         }
@@ -304,7 +305,10 @@ namespace OurPlace.Android.Adapters
         {
             ClearResults();
 
-            if (files == null) return;
+            if (files == null)
+            {
+                return;
+            }
 
             foreach (string imagePath in files)
             {
@@ -325,9 +329,9 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_RecordAudio : TaskViewHolder_ResultList
+    public class TaskViewHolderRecordAudio : TaskViewHolderResultList
     {
-        public TaskViewHolder_RecordAudio(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener)
+        public TaskViewHolderRecordAudio(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> itemTapListener)
             : base(itemView, ttsAction, btnListener, itemTapListener)
         {
         }
@@ -336,25 +340,28 @@ namespace OurPlace.Android.Adapters
         {
             ClearResults();
 
-            if (files == null) return;
-
-            for(int i = 0; i < files.Count(); i ++)
+            if (files == null)
             {
-                Button openbtn = new Button(context);
-                openbtn.SetPadding(10, 10, 10, 10);
-                openbtn.Text = string.Format(context.Resources.GetString(Resource.String.openAudioBtn), i + 1);
-                openbtn.Click += Item_Click;
-                ItemList.AddView(openbtn);
+                return;
+            }
+
+            for (int i = 0; i < files.Count(); i ++)
+            {
+                Button openButton = new Button(context);
+                openButton.SetPadding(10, 10, 10, 10);
+                openButton.Text = string.Format(context.Resources.GetString(Resource.String.openAudioBtn), i + 1);
+                openButton.Click += Item_Click;
+                ItemList.AddView(openButton);
             }
         }
     }
 
-    public class TaskViewHolder_MultipleChoice : TaskViewHolder
+    public class TaskViewHolderMultipleChoice : TaskViewHolder
     {
         public RadioGroup RadioGroup { get; protected set; }
         public ImageViewAsync Image { get; protected set; }
 
-        public TaskViewHolder_MultipleChoice(View itemView, Action<int> ttsAction) : base(itemView, ttsAction)
+        public TaskViewHolderMultipleChoice(View itemView, Action<int> ttsAction) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             RadioGroup = itemView.FindViewById<RadioGroup>(Resource.Id.taskRadioGroup);
@@ -362,12 +369,12 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_TextEntry : TaskViewHolder
+    public class TaskViewHolderTextEntry : TaskViewHolder
     {
         public EditText TextField { get; protected set; }
         public ImageViewAsync Image { get; protected set; }
 
-        public TaskViewHolder_TextEntry(View itemView, Action<int> ttsAction, Action<object, int> textListener) : base(itemView, ttsAction)
+        public TaskViewHolderTextEntry(View itemView, Action<int> ttsAction, Action<object, int> textListener) : base(itemView, ttsAction)
         {
             // Locate and cache view references:
             TextField = itemView.FindViewById<EditText>(Resource.Id.taskTextEntry);
@@ -376,13 +383,13 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class TaskViewHolder_Map : TaskViewHolder_Btn
+    public class TaskViewHolderMap : TaskViewHolderBtn
     {
-        public TextView EnteredLocsTextView { get; protected set; }
+        public TextView EnteredLocationsView { get; protected set; }
 
-        public TaskViewHolder_Map(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction, btnListener)
+        public TaskViewHolderMap(View itemView, Action<int> ttsAction, Action<int> btnListener) : base(itemView, ttsAction, btnListener)
         {
-            EnteredLocsTextView = itemView.FindViewById<TextView>(Resource.Id.chosenLocs);
+            EnteredLocationsView = itemView.FindViewById<TextView>(Resource.Id.chosenLocs);
         }
     }
 }

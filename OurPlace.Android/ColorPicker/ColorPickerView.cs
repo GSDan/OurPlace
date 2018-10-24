@@ -386,9 +386,12 @@ namespace ColorPicker
 		 * Will be drawn with hw acceleration, very fast.
 		 */
 
-			if(!mShowAlphaPanel || mAlphaRect == null || mAlphaPattern == null) return;
+			if(!mShowAlphaPanel || mAlphaRect == null || mAlphaPattern == null)
+            {
+                return;
+            }
 
-			RectF rect = mAlphaRect;
+            RectF rect = mAlphaRect;
 
 			if(BORDER_WIDTH_PX > 0){
 				//TODO: cross check the color
@@ -907,9 +910,12 @@ namespace ColorPicker
 
 		private void setUpAlphaRect(){
 
-			if(!mShowAlphaPanel) return;
+			if(!mShowAlphaPanel)
+            {
+                return;
+            }
 
-			RectF	dRect = mDrawingRect;		
+            RectF	dRect = mDrawingRect;		
 
 			float left = dRect.Left + BORDER_WIDTH_PX;
 			float top = dRect.Bottom - ALPHA_PANEL_HEIGHT + BORDER_WIDTH_PX;

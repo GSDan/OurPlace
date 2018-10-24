@@ -19,42 +19,39 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
 
 namespace OurPlace.Android.Adapters
 {
     public class PlacesAdapter : RecyclerView.Adapter
     {
         public event EventHandler<int> ItemClick;
-        public List<GooglePlaceResult> data;
-        public Context context;
+        public readonly List<GooglePlaceResult> Data;
+        public Context Context;
 
-        public PlacesAdapter(Context _context, List<GooglePlaceResult> _data)
+        public PlacesAdapter(Context context, List<GooglePlaceResult> data)
         {
-            data = _data;
-            context = _context;
+            this.Data = data;
+            this.Context = context;
         }
 
-        public override int ItemCount
-        {
-            get
-            {
-                if (data == null) return 0;
-                return data.Count;
-            }
-        }
+        public override int ItemCount => Data?.Count ?? 0;
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0) return 0;
-            if (position >= data.Count) return 2;
-            return 1;
+            if (position == 0)
+            {
+                return 0;
+            }
+
+            return position >= Data.Count ? 2 : 1;
         }
 
         private void OnClick(int position)
@@ -64,15 +61,14 @@ namespace OurPlace.Android.Adapters
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            TaskViewHolder_Btn vh = holder as TaskViewHolder_Btn;
-            vh.Title.Text = data[position].name;
-            vh.Description.Text = data[position].vicinity;
+            TaskViewHolderBtn vh = holder as TaskViewHolderBtn;
+            vh.Title.Text = Data[position].name;
+            vh.Description.Text = Data[position].vicinity;
 
-            if(data[position].photos != null && data[position].photos.Count > 0)
+            if(Data[position].photos != null && Data[position].photos.Count > 0)
             {
                 ImageService.Instance.LoadUrl(
-                    string.Format("https://maps.googleapis.com/maps/api/place/photo?photoreference={0}&sensor=false&maxheight={1}&maxwidth={2}&key={3}",
-                    data[position].photos[0].photo_reference, 500, 500, context.Resources.GetString(Resource.String.MapsApiKey))).Into(vh.TaskTypeIcon);
+                    $"https://maps.googleapis.com/maps/api/place/photo?photoreference={Data[position].photos[0].photo_reference}&sensor=false&maxheight={500}&maxwidth={500}&key={Context.Resources.GetString(Resource.String.MapsApiKey)}").Into(vh.TaskTypeIcon);
             }
             else
             {
@@ -83,8 +79,10 @@ namespace OurPlace.Android.Adapters
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
-            TaskViewHolder_Btn vh = new TaskViewHolder_Btn(itemView, null, OnClick);
-            vh.Button.Text = context.Resources.GetString(Resource.String.ChooseBtn);
+            TaskViewHolderBtn vh = new TaskViewHolderBtn(itemView, null, OnClick)
+            {
+                Button = { Text = Context.Resources.GetString(Resource.String.ChooseBtn) }
+            };
             return vh;
         }
     }

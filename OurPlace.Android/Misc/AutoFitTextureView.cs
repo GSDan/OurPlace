@@ -50,7 +50,10 @@ namespace OurPlace.Android
         public void SetAspectRatio(int width, int height)
         {
             if (width == 0 || height == 0)
+            {
                 throw new ArgumentException("Size cannot be negative.");
+            }
+
             mRatioWidth = width;
             mRatioHeight = height;
             RequestLayout();

@@ -71,7 +71,9 @@ namespace OurPlace.Android.Listeners
             finally
             {
                 if (image != null)
+                {
                     image.Close();
+                }
             }
         }
 
@@ -89,7 +91,9 @@ namespace OurPlace.Android.Listeners
             finally
             {
                 if (output != null)
+                {
                     output.Close();
+                }
             }
 
             global::Android.Graphics.Bitmap bitmap = global::Android.Graphics.BitmapFactory.DecodeFile(File.AbsolutePath);

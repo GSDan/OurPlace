@@ -19,6 +19,7 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
 using Android.Content;
 using Android.Support.V4.App;
 using Java.Lang;
@@ -28,24 +29,16 @@ namespace OurPlace.Android.Adapters
 {
     public class PagerAdapter : FragmentPagerAdapter
     {
-        private Context context;
-        private FragmentManager fragManager;
+        private readonly Context context;
 
-        public PagerAdapter(global::Android.Support.V4.App.FragmentManager fm, Context context) : base(fm)
+        public PagerAdapter(FragmentManager fm, Context context) : base(fm)
         {
             this.context = context;
-            fragManager = fm;
         }
 
-        public override int Count
-        {
-            get
-            {
-                return 2;
-            }
-        }
+        public override int Count => 2;
 
-        public override global::Android.Support.V4.App.Fragment GetItem(int position)
+        public override Fragment GetItem(int position)
         {
             switch (position)
             {
@@ -63,11 +56,11 @@ namespace OurPlace.Android.Adapters
             switch(position)
             {
                 case 0:
-                    return new Java.Lang.String(context.Resources.GetString(Resource.String.MainLandingTabTitle));
+                    return new String(context.Resources.GetString(Resource.String.MainLandingTabTitle));
                 case 1:
-                    return new Java.Lang.String(context.Resources.GetString(Resource.String.MainMyActivitiesTabTitle));
+                    return new String(context.Resources.GetString(Resource.String.MainMyActivitiesTabTitle));
                 default:
-                    return new Java.Lang.String("ERROR");
+                    return new String("ERROR");
             }
         }
     }

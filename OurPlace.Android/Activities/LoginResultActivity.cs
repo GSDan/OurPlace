@@ -33,7 +33,6 @@ namespace OurPlace.Android.Activities
     [IntentFilter(new[] { Intent.ActionView }, DataScheme = "parklearn", DataHost = "logincallback", Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault })]
     public class LoginResultActivity : Activity
     {
-        private string tokenType;
         private string accessToken;
         private DateTime accessTokenExpiresAt;
         private string refreshToken;
@@ -45,10 +44,12 @@ namespace OurPlace.Android.Activities
 
             global::Android.Net.Uri dataUri = base.Intent.Data;
 
-            if (dataUri == null) return;
+            if (dataUri == null)
+            {
+                return;
+            }
 
             accessToken = dataUri.GetQueryParameter("access_token");
-            tokenType = dataUri.GetQueryParameter("token_type");
             accessTokenExpiresAt = DateTime.Now.AddSeconds(int.Parse(dataUri.GetQueryParameter("expires_in")));
             refreshToken = dataUri.GetQueryParameter("refresh_token");
             refreshTokenExpiresAt = new DateTime(long.Parse(dataUri.GetQueryParameter("refresh_token_expires")), DateTimeKind.Utc);
@@ -84,7 +85,7 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            if (res != null && res.Success)
+            if (res.Success)
             {
                 // kill the login activity
                 Intent message = new Intent("com.park.learn.CALLBACK");

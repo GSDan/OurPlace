@@ -19,42 +19,42 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Android.App;
-using Android.Gms.Maps;
-using Android.Support.V7.Widget;
-using Android.Views;
-using Android.Widget;
-using FFImageLoading;
-using Microsoft.AppCenter.Analytics;
-using Newtonsoft.Json;
-using OurPlace.Common;
-using OurPlace.Common.Models;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Android.App;
+using Android.Support.V7.Widget;
+using Android.Views;
+using Android.Widget;
+using FFImageLoading;
+using FFImageLoading.Cache;
+using Microsoft.AppCenter.Analytics;
+using Newtonsoft.Json;
+using OurPlace.Common;
+using OurPlace.Common.Models;
 
 namespace OurPlace.Android.Adapters
 {
     public class TaskAdapter : RecyclerView.Adapter
     {
-        const int TASK = 0;
-        const int TASK_PHOTO = 1;
-        const int TASK_MULTIPLECHOICE = 2;
-        const int TASK_DRAWING = 3;
-        const int TASK_TEXTENTRY = 4;
-        const int TASK_VIDEO = 5;
-        const int TASK_AUDIO = 6;
-        const int TASK_LOCATIONHUNT = 7;
-        const int TASK_LOCATIONMARKER = 8;
-        const int TASK_INFO = 9;
-        const int TASK_LISTEN = 10;
-        const int TASK_SCAN = 11;
-        const int FINISH = 12;
-        const int CURATE = 13;
-        const int NAMES = 14;
+        private const int TaskPhoto = 1;
+        private const int TaskMultipleChoice = 2;
+        private const int TaskDrawing = 3;
+        private const int TaskTextEntry = 4;
+        private const int TaskVideo = 5;
+        private const int TaskAudio = 6;
+        private const int TaskLocationHunt = 7;
+        private const int TaskLocationMarker = 8;
+        private const int TaskInfo = 9;
+        private const int TaskListen = 10;
+        private const int TaskScan = 11;
+        private const int Finish = 12;
+        private const int Curate = 13;
+        private const int Names = 14;
 
-        public List<AppTask> items;
+        public List<AppTask> Items;
         private readonly Dictionary<int, List<AppTask>> hiddenChildren;
         private readonly Dictionary<string, int> viewTypes;
         public event EventHandler<int> ItemClick;
@@ -63,70 +63,71 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> SpeakText;
         public event EventHandler<int> ChangeName;
         public Action<int, int> ShowMedia;
-        public bool onBind = false;
-        public bool curator;
-        private bool reqName;
-        private string description;
+        public bool OnBind;
+        public bool Curator;
+        private readonly bool reqName;
+        private readonly string description;
         private string names;
-        Activity context;
+        private readonly Activity context;
 
-        public TaskAdapter(Activity context, List<AppTask> data, string description, bool curator, bool reqName) : base()
+        public TaskAdapter(Activity context, List<AppTask> data, string description, bool curator, bool reqName)
         {
             this.context = context;
-            this.curator = curator;
+            this.Curator = curator;
             this.description = description;
             this.reqName = reqName;
-            items = data;
 
-            if (items == null) items = new List<AppTask>();
+            Items = data ?? new List<AppTask>();
 
             hiddenChildren = new Dictionary<int, List<AppTask>>();
-            AppTask[] temp = data.ToArray();
-            foreach (AppTask parent in temp)
+            if (data != null)
             {
-                if (parent.TaskType.IdName == "INFO") parent.IsCompleted = true;
-
-                if (parent.ChildAppTasks?.Count > 0)
+                AppTask[] temp = data.ToArray();
+                foreach (AppTask parent in temp)
                 {
+                    if (parent.TaskType.IdName == "INFO")
+                    {
+                        parent.IsCompleted = true;
+                    }
+
+                    if (!(parent.ChildAppTasks?.Count > 0))
+                    {
+                        continue;
+                    }
+
                     hiddenChildren.Add(parent.Id, parent.ChildAppTasks);
-                    CheckForChildren(items.IndexOf(parent));
+                    CheckForChildren(Items.IndexOf(parent));
                 }
             }
 
             // Add curator controls to the start of the list
             if (curator)
             {
-                items.Insert(0, null);
+                Items.Insert(0, null);
             }
 
-            items.Insert(0, null);
-            items.Add(null);
+            Items.Insert(0, null);
+            Items.Add(null);
 
             viewTypes = new Dictionary<string, int>
             {
-                {"TAKE_PHOTO", TASK_PHOTO},
-                {"MATCH_PHOTO", TASK_PHOTO},
-                {"MULT_CHOICE", TASK_MULTIPLECHOICE},
-                {"DRAW", TASK_DRAWING },
-                {"DRAW_PHOTO", TASK_DRAWING },
-                {"ENTER_TEXT", TASK_TEXTENTRY },
-                {"TAKE_VIDEO", TASK_VIDEO },
-                {"REC_AUDIO", TASK_AUDIO },
-                {"LOC_HUNT", TASK_LOCATIONHUNT },
-                {"MAP_MARK", TASK_LOCATIONMARKER },
-                {"INFO", TASK_INFO },
-                {"LISTEN_AUDIO", TASK_LISTEN },
-                {"SCAN_QR", TASK_SCAN }
+                {"TAKE_PHOTO", TaskPhoto},
+                {"MATCH_PHOTO", TaskPhoto},
+                {"MULT_CHOICE", TaskMultipleChoice},
+                {"DRAW", TaskDrawing },
+                {"DRAW_PHOTO", TaskDrawing },
+                {"ENTER_TEXT", TaskTextEntry },
+                {"TAKE_VIDEO", TaskVideo },
+                {"REC_AUDIO", TaskAudio },
+                {"LOC_HUNT", TaskLocationHunt },
+                {"MAP_MARK", TaskLocationMarker },
+                {"INFO", TaskInfo },
+                {"LISTEN_AUDIO", TaskListen },
+                {"SCAN_QR", TaskScan }
             };
         }
 
-        public override int ItemCount
-        {
-            get
-            {
-                return items.Count;
-            }
-        }
+        public override int ItemCount => Items.Count;
 
         private void OnClick(int position)
         {
@@ -146,14 +147,14 @@ namespace OurPlace.Android.Adapters
         private void OnText(object obj, int position)
         {
             TextEntered?.Invoke(obj, position);
-            items[position].IsCompleted = true;
+            Items[position].IsCompleted = true;
             CheckForChildren(position);
         }
 
         private void OnMediaClick(int taskIndex, int pathIndex)
         {
             ShowMedia?.Invoke(taskIndex, pathIndex);
-            items[taskIndex].IsCompleted = true;
+            Items[taskIndex].IsCompleted = true;
             CheckForChildren(taskIndex);
         }
 
@@ -164,28 +165,27 @@ namespace OurPlace.Android.Adapters
 
         public AppTask GetTaskWithId(int id)
         {
-            return items.FirstOrDefault(t => t != null && t.Id == id);
+            return Items.FirstOrDefault(t => t != null && t.Id == id);
         }
 
         public int GetIndexWithId(int id)
         {
-            return items.IndexOf(items.FirstOrDefault(t => t != null && t.Id == id));
+            return Items.IndexOf(Items.FirstOrDefault(t => t != null && t.Id == id));
         }
 
         public bool IsPositionAChildView(int position)
         {
-            if (position >= items.Count || position <= 0 || (curator && position == 1) || position == items.Count - 1)
+            if (position >= Items.Count || position <= 0 || (Curator && position == 1) || position == Items.Count - 1)
             {
                 // Can't be a child
                 return false;
             }
 
-            return items[position].IsChild;
+            return Items[position].IsChild;
         }
 
         /// <summary>
-        /// Called when a task has returned new JSON data
-        /// sucessfully.
+        /// Called when a task has returned new JSON data successfully.
         /// </summary>
         /// <param name="taskId">The task's Id</param>
         /// <param name="json">New JSON data</param>
@@ -193,15 +193,12 @@ namespace OurPlace.Android.Adapters
         {
             int i = GetIndexWithId(taskId);
 
-            AppTask thisTask = GetTaskWithId(taskId);
-
-            List<string> files = JsonConvert.DeserializeObject<List<string>>(items[i].CompletionData.JsonData);
-            if (files == null) files = new List<string>();
+            List<string> files = JsonConvert.DeserializeObject<List<string>>(Items[i].CompletionData.JsonData) ?? new List<string>();
 
             files.Add(json);
 
-            items[i].IsCompleted = true;
-            items[i].CompletionData.JsonData = JsonConvert.SerializeObject(files);
+            Items[i].IsCompleted = true;
+            Items[i].CompletionData.JsonData = JsonConvert.SerializeObject(files);
 
             if (possibleSourceImage)
             {
@@ -209,56 +206,57 @@ namespace OurPlace.Android.Adapters
                 NotifyDataSetChanged();
             }
 
-            ImageService.Instance.InvalidateCacheEntryAsync(json, FFImageLoading.Cache.CacheType.All, true);
+            ImageService.Instance.InvalidateCacheEntryAsync(json, CacheType.All, true);
             NotifyItemChanged(i);
 
             // Tell the Finished button to update, just in case this is
             // the last unfinished task.
-            NotifyItemChanged(items.Count - 1);
+            NotifyItemChanged(Items.Count - 1);
 
             CheckForChildren(i);
         }
 
         private void CheckForChildren(int position)
         {
-            AppTask parent = items[position];
-            bool hasChildren = parent.ChildTasks != null && parent.ChildTasks.Count() > 0;
+            AppTask parent = Items[position];
+            bool hasChildren = parent.ChildTasks != null && parent.ChildTasks.Any();
 
             if (hasChildren && !parent.IsCompleted)
             {
-                if (!hiddenChildren.ContainsKey(parent.Id))
+                if (hiddenChildren.ContainsKey(parent.Id))
                 {
-                    // Parent task is no longer complete, hide children
-                    hiddenChildren[parent.Id] = new List<AppTask>();
-                    foreach(LearningTask child in parent.ChildTasks)
-                    {
-                        AppTask childProgress = GetTaskWithId(child.Id);
-                        if(childProgress != null)
-                        {
-                            hiddenChildren[parent.Id].Add(childProgress);
-                            items.Remove(childProgress);
-                        }
-                    }
-                    NotifyDataSetChanged();
+                    return;
                 }
+
+                // Parent task is no longer complete, hide children
+                hiddenChildren[parent.Id] = new List<AppTask>();
+                foreach(LearningTask child in parent.ChildTasks)
+                {
+                    AppTask childProgress = GetTaskWithId(child.Id);
+                    if (childProgress == null)
+                    {
+                        continue;
+                    }
+
+                    hiddenChildren[parent.Id].Add(childProgress);
+                    Items.Remove(childProgress);
+                }
+                NotifyDataSetChanged();
             }
-            else if (hasChildren && items[position].IsCompleted)
+            else if (hasChildren && Items[position].IsCompleted && hiddenChildren.ContainsKey(Items[position].Id))
             {
                 // Show the child tasks if they're hidden
-                if (hiddenChildren.ContainsKey(items[position].Id))
+                var children = hiddenChildren[Items[position].Id];
+                int nextPos = position + 1;
+                foreach(AppTask child in children)
                 {
-                    var children = hiddenChildren[items[position].Id];
-                    int nextPos = position + 1;
-                    foreach(AppTask child in children)
+                    if(!Items.Exists(t => t?.Id == child.Id))
                     {
-                        if(!items.Exists(t => t?.Id == child.Id))
-                        {
-                            items.Insert(nextPos++, child);
-                        }
+                        Items.Insert(nextPos++, child);
                     }
-                    hiddenChildren.Remove(items[position].Id);
-                    NotifyDataSetChanged();
                 }
+                hiddenChildren.Remove(Items[position].Id);
+                NotifyDataSetChanged();
             }
         }
 
@@ -280,7 +278,7 @@ namespace OurPlace.Android.Adapters
         {
             AppTask thisTask = GetTaskWithId(taskId);
             thisTask.IsCompleted = complete;
-            int ind = items.IndexOf(thisTask);
+            int ind = Items.IndexOf(thisTask);
             NotifyItemChanged(ind);
             CheckForChildren(ind);
         }
@@ -296,91 +294,117 @@ namespace OurPlace.Android.Adapters
             TaskViewHolder vh;
 
             Type thisType = holder.GetType();
-            onBind = true;
+            OnBind = true;
 
-            if (curator)
+            if (Curator)
             {
                 if (position == 0)
+                {
                     return;
+                }
             }
 
-            if (position == 0 || (curator && position == 1))
+            if (position == 0 || (Curator && position == 1))
             {
                 // Activity description + entered names (if required)
-                vh = holder as TaskViewHolder_Name;
+                vh = holder as TaskViewHolderName;
+                if (vh == null)
+                {
+                    return;
+                }
+
                 vh.Title.Text = description;
                 vh.Description.Text = context.Resources.GetString(Resource.String.TasksTitle);
 
-                ((TaskViewHolder_Name)vh).NameSection.Visibility = (reqName) ? ViewStates.Visible : ViewStates.Gone;
-                ((TaskViewHolder_Name)vh).EnteredNames.Text = names;
+                ((TaskViewHolderName) vh).NameSection.Visibility =
+                    (reqName) ? ViewStates.Visible : ViewStates.Gone;
+                ((TaskViewHolderName) vh).EnteredNames.Text = names;
+
                 return;
             }
 
-            if (position == items.Count - 1)
+            if (position == Items.Count - 1)
             {
                 // Finish button
-                ButtonViewHolder bvh = holder as ButtonViewHolder;
-                bvh.Button.Enabled = true;
+                if (holder is ButtonViewHolder bvh)
+                {
+                    bvh.Button.Enabled = true;
+                }
+
                 return;
             }
 
-            string taskType = items[position].TaskType.IdName;
-             if (thisType == typeof(TaskViewHolder_Info))
+            string taskType = Items[position].TaskType.IdName;
+             if (thisType == typeof(TaskViewHolderInfo))
             {
-                AdditionalInfoData taskInfo = JsonConvert.DeserializeObject<AdditionalInfoData>(items[position].JsonData);
-                vh = holder as TaskViewHolder_Info;
-                items[position].IsCompleted = true;
+                AdditionalInfoData taskInfo = JsonConvert.DeserializeObject<AdditionalInfoData>(Items[position].JsonData);
+                vh = holder as TaskViewHolderInfo;
+                Items[position].IsCompleted = true;
 
                 if (!string.IsNullOrWhiteSpace(taskInfo.ImageUrl))
                 {
-                    items[position].ImageUrl = taskInfo.ImageUrl;
+                    Items[position].ImageUrl = taskInfo.ImageUrl;
                 }
 
-                ((TaskViewHolder_Info)vh).Button.Visibility =
-                    (string.IsNullOrWhiteSpace(taskInfo.ExternalUrl)) ? ViewStates.Gone : ViewStates.Visible;
+                TaskViewHolderInfo taskViewHolderInfo = (TaskViewHolderInfo) vh;
+                if (taskViewHolderInfo != null)
+                {
+                    taskViewHolderInfo.Button.Visibility =
+                        (string.IsNullOrWhiteSpace(taskInfo.ExternalUrl)) ? ViewStates.Gone : ViewStates.Visible;
+                } 
             }
-            else if (thisType == typeof(TaskViewHolder_RecordAudio))
+            else if (thisType == typeof(TaskViewHolderRecordAudio))
             {
-                vh = holder as TaskViewHolder_RecordAudio;
-                ((TaskViewHolder_RecordAudio)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.StartBtn);
+                vh = holder as TaskViewHolderRecordAudio;
+                if (vh != null)
+                {
+                    ((TaskViewHolderRecordAudio) vh).StartTaskButton.Text =
+                        context.Resources.GetString(Resource.String.StartBtn);
 
-                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
-                {
-                    List<string> audioPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
+                    if (!string.IsNullOrWhiteSpace(Items[position].CompletionData.JsonData))
+                    {
+                        List<string> audioPaths =
+                            JsonConvert.DeserializeObject<List<string>>(Items[position].CompletionData.JsonData);
 
-                    ((TaskViewHolder_RecordAudio)vh).ShowResults(audioPaths, context);
-                    items[position].IsCompleted = true;
-                }
-                else
-                {
-                    items[position].IsCompleted = false;
-                    ((TaskViewHolder_RecordAudio)vh).ClearResults();
-                }
-            }
-            else if (thisType == typeof(TaskViewHolder_RecordVideo))
-            {
-                vh = holder as TaskViewHolder_RecordVideo;
-                ((TaskViewHolder_RecordVideo)vh).StartTaskButton.Text = context.Resources.GetString(Resource.String.RecBtn);
-                
-                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
-                {
-                    List<string> videoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
-
-                    ((TaskViewHolder_RecordVideo)vh).ShowResults(videoPaths, context);
-                    items[position].IsCompleted = true;
-                }
-                else
-                {
-                    items[position].IsCompleted = false;
-                    ((TaskViewHolder_RecordVideo)vh).ClearResults();
+                        ((TaskViewHolderRecordAudio) vh).ShowResults(audioPaths, context);
+                        Items[position].IsCompleted = true;
+                    }
+                    else
+                    {
+                        Items[position].IsCompleted = false;
+                        ((TaskViewHolderRecordAudio) vh).ClearResults();
+                    }
                 }
             }
-            else if (thisType == typeof(TaskViewHolder_ResultList))
+            else if (thisType == typeof(TaskViewHolderRecordVideo))
             {
-                vh = holder as TaskViewHolder_ResultList;
+                vh = holder as TaskViewHolderRecordVideo;
+                if (vh != null)
+                {
+                    ((TaskViewHolderRecordVideo) vh).StartTaskButton.Text =
+                        context.Resources.GetString(Resource.String.RecBtn);
+
+                    if (!string.IsNullOrWhiteSpace(Items[position].CompletionData.JsonData))
+                    {
+                        List<string> videoPaths =
+                            JsonConvert.DeserializeObject<List<string>>(Items[position].CompletionData.JsonData);
+
+                        ((TaskViewHolderRecordVideo) vh).ShowResults(videoPaths, context);
+                        Items[position].IsCompleted = true;
+                    }
+                    else
+                    {
+                        Items[position].IsCompleted = false;
+                        ((TaskViewHolderRecordVideo) vh).ClearResults();
+                    }
+                }
+            }
+            else if (thisType == typeof(TaskViewHolderResultList))
+            {
+                vh = holder as TaskViewHolderResultList;
 
                 bool btnEnabled = true;
-                string btnText = context.Resources.GetString(Resource.String.TaskBtn);
+                string btnText;
 
                 if (taskType == "DRAW" || taskType == "DRAW_PHOTO")
                 {
@@ -388,15 +412,7 @@ namespace OurPlace.Android.Adapters
 
                     if (taskType == "DRAW_PHOTO")
                     {
-                        int idResult = -1;
-                        if (int.TryParse(items[position].JsonData, out idResult))
-                        {
-                            btnEnabled = GetTaskWithId(idResult).IsCompleted;
-                        }
-                        else
-                        {
-                            btnEnabled = true;
-                        }
+                        btnEnabled = !int.TryParse(Items[position].JsonData, out var idResult) || GetTaskWithId(idResult).IsCompleted;
 
                         if (!btnEnabled)
                         {
@@ -409,25 +425,29 @@ namespace OurPlace.Android.Adapters
                     btnText = context.Resources.GetString(Resource.String.TakePhotoBtn);
                 }
 
-                ((TaskViewHolder_ResultList)vh).StartTaskButton.Text = btnText;
-                ((TaskViewHolder_ResultList)vh).StartTaskButton.Enabled = btnEnabled;
-
-                if (!string.IsNullOrWhiteSpace(items[position].CompletionData.JsonData))
+                if (vh != null)
                 {
-                    List<string> photoPaths = JsonConvert.DeserializeObject<List<string>>(items[position].CompletionData.JsonData);
+                    ((TaskViewHolderResultList) vh).StartTaskButton.Text = btnText;
+                    ((TaskViewHolderResultList) vh).StartTaskButton.Enabled = btnEnabled;
 
-                    ((TaskViewHolder_ResultList)vh).ShowResults(photoPaths, context);
-                    items[position].IsCompleted = true;
-                }
-                else
-                {
-                    items[position].IsCompleted = false;
-                    ((TaskViewHolder_ResultList)vh).ClearResults();
+                    if (!string.IsNullOrWhiteSpace(Items[position].CompletionData.JsonData))
+                    {
+                        List<string> photoPaths =
+                            JsonConvert.DeserializeObject<List<string>>(Items[position].CompletionData.JsonData);
+
+                        ((TaskViewHolderResultList) vh).ShowResults(photoPaths, context);
+                        Items[position].IsCompleted = true;
+                    }
+                    else
+                    {
+                        Items[position].IsCompleted = false;
+                        ((TaskViewHolderResultList) vh).ClearResults();
+                    }
                 }
             }
-            else if (thisType == typeof(TaskViewHolder_Btn))
+            else if (thisType == typeof(TaskViewHolderBtn))
             {
-                vh = holder as TaskViewHolder_Btn;
+                vh = holder as TaskViewHolderBtn;
                 string btnText = context.Resources.GetString(Resource.String.TaskBtn);
 
                 if (taskType == "LISTEN_AUDIO")
@@ -435,118 +455,141 @@ namespace OurPlace.Android.Adapters
                     btnText = context.Resources.GetString(Resource.String.ListenBtn);
                 }
 
-                ((TaskViewHolder_Btn)vh).Button.Text = btnText;
-            }
-            else if (thisType == typeof(TaskViewHolder_TextEntry))
-            {
-                vh = holder as TaskViewHolder_TextEntry;
-                ((TaskViewHolder_TextEntry)vh).TextField.Text = items[position].CompletionData.JsonData;
-                items[position].IsCompleted = !string.IsNullOrWhiteSpace(((TaskViewHolder_TextEntry)vh).TextField.Text);
-            }
-            else if (thisType == typeof(TaskViewHolder_MultipleChoice))
-            {
-                vh = holder as TaskViewHolder_MultipleChoice;
-                RadioGroup radios = ((TaskViewHolder_MultipleChoice)vh).RadioGroup;
-
-                string[] choices = JsonConvert.DeserializeObject<string[]>(items[position].JsonData);
-                int answeredInd = -1;
-                int.TryParse(items[position].CompletionData.JsonData, out answeredInd);
-
-                if (radios.ChildCount == 0)
+                TaskViewHolderBtn viewHolderBtn = (TaskViewHolderBtn)vh;
+                if (viewHolderBtn != null)
                 {
-                    int index = 0;
-                    foreach (string option in choices)
-                    {
-                        RadioButton rad = new RadioButton(context);
-                        rad.Text = option;
-                        rad.SetPadding(0, 0, 0, 5);
-                        rad.TextSize = 16;
-                        radios.AddView(rad);
-
-                        if (items[position].IsCompleted && answeredInd == index)
-                        {
-                            ((RadioButton)radios.GetChildAt(answeredInd)).Checked = true;
-                        }
-                        index++;
-                    }
+                    viewHolderBtn.Button.Text = btnText;
                 }
-
-                if (answeredInd == -1)
-                {
-                    items[position].IsCompleted = false;
-                }
-
-                radios.CheckedChange += (object sender, RadioGroup.CheckedChangeEventArgs e) =>
-                {
-                    items[position].IsCompleted = true;
-                    int radioButtonID = radios.CheckedRadioButtonId;
-                    View radioButton = radios.FindViewById(radioButtonID);
-                    int idx = radios.IndexOfChild(radioButton);
-                    items[position].CompletionData.JsonData = idx.ToString();
-                    NotifyItemChanged(items.Count - 1);
-                };
             }
-            else if (thisType == typeof(TaskViewHolder_Map))
+            else if (thisType == typeof(TaskViewHolderTextEntry))
             {
-                vh = holder as TaskViewHolder_Map;
-                TaskViewHolder_Map mapHolder = ((TaskViewHolder_Map)vh);
-
-                if (taskType == "MAP_MARK")
+                vh = holder as TaskViewHolderTextEntry;
+                if (vh != null)
                 {
-                    List<Map_Location> points = JsonConvert.DeserializeObject<List<Map_Location>>(items[position].CompletionData.JsonData);
-
-                    if (points != null && points.Count > 0)
-                    {
-                        mapHolder.EnteredLocsTextView.Visibility = ViewStates.Visible;
-                        mapHolder.EnteredLocsTextView.Text = string.Format(
-                            context.Resources.GetString(Resource.String.ChosenLocations), 
-                            points.Count, 
-                            (points.Count > 1) ? "s" : "");
-                        items[position].IsCompleted = true;
-                    }
-                    else
-                    {
-                        mapHolder.EnteredLocsTextView.Visibility = ViewStates.Gone;
-                        items[position].IsCompleted = false;
-                    }
+                    ((TaskViewHolderTextEntry) vh).TextField.Text = Items[position].CompletionData.JsonData;
+                    Items[position].IsCompleted =
+                        !string.IsNullOrWhiteSpace(((TaskViewHolderTextEntry) vh).TextField.Text);
                 }
             }
             else
-            {
-                vh = holder as TaskViewHolder;
-            }
+             {
+                 if (thisType == typeof(TaskViewHolderMultipleChoice))
+                 {
+                     vh = holder as TaskViewHolderMultipleChoice;
+                     RadioGroup radios = ((TaskViewHolderMultipleChoice)vh)?.RadioGroup;
+
+                     string[] choices = JsonConvert.DeserializeObject<string[]>(Items[position].JsonData);
+                     int.TryParse(Items[position].CompletionData.JsonData, out var answeredInd);
+
+                     if (radios != null && radios.ChildCount == 0)
+                     {
+                         int index = 0;
+                         foreach (string option in choices)
+                         {
+                             RadioButton rad = new RadioButton(context) { Text = option };
+                             rad.SetPadding(0, 0, 0, 5);
+                             rad.TextSize = 16;
+                             radios.AddView(rad);
+
+                             if (Items[position].IsCompleted && answeredInd == index)
+                             {
+                                 ((RadioButton)radios.GetChildAt(answeredInd)).Checked = true;
+                             }
+                             index++;
+                         }
+                     }
+
+                     if (answeredInd == -1)
+                     {
+                         Items[position].IsCompleted = false;
+                     }
+
+                     if (radios != null)
+                     {
+                         radios.CheckedChange += (sender, e) =>
+                         {
+                             Items[position].IsCompleted = true;
+                             int radioButtonId = radios.CheckedRadioButtonId;
+                             View radioButton = radios.FindViewById(radioButtonId);
+                             int idx = radios.IndexOfChild(radioButton);
+                             Items[position].CompletionData.JsonData = idx.ToString();
+                             NotifyItemChanged(Items.Count - 1);
+                         };
+                     }
+                 }
+                 else if (thisType == typeof(TaskViewHolderMap))
+                 {
+                     vh = holder as TaskViewHolderMap;
+                     TaskViewHolderMap mapHolder = ((TaskViewHolderMap)vh);
+
+                     if (taskType == "MAP_MARK")
+                     {
+                         List<Map_Location> points = JsonConvert.DeserializeObject<List<Map_Location>>(Items[position].CompletionData.JsonData);
+
+                         if (points != null && points.Count > 0)
+                         {
+                             if (mapHolder != null)
+                             {
+                                 mapHolder.EnteredLocationsView.Visibility = ViewStates.Visible;
+                                 mapHolder.EnteredLocationsView.Text = string.Format(
+                                     context.Resources.GetString(Resource.String.ChosenLocations),
+                                     points.Count,
+                                     (points.Count > 1) ? "s" : "");
+                             }
+
+                             Items[position].IsCompleted = true;
+                         }
+                         else
+                         {
+                             if (mapHolder != null)
+                            {
+                                mapHolder.EnteredLocationsView.Visibility = ViewStates.Gone;
+                            }
+
+                            Items[position].IsCompleted = false;
+                         }
+                     }
+                 }
+                 else
+                 {
+                     vh = holder as TaskViewHolder;
+                 }
+             }
 
             // These apply to all task types:
 
-            ImageService.Instance.LoadUrl(items[position].TaskType.IconUrl).Into(((TaskViewHolder)holder).TaskTypeIcon);
+            ImageService.Instance.LoadUrl(Items[position].TaskType.IconUrl).Into(((TaskViewHolder)holder).TaskTypeIcon);
 
-            if (!string.IsNullOrWhiteSpace(items[position].ImageUrl))
+            if (!string.IsNullOrWhiteSpace(Items[position].ImageUrl))
             {
                 vh.TaskImage.Visibility = ViewStates.Visible;
-                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(items[position].ImageUrl))
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(Items[position].ImageUrl))
                     .DownSampleInDip(300)
                     .Into(vh.TaskImage);
             }
             else
             {
-                vh.TaskImage.Visibility = ViewStates.Gone;
+                if (vh != null)
+                {
+                    vh.TaskImage.Visibility = ViewStates.Gone;
+                }
             }
 
-            vh.Description.Text = items[position].Description;
-            vh.Title.Text = items[position].TaskType.DisplayName;
+            vh.Description.Text = Items[position].Description;
+            vh.Title.Text = Items[position].TaskType.DisplayName;
 
-            bool hasChildren = items[position].ChildTasks != null && items[position].ChildTasks.Count() > 0;
+            bool hasChildren = Items[position].ChildTasks != null && Items[position].ChildTasks.Any();
 
-            if (hasChildren && !items[position].IsCompleted)
+            if (hasChildren && !Items[position].IsCompleted)
             {
                 vh.LockedChildrenTease.Visibility = ViewStates.Visible;
-                int childCount = items[position].ChildTasks.Count();
+                int childCount = Items[position].ChildTasks.Count();
                 vh.LockedChildrenTease.Text = string.Format(
                     context.GetString(Resource.String.taskLockedParent),
                     childCount,
                     (childCount > 1)? "s" : "");
             }
-            else if(hasChildren && items[position].IsCompleted)
+            else if(hasChildren && Items[position].IsCompleted)
             {
                 vh.LockedChildrenTease.Visibility = ViewStates.Visible;
                 vh.LockedChildrenTease.Text = context.GetString(Resource.String.taskUnlockedParent);
@@ -556,7 +599,7 @@ namespace OurPlace.Android.Adapters
                 vh.LockedChildrenTease.Visibility = ViewStates.Gone;
             }
 
-            onBind = false;
+            OnBind = false;
         }
 
         public void DeleteFile(int taskId, int fileIndex)
@@ -584,11 +627,11 @@ namespace OurPlace.Android.Adapters
 
                 info.Delete();
                 paths.RemoveAt(fileIndex);
-                items[taskIndex].CompletionData.JsonData = JsonConvert.SerializeObject(paths);
+                Items[taskIndex].CompletionData.JsonData = JsonConvert.SerializeObject(paths);
 
                 if (paths.Count == 0)
                 {
-                    items[taskIndex].IsCompleted = false;
+                    Items[taskIndex].IsCompleted = false;
                     CheckForChildren(taskIndex);
                 }
 
@@ -603,98 +646,59 @@ namespace OurPlace.Android.Adapters
             }
         }
 
-        private void HandlePhotoDeletion(int taskIndex, int photoIndex)
-        {
-            new AlertDialog.Builder(context)
-                .SetTitle(Resource.String.deleteTitle)
-                .SetMessage(Resource.String.deleteMessage)
-                .SetNegativeButton(Resource.String.dialog_cancel, (a, e) => { })
-                .SetPositiveButton(Resource.String.DeleteBtn, (a, e) =>
-                {
-                    try
-                    {
-                        List<string> paths = JsonConvert.DeserializeObject<List<string>>(items[taskIndex].CompletionData.JsonData);
-                        string deletePath = paths[photoIndex];
-
-                        FileInfo info = new FileInfo(deletePath);
-
-                        if (info.Exists)
-                        {
-                            info.Delete();
-                        }
-
-                        paths.RemoveAt(photoIndex);
-                        items[taskIndex].CompletionData.JsonData = JsonConvert.SerializeObject(paths);
-
-                        if (paths.Count == 0)
-                        {
-                            items[taskIndex].IsCompleted = false;
-                            CheckForChildren(taskIndex);
-                        }
-
-                        NotifyItemChanged(taskIndex);
-                    }
-                    catch (Exception ex)
-                    {
-                        Toast.MakeText(context, "Deletion error: " + ex.Message, ToastLength.Long).Show();
-                    }
-                })
-                .Show();
-        }
-
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             // Inflate the CardView for the task:
-            View itemView = null;
+            View itemView;
 
             switch (viewType)
             {
-                case TASK_SCAN:
-                case TASK_LISTEN:
-                case TASK_LOCATIONHUNT:
+                case TaskScan:
+                case TaskListen:
+                case TaskLocationHunt:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
-                    TaskViewHolder_Btn bvh = new TaskViewHolder_Btn(itemView, OnSpeakClick, OnClick);
+                    TaskViewHolderBtn bvh = new TaskViewHolderBtn(itemView, OnSpeakClick, OnClick);
                     return bvh;
-                case TASK_INFO:
+                case TaskInfo:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Info, parent, false);
-                    TaskViewHolder_Info ivh = new TaskViewHolder_Info(itemView, OnSpeakClick, OnClick);
+                    TaskViewHolderInfo ivh = new TaskViewHolderInfo(itemView, OnSpeakClick, OnClick);
                     return ivh;
-                case TASK_DRAWING:
-                case TASK_PHOTO:
+                case TaskDrawing:
+                case TaskPhoto:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
-                    TaskViewHolder_ResultList pvh = new TaskViewHolder_ResultList(itemView, OnSpeakClick, OnClick, OnMediaClick);
+                    TaskViewHolderResultList pvh = new TaskViewHolderResultList(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return pvh;
-                case TASK_MULTIPLECHOICE:
+                case TaskMultipleChoice:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_MultipleChoice, parent, false);
-                    TaskViewHolder_MultipleChoice vmh = new TaskViewHolder_MultipleChoice(itemView, OnSpeakClick);
+                    TaskViewHolderMultipleChoice vmh = new TaskViewHolderMultipleChoice(itemView, OnSpeakClick);
                     return vmh;
-                case TASK_LOCATIONMARKER:
+                case TaskLocationMarker:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Map, parent, false);
-                    TaskViewHolder_Map mvh = new TaskViewHolder_Map(itemView, OnSpeakClick, OnClick);
+                    TaskViewHolderMap mvh = new TaskViewHolderMap(itemView, OnSpeakClick, OnClick);
                     return mvh;
-                case TASK_TEXTENTRY:
+                case TaskTextEntry:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_TextEntry, parent, false);
-                    TaskViewHolder_TextEntry tvh = new TaskViewHolder_TextEntry(itemView, OnSpeakClick, OnText);
+                    TaskViewHolderTextEntry tvh = new TaskViewHolderTextEntry(itemView, OnSpeakClick, OnText);
                     return tvh;
-                case TASK_VIDEO:
+                case TaskVideo:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
-                    TaskViewHolder_RecordVideo vvh = new TaskViewHolder_RecordVideo(itemView, OnSpeakClick, OnClick, OnMediaClick);
+                    TaskViewHolderRecordVideo vvh = new TaskViewHolderRecordVideo(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return vvh;
-                case TASK_AUDIO:
+                case TaskAudio:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_ResultList, parent, false);
-                    TaskViewHolder_RecordAudio avh = new TaskViewHolder_RecordAudio(itemView, OnSpeakClick, OnClick, OnMediaClick);
+                    TaskViewHolderRecordAudio avh = new TaskViewHolderRecordAudio(itemView, OnSpeakClick, OnClick, OnMediaClick);
                     return avh;
-                case FINISH:
+                case Finish:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
-                    ButtonViewHolder fbvh = new ButtonViewHolder(itemView, OnClick);
-                    return fbvh;
-                case CURATE:
+                    ButtonViewHolder finishViewHolder = new ButtonViewHolder(itemView, OnClick);
+                    return finishViewHolder;
+                case Curate:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.CuratorCard, parent, false);
                     CuratorViewHolder curateCard = new CuratorViewHolder(itemView, OnCurate);
                     return curateCard;
-                case NAMES:
+                case Names:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Name, parent, false);
-                    TaskViewHolder_Name nameCard = new TaskViewHolder_Name(itemView, OnSpeakClick, OnChangeNameClick);
+                    TaskViewHolderName nameCard = new TaskViewHolderName(itemView, OnSpeakClick, OnChangeNameClick);
                     return nameCard;
                 default:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard, parent, false);
@@ -705,18 +709,28 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemViewType(int position)
         {
-            if (curator)
+            if (Curator)
             {
-                if (position == 0) return CURATE;
-                if (position == 1) return NAMES;
+                switch (position)
+                {
+                    case 0:
+                        return Curate;
+                    case 1:
+                        return Names;
+                }
             }
 
-            if (position == 0) return NAMES;
-            if (position >= items.Count - 1) return FINISH;
+            if (position == 0)
+            {
+                return Names;
+            }
 
-            if (viewTypes.ContainsKey(items[position].TaskType.IdName))
-                return viewTypes[items[position].TaskType.IdName];
-            return 0; // Default to base layout (All types will populate this correctly)
+            if (position >= Items.Count - 1)
+            {
+                return Finish;
+            }
+
+            return viewTypes.ContainsKey(Items[position].TaskType.IdName) ? viewTypes[Items[position].TaskType.IdName] : 0;
         }
     }
 

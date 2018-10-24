@@ -36,6 +36,7 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Debug = System.Diagnostics.Debug;
 
 namespace OurPlace.Android.Activities
 {
@@ -43,21 +44,19 @@ namespace OurPlace.Android.Activities
     {
         private Bitmap mBitmap;
         private Canvas mCanvas;
-        private global::Android.Graphics.Path mPath;
-        private Paint mBitmapPaint;
-        public Paint mPaint;
-        Context context;
+        private readonly global::Android.Graphics.Path mPath;
+        private readonly Paint mBitmapPaint;
+        public Paint MPaint;
 
         public PaintView(Context c, global::Android.Util.IAttributeSet att) : base(c, att)
         {
-            context = c;
             mPath = new global::Android.Graphics.Path();
             mBitmapPaint = new Paint(PaintFlags.AntiAlias);
         }
 
-        protected override void OnSizeChanged(int w, int h, int oldw, int oldh)
+        protected override void OnSizeChanged(int w, int h, int oldWidth, int oldHeight)
         {
-            base.OnSizeChanged(w, h, oldw, oldh);
+            base.OnSizeChanged(w, h, oldWidth, oldHeight);
             mBitmap = Bitmap.CreateBitmap(w, h, Bitmap.Config.Argb8888);
             mCanvas = new Canvas(mBitmap);
         }
@@ -66,13 +65,13 @@ namespace OurPlace.Android.Activities
         {
             base.OnDraw(canvas);
             canvas.DrawBitmap(mBitmap, 0, 0, mBitmapPaint);
-            canvas.DrawPath(mPath, mPaint);
+            canvas.DrawPath(mPath, MPaint);
         }
 
         private float mX, mY;
-        private const float TOUCH_TOLERANCE = 4;
+        private const float TouchTolerance = 4;
 
-        private void touch_start(float x, float y)
+        private void Touch_start(float x, float y)
         {
             mPath.Reset();
             mPath.MoveTo(x, y);
@@ -80,23 +79,25 @@ namespace OurPlace.Android.Activities
             mY = y;
         }
 
-        private void touch_move(float x, float y)
+        private void Touch_move(float x, float y)
         {
             float dx = Math.Abs(x - mX);
             float dy = Math.Abs(y - mY);
-            if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
+            if (!(dx >= TouchTolerance) && !(dy >= TouchTolerance))
             {
-                mPath.QuadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-                mX = x;
-                mY = y;
+                return;
             }
+
+            mPath.QuadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
         }
 
         private void touch_up()
         {
             mPath.LineTo(mX, mY);
             // commit the path to our offscreen
-            mCanvas.DrawPath(mPath, mPaint);
+            mCanvas.DrawPath(mPath, MPaint);
             // kill this so we don't double draw
             mPath.Reset();
         }
@@ -109,11 +110,11 @@ namespace OurPlace.Android.Activities
             switch (e.Action)
             {
                 case MotionEventActions.Down:
-                    touch_start(x, y);
+                    Touch_start(x, y);
                     Invalidate();
                     break;
                 case MotionEventActions.Move:
-                    touch_move(x, y);
+                    Touch_move(x, y);
                     Invalidate();
                     break;
                 case MotionEventActions.Up:
@@ -133,8 +134,8 @@ namespace OurPlace.Android.Activities
         private ImageViewAsync bgImage;
         private ColorPickerView colorPickerView;
         private const int Save = Menu.First;
-        public LearningTask learningTask;
-        public string previousImage;
+        public LearningTask LearningTask;
+        public string PreviousImage;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -142,40 +143,38 @@ namespace OurPlace.Android.Activities
             SetContentView(Resource.Layout.PaintActivity);
 
             string thisJsonData = Intent.GetStringExtra("JSON") ?? "";
-            learningTask = JsonConvert.DeserializeObject<LearningTask>(thisJsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+            LearningTask = JsonConvert.DeserializeObject<LearningTask>(thisJsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
             // Used if the task requires drawing on top of 
             // a photo taken in another task
-            previousImage = Intent.GetStringExtra("PREVIOUS_PHOTO");
+            PreviousImage = Intent.GetStringExtra("PREVIOUS_PHOTO");
 
-            SupportActionBar.Title = learningTask.Description;
+            SupportActionBar.Title = LearningTask.Description;
 
-            mPaint = new Paint();
-            mPaint.AntiAlias = true;
-            mPaint.Color = Color.Black;
+            mPaint = new Paint { AntiAlias = true, Color = Color.Black };
             mPaint.SetStyle(Paint.Style.Stroke);
             mPaint.StrokeJoin = (Paint.Join.Round);
             mPaint.StrokeCap = (Paint.Cap.Round);
             mPaint.StrokeWidth = 20;
 
             mv = FindViewById<PaintView>(Resource.Id.paintview);
-            mv.mPaint = mPaint;
+            mv.MPaint = mPaint;
             mv.DrawingCacheEnabled = true;
 
             bgImage = FindViewById<ImageViewAsync>(Resource.Id.paintBackground);
 
-            if (learningTask.TaskType.IdName == "DRAW_PHOTO")
+            if (LearningTask.TaskType.IdName == "DRAW_PHOTO")
             {
-                if(string.IsNullOrWhiteSpace(previousImage))
+                if(string.IsNullOrWhiteSpace(PreviousImage))
                 {
-                    ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(learningTask.JsonData))
-                        .DownSample(width: 500)
+                    ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(LearningTask.JsonData))
+                        .DownSample(500)
                         .Into(bgImage);
                 }
                 else
                 {
-                    ImageService.Instance.LoadFile(previousImage)
-                        .DownSample(width: 500)
+                    ImageService.Instance.LoadFile(PreviousImage)
+                        .DownSample(500)
                         .Into(bgImage);
                 }
             }
@@ -195,14 +194,16 @@ namespace OurPlace.Android.Activities
         {
             Dictionary<string, string> properties = new Dictionary<string, string>
             {
-                {"TaskId", learningTask?.Id.ToString() }
+                {"TaskId", LearningTask?.Id.ToString() }
             };
             Analytics.TrackEvent("DrawingActivity", properties);
 
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
-            myIntent.PutExtra("TASK_ID", learningTask.Id);
+
+            Debug.Assert(LearningTask != null, nameof(LearningTask) + " != null");
+            myIntent.PutExtra("TASK_ID", LearningTask.Id);
             myIntent.PutExtra("FILE_PATH", imagePath);
-            SetResult(global::Android.App.Result.Ok, myIntent);
+            SetResult(Result.Ok, myIntent);
             Finish();
         }
 
@@ -220,7 +221,7 @@ namespace OurPlace.Android.Activities
             canvas.DrawBitmap(bgLayer, new Matrix(), null);
             canvas.DrawBitmap(drawingLayer, 0, 0, null);
 
-            int maxSize = 1280;
+            const int maxSize = 1280;
             int outWidth;
             int outHeight;
             int inWidth = final.Width;

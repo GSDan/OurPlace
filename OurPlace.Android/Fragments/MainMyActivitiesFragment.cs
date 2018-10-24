@@ -54,98 +54,70 @@ namespace OurPlace.Android.Fragments
         private GridLayoutManager layoutManager;
         private TextView fabPrompt;
         private SwipeRefreshLayout refresher;
-        private readonly int permReqId = 111;
+        private const int PermReqId = 111;
         private List<LearningActivity> unsubmittedActivities;
         private TextView uploadsHint;
-        private bool loading = false;
-        public static bool Loaded = false;
-        private DatabaseManager dbManager;
+        private bool refreshingData = true;
+        private bool viewLoaded;
+        public static bool ForceRefresh;
 
-        public override void OnCreate(Bundle savedInstanceState)
+        public override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-        }
 
-        private async Task InitialLoad()
-        {
-            try
-            {
-                dbManager = await Storage.GetDatabaseManager();
+            // Load from cached data from the database if available, 
+            // just in case we can't contact the server
+            List<ActivityFeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
 
-                // Load from cached data from the database if available, 
-                // just in case we can't contact the server
-                string jsonCache = dbManager.currentUser.RemoteCreatedActivitiesJson;
-                List<LearningActivity> cached = null;
+            var metrics = Resources.DisplayMetrics;
+            var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
+            int cols = Math.Max(widthInDp / 300, 1);
 
-                if (!string.IsNullOrWhiteSpace(jsonCache))
-                {
-                    cached = JsonConvert.DeserializeObject<List<LearningActivity>>(jsonCache,
-                        new JsonSerializerSettings
-                        {
-                            //TypeNameHandling = TypeNameHandling.Objects,
-                            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                            MaxDepth = 10
-                        });
-                }
-
-                LoadIntoFeed(cached);
-                LoadData();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.Message);
-                dbManager.currentUser.RemoteCreatedActivitiesJson = null;
-                dbManager.AddUser(dbManager.currentUser);
-            }
+            adapter = new LearningActivitiesAdapter(cached, await ((MainActivity)Activity).GetDbManager());
+            adapter.ItemClick += OnItemClick;
+            layoutManager = new GridLayoutManager(Activity, cols);
+            layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
         }
 
         public override async void OnResume()
         {
             base.OnResume();
 
-            if(dbManager == null)
+            if (viewLoaded && !refreshingData && ForceRefresh)
             {
-                await InitialLoad();
+                LoadRemoteData();
             }
 
-            if (!Loaded && !loading)
-            {
-                LoadData();
-            }
-
-            if (uploadsHint != null && dbManager != null)
-            {
-                uploadsHint.Visibility = (dbManager.GetUploadQueue().Count() > 0) ?
+            uploadsHint.Visibility = ((await ((MainActivity)Activity).GetDbManager()).GetUploadQueue().Any()) ?
                     ViewStates.Visible : ViewStates.Gone;
-            }
         }
 
         public override bool UserVisibleHint
         {
-            get
-            {
-                return base.UserVisibleHint;
-            }
+            get => base.UserVisibleHint;
 
             set
             {
-                if (value && !Loaded && !loading)
+                if (value && viewLoaded && !refreshingData && ForceRefresh)
                 {
-                    LoadData();
+                    LoadRemoteData();
                 }
 
                 base.UserVisibleHint = value;
             }
         }
 
-        private async void LoadData()
+        private async void LoadRemoteData()
         {
             try
             {
-                loading = true;
+                refreshingData = true;
                 refresher.Refreshing = true;
-                Common.ServerResponse<List<LearningActivity>> results =
-                    await Common.ServerUtils.Get<List<LearningActivity>>(
+
+                DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
+
+                ServerResponse<List<LearningActivity>> results =
+                    await ServerUtils.Get<List<LearningActivity>>(
                         "/api/learningactivities/getfromuser/?creatorId=" + dbManager.currentUser.Id);
                 refresher.Refreshing = false;
 
@@ -173,7 +145,8 @@ namespace OurPlace.Android.Fragments
                 dbManager.AddUser(dbManager.currentUser);
 
                 LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
-                loading = false;
+
+                refreshingData = false;
             }
             catch(Exception e)
             {
@@ -181,11 +154,11 @@ namespace OurPlace.Android.Fragments
             }
         }
 
-        private void LoadIntoFeed(List<LearningActivity> remoteData)
+        private async Task LoadIntoFeed(List<LearningActivity> remoteData)
         {
             List<ActivityFeedSection> feed = new List<ActivityFeedSection>();
 
-            string unsubmittedActivitiesJson = dbManager.currentUser.LocalCreatedActivitiesJson;
+            string unsubmittedActivitiesJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedActivitiesJson;
             unsubmittedActivities = null;
 
             if (!string.IsNullOrWhiteSpace(unsubmittedActivitiesJson))
@@ -223,62 +196,53 @@ namespace OurPlace.Android.Fragments
             }
 
             // Set up the adapter if needed, adding the feed data
-            if (adapter == null)
-            {
-                var metrics = Resources.DisplayMetrics;
-                var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
-                int cols = Math.Max(widthInDp / 300, 1);
-
-                adapter = new LearningActivitiesAdapter(feed, dbManager);
-                adapter.ItemClick += OnItemClick;
-                layoutManager = new GridLayoutManager(Activity, cols);
-                layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
-
-                recyclerView.SetAdapter(adapter);
-                recyclerView.SetLayoutManager(layoutManager);
-            }
-            else
-            {
-                adapter.data = feed;
-                adapter.NotifyDataSetChanged();
-            }
-
-            Loaded = true;
+            adapter.Data = feed;
+            adapter.NotifyDataSetChanged();
 
             if(fabPrompt != null)
             {
                 // Hide the fab tutorial if the user has already created an activity
-                fabPrompt.Visibility = (adapter.data.Count > 0) ? ViewStates.Gone : ViewStates.Visible;
+                fabPrompt.Visibility = (adapter.Data.Count > 0) ? ViewStates.Gone : ViewStates.Visible;
             }
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.MainMyActivities, container, false);
-            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            return view;
+        }
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
             uploadsHint = view.FindViewById<TextView>(Resource.Id.uploadsHint);
             fabPrompt = view.FindViewById<TextView>(Resource.Id.fabPrompt);
             refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            refresher.Refresh += (a, e) => { LoadData(); };
+            refresher.Refresh += (a, e) => { LoadRemoteData(); };
             refresher.SetColorSchemeResources(
                 Resource.Color.app_darkgreen,
                 Resource.Color.app_green,
                 Resource.Color.app_lightgreen,
                 Resource.Color.app_lightergreen
-                );
+            );
 
             FloatingActionButton fab = view.FindViewById<FloatingActionButton>(Resource.Id.createActivityFab);
             fab.Click += Fab_Click;
 
-            return view;
+            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            recyclerView.SetLayoutManager(layoutManager);
+            recyclerView.SetAdapter(adapter);
+
+            viewLoaded = true;
+
+            LoadRemoteData();
         }
 
         private void Fab_Click(object sender, EventArgs e)
         {
-            string permission = global::Android.Manifest.Permission.ReadExternalStorage;
+            const string permission = global::Android.Manifest.Permission.ReadExternalStorage;
             Permission currentPerm = ContextCompat.CheckSelfPermission(Activity, permission);
 
-            string writePerm = global::Android.Manifest.Permission.WriteExternalStorage;
+            const string writePerm = global::Android.Manifest.Permission.WriteExternalStorage;
             Permission currentWritePerm = ContextCompat.CheckSelfPermission(Activity, writePerm);
 
             if (currentPerm != Permission.Granted || currentWritePerm != Permission.Granted)
@@ -290,7 +254,7 @@ namespace OurPlace.Android.Fragments
                         .SetTitle(Resources.GetString(Resource.String.permissionFilesTitle))
                         .SetMessage(Resources.GetString(Resource.String.permissionFilesExplanation))
                         .SetPositiveButton("Got it", (s, o) => {
-                            RequestPermissions(new string[] { permission, writePerm }, permReqId);
+                            RequestPermissions(new string[] { permission, writePerm }, PermReqId);
                         })
                         .Create();
                     dialog.Show();
@@ -298,7 +262,7 @@ namespace OurPlace.Android.Fragments
                 else
                 {
                     // No explanation needed, just ask
-                    RequestPermissions(new string[] { permission, writePerm }, permReqId);
+                    RequestPermissions(new string[] { permission, writePerm }, PermReqId);
                 }
             }
             else
@@ -310,7 +274,7 @@ namespace OurPlace.Android.Fragments
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            if (requestCode == permReqId && grantResults.All((p) => p == Permission.Granted))
+            if (requestCode == PermReqId && grantResults.All((p) => p == Permission.Granted))
             {
                 StartCreate();
             }
@@ -319,7 +283,7 @@ namespace OurPlace.Android.Fragments
         private void StartCreate()
         {
             Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
-            Intent intent = new Intent(this.Activity, typeof(CreateNewActivity));
+            Intent intent = new Intent(Activity, typeof(CreateNewActivity));
             StartActivity(intent);
         }
 
@@ -381,15 +345,17 @@ namespace OurPlace.Android.Fragments
             .SetMessage(Resource.String.deleteMessage)
             .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
             .SetCancelable(true)
-            .SetPositiveButton(Resource.String.DeleteBtn, (a, b) => {
+            .SetPositiveButton(Resource.String.DeleteBtn, async (a, b) =>
+            {
                 // Remove this activity from the user's inprogress cache
-                if(unsubmittedActivities != null)
+                if (unsubmittedActivities != null)
                 {
                     unsubmittedActivities.Remove(chosen);
+                    DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
                     dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
                     dbManager.AddUser(dbManager.currentUser);
                 }
-                LoadData();
+                LoadRemoteData();
             })
             .Show();
         }
@@ -431,7 +397,7 @@ namespace OurPlace.Android.Fragments
                 Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
             }
 
-            LoadData();
+            LoadRemoteData();
         }
     }
 }

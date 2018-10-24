@@ -48,9 +48,9 @@ namespace OurPlace.Android.Activities
         private MediaRecorder recorder;
         private MediaPlayer player;
         private string filePath;
-        private float lowAlpha = 0.25f;
+        private const float LowAlpha = 0.25f;
         private Color defaultCol;
-        private volatile bool recording = false;
+        private volatile bool recording;
         private Thread clockThread;
         private Button playBtn;
 
@@ -78,7 +78,7 @@ namespace OurPlace.Android.Activities
                 Color.GetBlueComponent(timer.CurrentTextColor));
 
             image = FindViewById<ImageViewAsync>(Resource.Id.taskImage);
-            image.Alpha = lowAlpha;
+            image.Alpha = LowAlpha;
 
             recordBtn.Click += RecordBtn_Click;
             recordBtn.Text = Resources.GetString(Resource.String.StartBtn);
@@ -159,7 +159,7 @@ namespace OurPlace.Android.Activities
                 recorder.Reset();
 
                 recordBtn.Text = Resources.GetString(Resource.String.StartBtn);
-                image.Alpha = lowAlpha;
+                image.Alpha = LowAlpha;
                 clockThread.Join();
 
                 PlaybackAcceptPopup();
@@ -225,9 +225,13 @@ namespace OurPlace.Android.Activities
             Analytics.TrackEvent("RecordAudioActivity_ReturnWithFile", properties);
 
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
-            myIntent.PutExtra("TASK_ID", learningTask.Id);
+            if (learningTask != null)
+            {
+                myIntent.PutExtra("TASK_ID", learningTask.Id);
+            }
+
             myIntent.PutExtra("FILE_PATH", filePath);
-            SetResult(global::Android.App.Result.Ok, myIntent);
+            SetResult(Result.Ok, myIntent);
             Finish();
         }
     }

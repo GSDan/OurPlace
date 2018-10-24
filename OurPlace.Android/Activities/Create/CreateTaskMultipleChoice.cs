@@ -96,7 +96,10 @@ namespace OurPlace.Android.Activities.Create
 
         private void CreateTaskMultipleChoice_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(newEntryText.Text)) return;
+            if (string.IsNullOrWhiteSpace(newEntryText.Text))
+            {
+                return;
+            }
 
             AddChoice(newEntryText.Text);
             newEntryText.Text = "";

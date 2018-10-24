@@ -41,24 +41,24 @@ namespace OurPlace.Android.Listeners
         public override void OnConfigured(CameraCaptureSession session)
         {
             // The camera is already closed
-            if (null == Owner.mCameraDevice)
+            if (null == Owner.MCameraDevice)
             {
                 return;
             }
 
             // When the session is ready, we start displaying the preview.
-            Owner.mCaptureSession = session;
+            Owner.MCaptureSession = session;
             try
             {
                 // Auto focus should be continuous for camera preview.
-                Owner.mPreviewRequestBuilder.Set(CaptureRequest.ControlAfMode, (int)ControlAFMode.ContinuousPicture);
+                Owner.MPreviewRequestBuilder.Set(CaptureRequest.ControlAfMode, (int)ControlAFMode.ContinuousPicture);
                 // Flash is automatically enabled when necessary.
-                Owner.SetAutoFlash(Owner.mPreviewRequestBuilder);
+                Owner.SetAutoFlash(Owner.MPreviewRequestBuilder);
 
                 // Finally, we start displaying the camera preview.
-                Owner.mPreviewRequest = Owner.mPreviewRequestBuilder.Build();
-                Owner.mCaptureSession.SetRepeatingRequest(Owner.mPreviewRequest,
-                        Owner.mCaptureCallback, Owner.mBackgroundHandler);
+                Owner.MPreviewRequest = Owner.MPreviewRequestBuilder.Build();
+                Owner.MCaptureSession.SetRepeatingRequest(Owner.MPreviewRequest,
+                        Owner.MCaptureCallback, Owner.MBackgroundHandler);
             }
             catch (CameraAccessException e)
             {

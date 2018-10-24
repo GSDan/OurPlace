@@ -41,7 +41,6 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Fragments
 {
@@ -51,97 +50,57 @@ namespace OurPlace.Android.Fragments
         private RecyclerView recyclerView;
         private GridLayoutManager layoutManager;
         private SwipeRefreshLayout refresher;
-        private bool loaded = false;
+        private bool viewLoaded;
         private bool loading = true;
         public static bool ForceRefresh;
-        private int permReqId = 111;
+        private const int PermReqId = 111;
         private GoogleApiClient googleApiClient;
-        private DatabaseManager dbManager;
 
-        public override void OnCreate(Bundle savedInstanceState)
+        public override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            dbManager = GetDatabaseManager().Result;
-
-            if (dbManager == null || dbManager.currentUser == null)
-            {
-                // Something bad has happened, log out
-                var suppress = AndroidUtils.ReturnToSignIn(Activity);
-                return;
-            }
-
             // Load from cached data from the database if available, 
             // just in case we can't contact the server
-            string jsonCache = dbManager.currentUser.CachedActivitiesJson;
-            List<ActivityFeedSection> cached = null;
-
-            if (!string.IsNullOrWhiteSpace(jsonCache))
-            {
-                try
-                {
-                    cached = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(jsonCache,
-                        new JsonSerializerSettings
-                        {
-                            //TypeNameHandling = TypeNameHandling.Objects,
-                            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                            MaxDepth = 10
-                        });
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    Toast.MakeText(Activity, Resource.String.errorCache, ToastLength.Long).Show();
-                    cached = new List<ActivityFeedSection>();
-                    dbManager.currentUser.CachedActivitiesJson = null;
-                    dbManager.AddUser(dbManager.currentUser);
-                }
-            }
-            else
-            {
-                cached = new List<ActivityFeedSection>();
-            }
+            List<ActivityFeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
 
             // Check for recently opened activities
-            ActivityFeedSection recents = LoadRecent();
-            if (recents != null) cached.Insert(0, recents);
-
-            int cols = 2;
+            ActivityFeedSection recents = await LoadRecent();
+            if (recents != null)
+            {
+                cached.Insert(0, recents);
+            }
 
             var metrics = Resources.DisplayMetrics;
             var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
 
-            cols = Math.Max(widthInDp / 300, 1);
+            int cols = Math.Max(widthInDp / 300, 1);
 
-            adapter = new LearningActivitiesAdapter(cached, dbManager);
+            adapter = new LearningActivitiesAdapter(cached, await ((MainActivity)Activity).GetDbManager());
             adapter.ItemClick += OnItemClick;
 
             if (savedInstanceState != null)
             {
-                adapter.data = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
+                adapter.Data = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
                 adapter.NotifyDataSetChanged();
             }
 
             layoutManager = new GridLayoutManager(Activity, cols);
             layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
 
-            if (AndroidUtils.IsGooglePlayServicesInstalled(Activity) && googleApiClient == null)
-            {
-                googleApiClient = new GoogleApiClient.Builder(Activity)
-                    .AddConnectionCallbacks(this)
-                    .AddOnConnectionFailedListener(this)
-                    .AddApi(LocationServices.API)
-                    .Build();
-                googleApiClient?.Connect();
-            }
+            if (!AndroidUtils.IsGooglePlayServicesInstalled(Activity) || googleApiClient != null) return;
+
+            googleApiClient = new GoogleApiClient.Builder(Activity)
+                .AddConnectionCallbacks(this)
+                .AddOnConnectionFailedListener(this)
+                .AddApi(LocationServices.API)
+                .Build();
+            googleApiClient?.Connect();
         }
 
         public override void OnStop()
         {
-            if (googleApiClient != null)
-            {
-                googleApiClient.Disconnect();
-            }
+            googleApiClient?.Disconnect();
             base.OnStop();
         }
 
@@ -149,7 +108,7 @@ namespace OurPlace.Android.Fragments
         {
             base.OnResume();
 
-            if ((!loaded || ForceRefresh) && !loading)
+            if (viewLoaded && ForceRefresh && !loading)
             {
                 LoadData();
             }
@@ -157,14 +116,11 @@ namespace OurPlace.Android.Fragments
 
         public override bool UserVisibleHint
         {
-            get
-            {
-                return base.UserVisibleHint;
-            }
+            get => base.UserVisibleHint;
 
             set
             {
-                if (value && !loading && (ForceRefresh || !loaded))
+                if (value && viewLoaded && !loading && ForceRefresh)
                 {
                     CheckLocationPermission();
                 }
@@ -177,7 +133,7 @@ namespace OurPlace.Android.Fragments
         {
             loading = true;
             refresher.Refreshing = true;
-            string permission = global::Android.Manifest.Permission.AccessFineLocation;
+            const string permission = global::Android.Manifest.Permission.AccessFineLocation;
             Permission currentPerm = ContextCompat.CheckSelfPermission(Activity, permission);
             if (currentPerm != Permission.Granted)
             {
@@ -201,7 +157,7 @@ namespace OurPlace.Android.Fragments
                     {
                         // We've asked before, and they declined. Might be set to 'never ask again',
                         // so don't show explanation                     
-                        RequestPermissions(new string[] { permission }, permReqId);
+                        RequestPermissions(new string[] { permission }, PermReqId);
                     }
                 }
             }
@@ -218,7 +174,7 @@ namespace OurPlace.Android.Fragments
                         .SetMessage(Resources.GetString(Resource.String.permissionLocationActivitiesExplanation))
                         .SetPositiveButton("Got it", (s, o) =>
                         {
-                            RequestPermissions(new string[] { permission }, permReqId);
+                            RequestPermissions(new string[] { permission }, PermReqId);
                         })
                         .Create();
             dialog.Show();
@@ -227,16 +183,15 @@ namespace OurPlace.Android.Fragments
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            if (requestCode == permReqId)
-            {
-                // Save that we have already asked permission for location
-                ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Activity);
-                ISharedPreferencesEditor editor = prefs.Edit();
-                editor.PutBoolean("has_asked_loc_perm", true);
-                editor.Apply();
+            if (requestCode != PermReqId) return;
 
-                LoadData(grantResults[0] == Permission.Granted);
-            }
+            // Save that we have already asked permission for location
+            ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Activity);
+            ISharedPreferencesEditor editor = prefs.Edit();
+            editor.PutBoolean("has_asked_loc_perm", true);
+            editor.Apply();
+
+            LoadData(grantResults[0] == Permission.Granted);
         }
 
         private async void LoadData(bool withLocation = false)
@@ -255,18 +210,16 @@ namespace OurPlace.Android.Fragments
                     await Task.Run(() => {
 
                         global::Android.Locations.Location lastKnown = LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
-                        if (lastKnown != null)
-                        {
-                            lat = lastKnown.Latitude;
-                            lon = lastKnown.Longitude;
-                        }
+                        if (lastKnown == null) return;
+
+                        lat = lastKnown.Latitude;
+                        lon = lastKnown.Longitude;
 
                     });
                 }
 
                 Common.ServerResponse<List<ActivityFeedSection>> results =
-                    await Common.ServerUtils.Get<List<ActivityFeedSection>>(
-                        string.Format("/api/learningactivities/GetFeed?lat={0}&lon={1}", lat, lon));
+                    await Common.ServerUtils.Get<List<ActivityFeedSection>>($"/api/learningactivities/GetFeed?lat={lat}&lon={lon}");
 
                 refresher.Refreshing = false;
 
@@ -277,20 +230,30 @@ namespace OurPlace.Android.Fragments
                     return;
                 }
 
-                if (!results.Success && IsAdded && Activity != null)
+                ActivityFeedSection recent = await LoadRecent();
+
+                if (!results.Success)
                 {
-                    // if token invalid, return to signin 
+                    //// if token invalid, return to sign-in 
                     if (Common.ServerUtils.CheckNeedsLogin(results.StatusCode))
                     {
                         var suppress = AndroidUtils.ReturnToSignIn(this.Activity);
                         return;
                     }
 
+                    if (recent != null)
+                    {
+                        adapter.Data[0] = recent;
+                        adapter.NotifyDataSetChanged();
+                    }
+                    
                     Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
                     return;
                 }
 
                 // Save this in the offline cache
+                DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
+
                 dbManager.currentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
                     {
@@ -301,13 +264,16 @@ namespace OurPlace.Android.Fragments
                 dbManager.AddUser(dbManager.currentUser);
 
                 // Check for recently opened activities
-                ActivityFeedSection recents = LoadRecent();
-                if (recents != null) results.Data.Insert(0, recents);
+                
+                if (recent != null)
+                {
+                    results.Data.Insert(0, recent);
+                }
 
-                adapter.data = results.Data;
+                adapter.Data = results.Data;
                 adapter.NotifyDataSetChanged();
                 ForceRefresh = false;
-                loaded = true;
+                viewLoaded = true;
                 loading = false;
             }
             catch(Exception e)
@@ -320,9 +286,9 @@ namespace OurPlace.Android.Fragments
         /// Load recently opened Activities
         /// </summary>
         /// <returns></returns>
-        private ActivityFeedSection LoadRecent()
+        private async Task<ActivityFeedSection> LoadRecent()
         {
-            List<LearningActivity> recentlyOpened = dbManager.GetActivities();
+            List<LearningActivity> recentlyOpened = (await((MainActivity)Activity).GetDbManager()).GetActivities();
             if (recentlyOpened != null && recentlyOpened.Count > 0)
             {
                 return new ActivityFeedSection
@@ -340,7 +306,7 @@ namespace OurPlace.Android.Fragments
             LearningActivity act = adapter.GetItem(position);
             if (act != null)
             {
-                loaded = false;
+                viewLoaded = false;
                 ((MainActivity)Activity).LaunchActivity(act);
             }
             else
@@ -369,7 +335,7 @@ namespace OurPlace.Android.Fragments
             recyclerView.SetLayoutManager(layoutManager);
             recyclerView.SetAdapter(adapter);
 
-            loaded = true;
+            viewLoaded = true;
 
             CheckLocationPermission();
 
@@ -379,13 +345,13 @@ namespace OurPlace.Android.Fragments
         public override void OnSaveInstanceState(Bundle outState)
         {
             base.OnSaveInstanceState(outState);
-            if (adapter != null && adapter.data.Count > 0)
+            if (adapter != null && adapter.Data.Count > 0)
             {
-                outState.PutString("MAIN_ADAPTER_DATA", JsonConvert.SerializeObject(adapter.data));
+                outState.PutString("MAIN_ADAPTER_DATA", JsonConvert.SerializeObject(adapter.Data));
             }
         }
 
-        private void Refresher_Refresh(object sender, System.EventArgs e)
+        private void Refresher_Refresh(object sender, EventArgs e)
         {
             CheckLocationPermission();
         }
@@ -399,10 +365,6 @@ namespace OurPlace.Android.Fragments
         }
 
         public void OnConnectionFailed(ConnectionResult result)
-        {
-        }
-
-        public void OnLocationChanged(global::Android.Locations.Location location)
         {
         }
     }

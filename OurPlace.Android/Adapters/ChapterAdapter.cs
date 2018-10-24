@@ -19,16 +19,17 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
 
 namespace OurPlace.Android.Adapters
 {
-    class ChapterAdapter : RecyclerView.Adapter
+    internal class ChapterAdapter : RecyclerView.Adapter
     {
         private Context context;
         public List<LearningChapter> data;
@@ -66,11 +67,5 @@ namespace OurPlace.Android.Adapters
         {
             throw new NotImplementedException();
         }
-    }
-
-    class ChapterAdapterViewHolder : Java.Lang.Object
-    {
-        //Your adapter views to re-use
-        //public TextView Title { get; set; }
     }
 }

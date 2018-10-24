@@ -240,7 +240,7 @@ namespace colorpicker
 			mNewColorView.setColor(newColor);
 		}
 
-		class SavedState : BaseSavedState {
+	    private class SavedState : BaseSavedState {
 			public int currentColor;
 
 			public SavedState(IParcelable superState) : base(superState) {

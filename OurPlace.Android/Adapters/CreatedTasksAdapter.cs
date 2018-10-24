@@ -19,16 +19,17 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using FFImageLoading.Transformations;
 using FFImageLoading.Views;
-using OurPlace.Common.Models;
-using System;
-using System.Collections.Generic;
 using OurPlace.Common;
+using OurPlace.Common.Models;
 
 namespace OurPlace.Android.Adapters
 {
@@ -41,22 +42,22 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> ManageChildrenItemClick;
 
         public Action SaveProgress;
-        public List<LearningTask> data;
-        private Context context;
+        public List<LearningTask> Data;
+        private readonly Context context;
         private LearningActivity learningActivity;
 
-        public CreatedTasksAdapter(Context _context, LearningActivity learningAct, Action save)
+        public CreatedTasksAdapter(Context context, LearningActivity learningAct, Action save)
         {
             if (learningAct.LearningTasks != null)
             {
-                data = (List<LearningTask>)learningAct.LearningTasks;
+                Data = (List<LearningTask>)learningAct.LearningTasks;
             }
             else
             {
-                data = new List<LearningTask>();
+                Data = new List<LearningTask>();
             }
 
-            context = _context;
+            this.context = context;
             learningActivity = learningAct;
             SaveProgress = save;
         }
@@ -71,16 +72,23 @@ namespace OurPlace.Android.Adapters
         {
             get
             {
-                if (data == null) return 2;
-                return data.Count + 2;
+                if (Data == null)
+                {
+                    return 2;
+                }
+
+                return Data.Count + 2;
             }
         }
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0) return 0;
-            if (position > data.Count) return 2;
-            return 1;
+            if (position == 0)
+            {
+                return 0;
+            }
+
+            return position > Data.Count ? 2 : 1;
         }
 
         private void OnEditActivityClick(int position)
@@ -110,16 +118,19 @@ namespace OurPlace.Android.Adapters
 
         private void LoadImage(int position, ImageViewAsync view)
         {
-            if (data[position] == null || data[position].TaskType == null) return;
+            if (Data[position] == null || Data[position].TaskType == null)
+            {
+                return;
+            }
 
-            if (string.IsNullOrEmpty(data[position].TaskType.IconUrl))
+            if (string.IsNullOrEmpty(Data[position].TaskType.IconUrl))
             {
                 ImageService.Instance.LoadCompiledResource("OurPlace_logo")
                     .Into(view);
             }
             else
             {
-                ImageService.Instance.LoadUrl(data[position].TaskType.IconUrl)
+                ImageService.Instance.LoadUrl(Data[position].TaskType.IconUrl)
                     .Transform(new CircleTransformation())
                     .Into(view);
             }
@@ -129,7 +140,11 @@ namespace OurPlace.Android.Adapters
         {
             if (position == 0)
             {
-                ActivityViewHolder avh = holder as ActivityViewHolder;
+                if (!(holder is ActivityViewHolder avh))
+                {
+                    return;
+                }
+
                 avh.Title.Text = learningActivity.Name;
                 avh.Description.Text = learningActivity.Description;
 
@@ -139,23 +154,29 @@ namespace OurPlace.Android.Adapters
                         .Transform(new CircleTransformation())
                         .Into(avh.TaskTypeIcon);
                 }
+
                 return;
             }
-            else if (position > data.Count)
+
+            if (position > Data.Count)
             {
                 // Allow the activity to be submitted if there's at least one task
                 ButtonViewHolder bvh = holder as ButtonViewHolder;
-                bvh.Button.Enabled = data.Count > 0;
+                bvh.Button.Enabled = Data.Count > 0;
                 return;
             }
 
             position--;
 
-            TaskViewHolder_CreatedTask vh = holder as TaskViewHolder_CreatedTask;
-            vh.Title.Text = data[position].TaskType.DisplayName;
-            vh.Description.Text = data[position].Description;
+            if (!(holder is TaskViewHolderCreatedTask vh))
+            {
+                return;
+            }
 
-            if (((List<LearningTask>)data[position].ChildTasks).Count > 0)
+            vh.Title.Text = Data[position].TaskType.DisplayName;
+            vh.Description.Text = Data[position].Description;
+
+            if (((List<LearningTask>) Data[position].ChildTasks).Count > 0)
             {
                 vh.ManageChildrenBtn.Text = context.GetString(Resource.String.createTaskChildrenManage);
             }
@@ -170,23 +191,26 @@ namespace OurPlace.Android.Adapters
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            if (viewType == 0)
+            switch (viewType)
             {
-                // The Activity details at the top of the list
-                View activityView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Activity, parent, false);
-                ActivityViewHolder avh = new ActivityViewHolder(activityView, null, OnEditActivityClick);
-                return avh;
-            }
-            else if (viewType == 2)
-            {
-                // The finish button at the bottom of the list
-                View finishView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
-                ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
-                return bvh;
+                case 0:
+                {
+                    // The Activity details at the top of the list
+                    View activityView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Activity, parent, false);
+                    ActivityViewHolder avh = new ActivityViewHolder(activityView, null, OnEditActivityClick);
+                    return avh;
+                }
+                case 2:
+                {
+                    // The finish button at the bottom of the list
+                    View finishView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
+                    ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
+                    return bvh;
+                }
             }
 
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.CreateTaskCard, parent, false);
-            TaskViewHolder_CreatedTask vh = new TaskViewHolder_CreatedTask(itemView, null, OnDeleteItemClick, OnEditItemClick, OnManageChildrenClick);
+            TaskViewHolderCreatedTask vh = new TaskViewHolderCreatedTask(itemView, null, OnDeleteItemClick, OnEditItemClick, OnManageChildrenClick);
             return vh;
         }
 
@@ -195,21 +219,18 @@ namespace OurPlace.Android.Adapters
             // Account for the header and finish cards
             int dataFrom = fromPosition - 1;
 
-            if (dataFrom < 0 || dataFrom >= data.Count)
+            if (dataFrom < 0 || dataFrom >= Data.Count)
             {
                 return false;
             }
 
-            int dataTo = Math.Min(toPosition - 1, data.Count - 1);
+            int dataTo = Math.Min(toPosition - 1, Data.Count - 1);
             dataTo = Math.Max(dataTo, 0);
 
-            data.Swap(dataFrom, dataTo);
+            Data.Swap(dataFrom, dataTo);
             NotifyItemMoved(fromPosition, toPosition);
 
-            if(SaveProgress != null)
-            {
-                SaveProgress();
-            }
+            SaveProgress?.Invoke();
 
             return true;
         }
@@ -221,10 +242,17 @@ namespace OurPlace.Android.Adapters
 
         public override long GetItemId(int position)
         {
-            if (position == 0) return -2;
-            if (position >= data.Count) return -1;
+            if (position == 0)
+            {
+                return -2;
+            }
 
-            return data[position].Id;
+            if (position >= Data.Count)
+            {
+                return -1;
+            }
+
+            return Data[position].Id;
         }
     }
 }

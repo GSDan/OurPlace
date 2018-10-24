@@ -19,6 +19,7 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
 using System;
 using System.Collections.Generic;
 using Android.Content;
@@ -33,29 +34,25 @@ namespace OurPlace.Android.Adapters
     {
         public event EventHandler<int> UploadClick;
         public event EventHandler<int> DeleteClick;
-        public List<AppDataUpload> data;
-        public Context context;
+        public List<AppDataUpload> Data;
+        public Context Context;
 
-        public UploadsAdapter(Context _context, List<AppDataUpload> _data)
+        public UploadsAdapter(Context context, List<AppDataUpload> data)
         {
-            data = _data;
-            context = _context;
+            Data = data;
+            Context = context;
         }
 
-        public override int ItemCount
-        {
-            get
-            {
-                if (data == null) return 0;
-                return data.Count;
-            }
-        }
+        public override int ItemCount => Data?.Count ?? 0;
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0) return 0;
-            if (position >= data.Count) return 2;
-            return 1;
+            if (position == 0)
+            {
+                return 0;
+            }
+
+            return position >= Data.Count ? 2 : 1;
         }
 
         private void OnUploadClick(int position)
@@ -70,17 +67,21 @@ namespace OurPlace.Android.Adapters
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            TaskViewHolder_UploadCard vh = holder as TaskViewHolder_UploadCard;
-            vh.Title.Text = data[position].Name;
-            vh.Description.Text = data[position].Description;
-            ImageService.Instance.LoadFile(data[position].ImageUrl)
-                    .Into(vh.TaskTypeIcon);
+            if (!(holder is TaskViewHolderUploadCard vh))
+            {
+                return;
+            }
+
+            vh.Title.Text = Data[position].Name;
+            vh.Description.Text = Data[position].Description;
+            ImageService.Instance.LoadFile(Data[position].ImageUrl)
+                .Into(vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.UploadCard, parent, false);
-            TaskViewHolder_UploadCard vh = new TaskViewHolder_UploadCard(itemView, null, OnUploadClick, OnDeleteClick);
+            TaskViewHolderUploadCard vh = new TaskViewHolderUploadCard(itemView, null, OnUploadClick, OnDeleteClick);
             return vh;
         }
     }

@@ -19,9 +19,9 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
-using System;
 
 namespace OurPlace.Android.Adapters
 {

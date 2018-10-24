@@ -36,10 +36,10 @@ namespace OurPlace.Android.Activities
             base.OnCreate(savedInstanceState);
             AppCenter.Start("4b34939c-d3b8-4b89-8ba4-0355c4a4732b", typeof(Analytics), typeof(Crashes));
 
-            Init();
+            Initialise();
         }
 
-        private async void Init()
+        private async void Initialise()
         {
 			if (await Common.LocalData.Storage.InitializeLogin())
 			{

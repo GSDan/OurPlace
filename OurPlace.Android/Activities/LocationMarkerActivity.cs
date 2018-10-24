@@ -42,7 +42,7 @@ namespace OurPlace.Android.Activities
         private AppTask learningTask;
         private Button markButton;
         private Button finishButton;
-        private ProgressDialog progDialog;
+        private ProgressDialog progressDialog;
         private TextView locationCountText;
         private MapMarkerTaskData taskData;
 
@@ -65,15 +65,15 @@ namespace OurPlace.Android.Activities
             MapFragment mapFrag = (MapFragment)FragmentManager.FindFragmentById(Resource.Id.map);
             mapFrag.GetMapAsync(this);
 
-            progDialog = new ProgressDialog(this);
-            progDialog.SetTitle(Resource.String.PleaseWait);
-            progDialog.SetMessage(Resources.GetString(Resource.String.mapLoadingMessage)); // Why Xamarin, why??
-            progDialog.SetCancelable(false);
-            progDialog.Indeterminate = true;
-            progDialog.SetButton(Resources.GetString(Resource.String.dialog_cancel), (a, b) => {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.SetTitle(Resource.String.PleaseWait);
+            progressDialog.SetMessage(Resources.GetString(Resource.String.mapLoadingMessage)); // Why Xamarin, why??
+            progressDialog.SetCancelable(false);
+            progressDialog.Indeterminate = true;
+            progressDialog.SetButton(Resources.GetString(Resource.String.dialog_cancel), (a, b) => {
                 Finish();
             });
-            progDialog.Show();
+            progressDialog.Show();
 
             markButton = FindViewById<Button>(Resource.Id.markBtn);
             markButton.Click += MarkBtn_Click;
@@ -98,16 +98,18 @@ namespace OurPlace.Android.Activities
 
         private void UpdateText()
         {
-            locationCountText.Text = string.Format("{0}/{1} Locations Marked", selectedMarkers.Count, taskData.MaxNumMarkers);
+            locationCountText.Text = $"{selectedMarkers.Count}/{taskData.MaxNumMarkers} Locations Marked";
         }
 
         private void StopDialog()
         {
-            if (progDialog != null)
+            if (progressDialog == null)
             {
-                progDialog.Dismiss();
-                progDialog = null;
+                return;
             }
+
+            progressDialog.Dismiss();
+            progressDialog = null;
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -123,14 +125,16 @@ namespace OurPlace.Android.Activities
 
             // Load previously placed locations
             List<Map_Location> existing = JsonConvert.DeserializeObject<List<Map_Location>>(learningTask.CompletionData.JsonData);
-            if (existing != null)
+            if (existing == null)
             {
-                foreach (Map_Location loc in existing)
-                {
-                    AddMarker(loc);
-                }
-                learningTask.CompletionData.JsonData = "";
+                return;
             }
+
+            foreach (Map_Location loc in existing)
+            {
+                AddMarker(loc);
+            }
+            learningTask.CompletionData.JsonData = "";
         }
 
         private void GoogleMap_MapClick(object sender, GoogleMap.MapClickEventArgs e)
@@ -174,12 +178,14 @@ namespace OurPlace.Android.Activities
                 {
                     for (int i = 0; i < selectedMarkers.Count; i++)
                     {
-                        if (selectedMarkers[i].Id == e.Marker.Id)
+                        if (selectedMarkers[i].Id != e.Marker.Id)
                         {
-                            e.Marker.Remove();
-                            selectedMarkers.RemoveAt(i);
-                            break;
+                            continue;
                         }
+
+                        e.Marker.Remove();
+                        selectedMarkers.RemoveAt(i);
+                        break;
                     }
 
                     UpdateText();
@@ -187,14 +193,6 @@ namespace OurPlace.Android.Activities
                 })
                 .SetNegativeButton("Cancel", (a,b) =>{ })
                 .Show();
-        }
-
-        private LatLng GetCenterPoint(LatLng lhs, LatLng rhs)
-        {
-            LatLngBounds.Builder bounds = new LatLngBounds.Builder();
-            bounds.Include(lhs);
-            bounds.Include(rhs);
-            return bounds.Build().Center;
         }
 
         private void AddMarker(Map_Location newLoc)
@@ -219,27 +217,27 @@ namespace OurPlace.Android.Activities
 
         private void FinishButton_Click(object sender, System.EventArgs e)
         {
-            Map_Location[] locs = new Map_Location[selectedMarkers.Count];
-           for (int i = 0; i < selectedMarkers.Count; i++)
-           {
-               locs[i] = new Map_Location(selectedMarkers[i].Position.Latitude, selectedMarkers[i].Position.Longitude, 15);
-           }
-           string locJson = JsonConvert.SerializeObject(locs);
+            Map_Location[] locations = new Map_Location[selectedMarkers.Count];
+            for (int i = 0; i < selectedMarkers.Count; i++)
+            {
+                locations[i] = new Map_Location(selectedMarkers[i].Position.Latitude, selectedMarkers[i].Position.Longitude, 15);
+            }
+            string locJson = JsonConvert.SerializeObject(locations);
 
-           if (progDialog != null) progDialog.Dismiss();
+            progressDialog?.Dismiss();
 
             Dictionary<string, string> properties = new Dictionary<string, string>
             {
                 {"TaskId", learningTask.Id.ToString() },
-                {"NumLocs", locs.Length.ToString()}
+                {"NumLocs", locations.Length.ToString()}
             };
             Analytics.TrackEvent("LocationMarkerActivity_Finish", properties);
 
             Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
-           myIntent.PutExtra("TASK_ID", learningTask.Id);
-           myIntent.PutExtra("LOCATIONS", locJson);
-            SetResult(global::Android.App.Result.Ok, myIntent);
-           Finish();
+            myIntent.PutExtra("TASK_ID", learningTask.Id);
+            myIntent.PutExtra("LOCATIONS", locJson);
+            SetResult(Result.Ok, myIntent);
+            Finish();
         }
     }
 }
