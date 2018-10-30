@@ -18,10 +18,6 @@ else if (Model.EventTask.TaskType.IdName == "ENTER_TEXT")
 {
     @Html.Partial("TaskCards/_TextTaskPartial", Model)
 }
-else if (Model.EventTask.TaskType.IdName == "TAKE_VIDEO")
-{
-    @Html.Partial("TaskCards/_VideoTaskPartial", Model)
-}
 else if (Model.EventTask.TaskType.IdName == "MAP_MARK")
 {
     @Html.Partial("TaskCards/_MapMarkerTaskPartial", Model)

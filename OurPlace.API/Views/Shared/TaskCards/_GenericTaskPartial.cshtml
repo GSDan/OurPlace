@@ -38,7 +38,13 @@
                         }
                         else if (Model.EventTask.TaskType.IdName == "REC_AUDIO")
                         {
-                            <audio src="@src" controls="controls" />
+                            <audio src="@src" controls="controls"></audio>
+                        }
+                        else if (Model.EventTask.TaskType.IdName == "TAKE_VIDEO")
+                        {
+                            <video class="responsive-video" controls="controls">
+                                <source src="@src" type="video/mp4">
+                            </video>
                         }
                     }
                 }
