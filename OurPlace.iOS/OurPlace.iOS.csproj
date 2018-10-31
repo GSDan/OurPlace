@@ -84,7 +84,7 @@
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <AssemblyName>OurPlace.iOS</AssemblyName>
-    <CodesignProvision>OurPlace Dev (iCloud compat)</CodesignProvision>
+    <CodesignProvision>OurPlace Dev</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -98,9 +98,6 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="Rivets">
-      <HintPath>..\Components\rivets-1.0.5.1\lib\ios-unified\Rivets.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="MessageBarLib">
@@ -163,6 +160,7 @@
     <Reference Include="Google.Places">
       <HintPath>..\packages\Xamarin.Google.iOS.Places.2.5.0\lib\Xamarin.iOS10\Google.Places.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
@@ -446,6 +444,8 @@
     <Folder Include="Assets.xcassets\SettingsIcon.imageset\" />
     <Folder Include="Assets.xcassets\MyActivitiesIcon.imageset\" />
     <Folder Include="Controllers\Create\" />
+    <Folder Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\bin\Debug\" />
+    <Folder Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -465,12 +465,6 @@
     <None Include="packages.config" />
     <None Include="Libraries\PopColorPicker\PopColorPicker.iOS\PopColorPicker.iOS.csproj" />
     <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\PopColorPicker.iOS-Unified.csproj" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\bin\Debug\PopColorPicker.iOS-Unified.dll" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\bin\Debug\PopColorPicker.iOS-Unified.pdb" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.csproj.CoreCompileInputs.cache" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.csproj.FileListAbsolute.txt" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.dll" />
-    <None Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\PopColorPicker.iOS-Unified.pdb" />
     <None Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\PopColorPicker.iOS.Shared.projitems" />
     <None Include="Libraries\PopColorPicker\PopColorPicker.iOS.Shared\PopColorPicker.iOS.Shared.shproj" />
   </ItemGroup>
@@ -715,14 +709,6 @@
     <BundleResource Include="Resources\ic_cloud_upload_2x.png" />
     <BundleResource Include="Resources\ic_cloud_upload_3x.png" />
     <BundleResource Include="Resources\ic_cloud_upload.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-bar%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-custom%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-favorite%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-grid%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-inner-marker%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-marker%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-save%402x.png" />
-    <BundleResource Include="Libraries\PopColorPicker\PopColorPicker.iOS-Unified\obj\Debug\optimized\color-picker-trash%402x.png" />
     <BundleResource Include="Resources\color-bar%402x.png" />
     <BundleResource Include="Resources\color-picker-custom%402x.png" />
     <BundleResource Include="Resources\color-picker-favorite%402x.png" />
