@@ -39,6 +39,8 @@ using System.IO;
 using FFImageLoading;
 using CoreGraphics;
 using System.Linq;
+using ZXing.Mobile;
+using GlobalToast;
 
 namespace OurPlace.iOS
 {
@@ -48,6 +50,8 @@ namespace OurPlace.iOS
         private LoadingOverlay loadPop;
         private Dictionary<int, List<AppTask>> hiddenChildren;
         private bool loaded;
+        private MobileBarcodeScanner scanner;
+        private AppTask currentScanTask;
 
         public ActivityController(IntPtr handle) : base(handle)
         {
@@ -363,10 +367,50 @@ namespace OurPlace.iOS
                     RecordAudioController audioController = Storyboard.InstantiateViewController("RecordAudioController") as RecordAudioController;
                     audioController.StartTask(DisplayedActivity, taskData, TaskResultReturned, NavigationController);
                     break;
+                case "SCAN_QR":
+                    StartScanning(taskData);
+                    break;
                 default:
                     Console.WriteLine("Unknown task type: " + taskData.TaskType.IdName);
                     break;
             }
+        }
+
+        private void StartScanning(AppTask thisTask)
+        {
+            currentScanTask = thisTask;
+            scanner = new MobileBarcodeScanner(NavigationController)
+            {
+                UseCustomOverlay = false,
+                TopText = thisTask.TaskType.Description,
+                BottomText = thisTask.Description
+            };
+            scanner.ScanContinuously(HandleScanResult);
+        }
+
+        private void HandleScanResult(ZXing.Result result)
+        {
+            if (result != null && !string.IsNullOrEmpty(result.Text))
+            {
+                if (result.Text == ServerUtils.GetTaskQRCodeData(currentScanTask.Id))
+                {
+                    scanner.Cancel();
+                    InvokeOnMainThread(() =>
+                    {
+                        Toast.ShowToast("Found!");
+                        TaskResultReturned(null, currentScanTask.Id);
+                    });
+                }
+                else
+                {
+                    InvokeOnMainThread(() => { Toast.ShowToast("That's not the right code!"); });
+                }
+            }
+            else
+            {
+                InvokeOnMainThread(() => { Toast.ShowToast("Scan cancelled"); });
+            }
+
         }
 
         private void TaskResultReturned(string result, int taskId)

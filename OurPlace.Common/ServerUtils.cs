@@ -220,6 +220,11 @@ namespace OurPlace.Common
             return tempTypes;
         }
 
+        public static string GetTaskQRCodeData(int taskId)
+        {
+            return ConfidentialData.api + "app/task?id=" + taskId;
+        }
+
         public static bool CheckNeedsLogin(HttpStatusCode status)
         {
             if (status == HttpStatusCode.Forbidden || status == HttpStatusCode.Unauthorized)
