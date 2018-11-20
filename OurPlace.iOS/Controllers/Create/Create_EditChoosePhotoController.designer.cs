@@ -32,7 +32,7 @@ using System.CodeDom.Compiler;
 
 namespace OurPlace.iOS
 {
-    [Register ("Create_EditChoosePhotoController")]
+    [Register("Create_EditChoosePhotoController")]
     partial class Create_EditChoosePhotoController
     {
         [Outlet]
@@ -42,31 +42,18 @@ namespace OurPlace.iOS
         [Outlet]
         UIKit.UIImageView ChosenImage { get; set; }
 
-        void ReleaseDesignerOutlets ()
+        void ReleaseDesignerOutlets()
         {
-            if (ChooseImageButton != null) {
-                ChooseImageButton.Dispose ();
+            if (ChooseImageButton != null)
+            {
+                ChooseImageButton.Dispose();
                 ChooseImageButton = null;
             }
 
-            if (ChosenImage != null) {
-                ChosenImage.Dispose ();
+            if (ChosenImage != null)
+            {
+                ChosenImage.Dispose();
                 ChosenImage = null;
-            }
-
-            if (FinishButton != null) {
-                FinishButton.Dispose ();
-                FinishButton = null;
-            }
-
-            if (TaskDescription != null) {
-                TaskDescription.Dispose ();
-                TaskDescription = null;
-            }
-
-            if (TaskTypeIcon != null) {
-                TaskTypeIcon.Dispose ();
-                TaskTypeIcon = null;
             }
         }
     }

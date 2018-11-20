@@ -33,7 +33,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using ParkLearn.PCL.Models;
-using Microsoft.AppCenter.Analytics;
 
 namespace OurPlace.Common
 {
@@ -108,7 +107,6 @@ namespace OurPlace.Common
                                     ErrorResponse errResp = JsonConvert.DeserializeObject<ErrorResponse>(json);
                                     if (errResp != null && errResp.Error == "invalid_grant")
                                     {
-                                        Analytics.TrackEvent("ServerUtils_GetAccessToken_RefreshTokenInvalid");
                                         // token invalid, prompt new sign-in
                                         return null;
                                     }
@@ -124,7 +122,6 @@ namespace OurPlace.Common
 
                             if (refResp != null && !string.IsNullOrWhiteSpace(refResp.Access_token))
                             {
-                                Analytics.TrackEvent("ServerUtils_GetAccessToken_SuccessfulRefresh");
                                 // success! Save the new access token and its expiry time
                                 dbManager.currentUser.AccessToken = refResp.Access_token;
                                 dbManager.currentUser.AccessExpiresAt = DateTime.UtcNow.AddSeconds(refResp.Expires_in);
@@ -179,15 +176,48 @@ namespace OurPlace.Common
             return ConfidentialData.storage + data;
         }
 
-        public static string GetTaskQRCodeData(int taskId)
-        {
-            return ConfidentialData.api + "app/task?id=" + taskId;
-        }
-
-        public static async Task<ServerResponse<TaskType[]>> GetTaskTypes()
+        private static async Task<ServerResponse<TaskType[]>> GetTaskTypes()
         {
             ServerResponse<TaskType[]> response = await Get<TaskType[]>("/api/tasktypes");
             return response;
+        }
+
+        public static async Task<List<TaskType>> RefreshTaskTypes(DatabaseManager dbManager = null)
+        {
+            if (dbManager == null) dbManager = await Storage.GetDatabaseManager();
+
+            ServerResponse<TaskType[]> response = await GetTaskTypes();
+
+            if (response == null)
+            {
+                // refresh token invalid - return null
+                return null;
+            }
+
+            if (!response.Success)
+            {
+                // token fine, just a failed request - return empty
+                return new List<TaskType>();
+            }
+
+            // TODO make sure to remove this after updating the iOS version!!
+
+            List<TaskType> tempTypes = new List<TaskType>(response.Data)
+            {
+                new TaskType
+                {
+                    Id = 14,
+                    Order = 10,
+                    IdName = "SCAN_QR",
+                    ReqFileUpload = false,
+                    DisplayName = "Scan the QR Code",
+                    Description = "Find and scan the correct QR code",
+                    IconUrl = ConfidentialData.storage + "icons/scanQR.png"
+                }
+            };
+
+            dbManager.AddTaskTypes(tempTypes);
+            return tempTypes;
         }
 
         public static bool CheckNeedsLogin(HttpStatusCode status)
@@ -499,14 +529,6 @@ namespace OurPlace.Common
                     }
                 }
             }
-
-            // clean up json
-            activity.Author.AccessToken = null;
-            activity.Author.RefreshToken = null;
-            activity.Author.CachedActivitiesJson = null;
-            activity.Author.RemoteCreatedActivitiesJson = null;
-            activity.Author.LocalCreatedActivitiesJson = null; 
-
             return Post<string>(upload.UploadRoute, activity);
         }
 

@@ -32,7 +32,7 @@ using System.CodeDom.Compiler;
 
 namespace OurPlace.iOS
 {
-    [Register ("Create_EditMapMarkController")]
+    [Register("Create_EditMapMarkController")]
     partial class Create_EditMapMarkController
     {
         [Outlet]
@@ -46,36 +46,24 @@ namespace OurPlace.iOS
         [Outlet]
         UIKit.UIPickerView minPicker { get; set; }
 
-        void ReleaseDesignerOutlets ()
+        void ReleaseDesignerOutlets()
         {
-            if (FinishButton != null) {
-                FinishButton.Dispose ();
-                FinishButton = null;
-            }
-
-            if (limitToCurrentLoc != null) {
-                limitToCurrentLoc.Dispose ();
+            if (limitToCurrentLoc != null)
+            {
+                limitToCurrentLoc.Dispose();
                 limitToCurrentLoc = null;
             }
 
-            if (maxPicker != null) {
-                maxPicker.Dispose ();
+            if (maxPicker != null)
+            {
+                maxPicker.Dispose();
                 maxPicker = null;
             }
 
-            if (minPicker != null) {
-                minPicker.Dispose ();
+            if (minPicker != null)
+            {
+                minPicker.Dispose();
                 minPicker = null;
-            }
-
-            if (TaskDescription != null) {
-                TaskDescription.Dispose ();
-                TaskDescription = null;
-            }
-
-            if (TaskTypeIcon != null) {
-                TaskTypeIcon.Dispose ();
-                TaskTypeIcon = null;
             }
         }
     }

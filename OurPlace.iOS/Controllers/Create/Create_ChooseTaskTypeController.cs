@@ -32,22 +32,23 @@ using OurPlace.iOS.ViewSources;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using UIKit;
+using OurPlace.Common;
 
 namespace OurPlace.iOS
 {
-	public partial class Create_ChooseTaskTypeController : UITableViewController
-	{
+    public partial class Create_ChooseTaskTypeController : UITableViewController
+    {
         public LearningActivity thisActivity;
         public int parentTaskIndex;
-        public int? childTaskIndex; 
+        public int? childTaskIndex;
 
         private LoadingOverlay loadPop;
         private List<TaskType> taskTypes;
         private TaskType chosen;
 
-		public Create_ChooseTaskTypeController (IntPtr handle) : base (handle)
-		{
-		}
+        public Create_ChooseTaskTypeController(IntPtr handle) : base(handle)
+        {
+        }
 
         public override void ViewDidLoad()
         {
@@ -59,7 +60,7 @@ namespace OurPlace.iOS
         private async Task LoadData()
         {
             DatabaseManager dbManager = await Storage.GetDatabaseManager();
-            taskTypes = dbManager.GetTaskTypes()?.ToList();
+            taskTypes = dbManager.GetTaskTypes()?.OrderBy((arg) => arg.Order).ToList();
 
             if (taskTypes == null || taskTypes.Count == 0)
             {
@@ -67,15 +68,13 @@ namespace OurPlace.iOS
 
                 // show the loading overlay on the UI thread using the correct orientation sizing
                 loadPop = new LoadingOverlay(bounds);
+
                 View.Add(loadPop);
-
-                Common.ServerResponse<TaskType[]> response = await Common.ServerUtils.GetTaskTypes();
-
+                taskTypes = await ServerUtils.RefreshTaskTypes(dbManager);
                 loadPop.Hide();
 
-                if (response.Success)
+                if (taskTypes != null || taskTypes.Count > 0)
                 {
-                    taskTypes = response.Data.ToList();
                     taskTypes = taskTypes.OrderBy((arg) => arg.Order).ToList();
                     dbManager.AddTaskTypes(taskTypes);
                     ShowTaskTypes();
@@ -91,7 +90,6 @@ namespace OurPlace.iOS
             }
             else
             {
-                taskTypes = taskTypes.OrderBy((arg) => arg.Order).ToList();
                 ShowTaskTypes();
             }
         }
@@ -105,7 +103,7 @@ namespace OurPlace.iOS
         {
             chosen = returned;
 
-            switch(returned.IdName)
+            switch (returned.IdName)
             {
                 case "LISTEN_AUDIO":
                     PerformSegue("CreateNewListenAudioTask", this);

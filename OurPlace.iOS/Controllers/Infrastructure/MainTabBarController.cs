@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using OurPlace.Common.LocalData;
 using System.Linq;
+using OurPlace.Common;
 
 namespace OurPlace.iOS
 {
@@ -43,6 +44,8 @@ namespace OurPlace.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            var suppressAsync = ServerUtils.RefreshTaskTypes();
         }
 
         public override void ViewWillAppear(bool animated)

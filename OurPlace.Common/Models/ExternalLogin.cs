@@ -19,13 +19,12 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
 namespace OurPlace.Common.Models
 {
-	public class ExternalLogin
-	{
-		public string Name { get; set; }
-		public string Url { get; set; }
-		public string State { get; set; }
-	}
+    public class ExternalLogin
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }
+        public string State { get; set; }
+    }
 }

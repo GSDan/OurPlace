@@ -233,6 +233,5 @@ namespace OurPlace.iOS
             var ul = BitConverter.ToUInt64(bytes, 0) / (1 << 11);
             return ul / (Double)(1UL << 53);
         }
-
     }
 }

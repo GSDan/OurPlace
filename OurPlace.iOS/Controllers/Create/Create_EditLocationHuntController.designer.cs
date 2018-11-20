@@ -32,7 +32,7 @@ using System.CodeDom.Compiler;
 
 namespace OurPlace.iOS
 {
-    [Register ("Create_LocationHuntController")]
+    [Register("Create_LocationHuntController")]
     partial class Create_EditLocationHuntController
     {
         [Outlet]
@@ -46,36 +46,24 @@ namespace OurPlace.iOS
         [Outlet]
         UIKit.UILabel ChosenLocationLabel { get; set; }
 
-        void ReleaseDesignerOutlets ()
+        void ReleaseDesignerOutlets()
         {
-            if (allowMap != null) {
-                allowMap.Dispose ();
+            if (allowMap != null)
+            {
+                allowMap.Dispose();
                 allowMap = null;
             }
 
-            if (ChooseLocationButton != null) {
-                ChooseLocationButton.Dispose ();
+            if (ChooseLocationButton != null)
+            {
+                ChooseLocationButton.Dispose();
                 ChooseLocationButton = null;
             }
 
-            if (ChosenLocationLabel != null) {
-                ChosenLocationLabel.Dispose ();
+            if (ChosenLocationLabel != null)
+            {
+                ChosenLocationLabel.Dispose();
                 ChosenLocationLabel = null;
-            }
-
-            if (FinishButton != null) {
-                FinishButton.Dispose ();
-                FinishButton = null;
-            }
-
-            if (TaskDescription != null) {
-                TaskDescription.Dispose ();
-                TaskDescription = null;
-            }
-
-            if (TaskTypeIcon != null) {
-                TaskTypeIcon.Dispose ();
-                TaskTypeIcon = null;
             }
         }
     }

@@ -237,10 +237,6 @@ namespace OurPlace.iOS
 
         private void AddLinkButton_TouchUpInside(object sender, EventArgs e)
         {
-            ScrollTheView(false);
-
-            keyboardManagedElsewhere = true;
-
             UIAlertController alertController = UIAlertController.Create(
                 "Add External Link",
                 "Paste the full URL:",
@@ -283,7 +279,7 @@ namespace OurPlace.iOS
             // Add cancel button
             alertController.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
-            PresentViewController(alertController, true, () => { keyboardManagedElsewhere = false; });
+            PresentViewController(alertController, true, () => { });
         }
 
         protected void UpdateLabels()

@@ -32,7 +32,7 @@ using System.CodeDom.Compiler;
 
 namespace OurPlace.iOS
 {
-    [Register ("Create_EditMultiChoiceController")]
+    [Register("Create_EditMultiChoiceController")]
     partial class Create_EditMultiChoiceController
     {
         [Outlet]
@@ -42,31 +42,18 @@ namespace OurPlace.iOS
         [Outlet]
         UIKit.UITableView TableView { get; set; }
 
-        void ReleaseDesignerOutlets ()
+        void ReleaseDesignerOutlets()
         {
-            if (AddOptionButton != null) {
-                AddOptionButton.Dispose ();
+            if (AddOptionButton != null)
+            {
+                AddOptionButton.Dispose();
                 AddOptionButton = null;
             }
 
-            if (FinishButton != null) {
-                FinishButton.Dispose ();
-                FinishButton = null;
-            }
-
-            if (TableView != null) {
-                TableView.Dispose ();
+            if (TableView != null)
+            {
+                TableView.Dispose();
                 TableView = null;
-            }
-
-            if (TaskDescription != null) {
-                TaskDescription.Dispose ();
-                TaskDescription = null;
-            }
-
-            if (TaskTypeIcon != null) {
-                TaskTypeIcon.Dispose ();
-                TaskTypeIcon = null;
             }
         }
     }

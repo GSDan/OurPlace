@@ -41,13 +41,7 @@ namespace OurPlace.iOS
         public int parentTaskIndex;
         public int? childTaskIndex;
         protected LearningTask thisTask;
-        private NSObject _notification;
-        private nfloat _scrollAmount;
-        private double _animationDuration;
-        private UIViewAnimationCurve _animationCurve;
         protected string placeholderText = "Provide a short instruction for the task.";
-        protected bool keyboardManagedElsewhere;
-        protected bool keyboardIsUp;
 
         public Create_EditTaskController(IntPtr handle) : base(handle)
         {
@@ -62,18 +56,17 @@ namespace OurPlace.iOS
             get { return (AppDelegate)UIApplication.SharedApplication.Delegate; }
         }
 
-        public override void TouchesBegan(NSSet touches, UIEvent evt)
+        public override bool HandlesKeyboardNotifications()
         {
-            TaskDescription.ResignFirstResponder();
-            if (keyboardIsUp)
-            {
-                ScrollTheView(false);
-            }
+            return true;
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            InitKeyboardHandling();
+            DismissKeyboardOnBackgroundTap();
 
             if (thisActivity == null)
             {
@@ -122,59 +115,12 @@ namespace OurPlace.iOS
             TaskDescription.Layer.CornerRadius = 5;
             TaskDescription.ClipsToBounds = true;
 
-            _notification = UIKeyboard.Notifications.ObserveWillShow((s, e) =>
-            {
-                if (keyboardManagedElsewhere) return;
-
-                _animationDuration = e.AnimationDuration;
-                _animationCurve = e.AnimationCurve;
-
-                CGRect r = UIKeyboard.FrameBeginFromNotification(e.Notification);
-                _scrollAmount = r.Height;
-                ScrollTheView(true);
-            });
+            TaskDescription.Delegate = new TextViewPlaceholderDelegate(TaskDescription, placeholderText);
 
             if (thisTask != null)
             {
                 TaskDescription.Text = thisTask.Description;
                 FinishButton.SetTitle("Save Changes", UIControlState.Normal);
-            }
-            else
-            {
-                // Bootstrap for placeholder text. FML
-                TaskDescription.Delegate = new TextViewPlaceholderDelegate(TaskDescription, placeholderText);
-            }
-        }
-
-        protected void ScrollTheView(bool scale)
-        {
-            try
-            {
-                UIView.BeginAnimations(string.Empty, IntPtr.Zero);
-                UIView.SetAnimationDuration(_animationDuration);
-                UIView.SetAnimationCurve(_animationCurve);
-
-                CGRect frame = View.Frame;
-
-                if (scale)
-                {
-                    frame.Height -= _scrollAmount;
-                    FinishButton.Alpha = 0;
-                    keyboardIsUp = true;
-                }
-                else
-                {
-                    frame.Height += _scrollAmount;
-                    FinishButton.Alpha = 1;
-                    keyboardIsUp = false;
-                }
-
-                View.Frame = frame;
-                UIView.CommitAnimations();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(string.Format("ScrollTheView(scale: {0}) error: {1}", scale, e.Message));
             }
         }
 

@@ -20,7 +20,6 @@
 */
 #endregion
 using System;
-using System.Collections.Generic;
 
 namespace OurPlace.Common.Models
 {

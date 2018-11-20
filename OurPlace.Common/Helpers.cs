@@ -21,11 +21,16 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Web;
 
 namespace OurPlace.Common
 {
     public static class Helpers
     {
+        public static string GetUrlParam(Uri uri, string query)
+        {
+            return HttpUtility.ParseQueryString(uri.Query).Get(query);
+        }
 
         public static int AppVersionNumber = 38;
 

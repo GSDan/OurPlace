@@ -20,13 +20,14 @@
 */
 #endregion
 using System;
+using System.Drawing;
 using UIKit;
 
 namespace OurPlace.iOS.Delegates
 {
     public class TextViewPlaceholderDelegate : UITextViewDelegate
     {
-        private string placeholderText;
+        private readonly string placeholderText;
 
         public TextViewPlaceholderDelegate(UITextView view, string placeholder)
         {
@@ -34,11 +35,12 @@ namespace OurPlace.iOS.Delegates
             view.Text = placeholderText;
             view.TextColor = UIColor.LightGray;
             view.Tag = 0;
+
         }
 
         public override void EditingStarted(UITextView textView)
         {
-            if(textView.Tag == 0)
+            if (textView.Tag == 0)
             {
                 // Remove placeholder text
                 textView.Text = "";

@@ -199,7 +199,7 @@ namespace OurPlace.Android.Activities
                     Intent uploadIntent = new Intent(this, typeof(UploadsActivity));
                     StartActivity(uploadIntent);
                     return true;
-                
+
                 case Resource.Id.menusettings:
                     Intent settingsIntent = new Intent(this, typeof(PreferencesActivity));
                     StartActivity(settingsIntent);
@@ -282,45 +282,31 @@ namespace OurPlace.Android.Activities
         }
 
         // Update the TaskTypes available in the background
-        public async void UpdateTaskTypes()
+        public async Task UpdateTaskTypes()
         {
-            ServerResponse<TaskType[]> response = await ServerUtils.GetTaskTypes();
+            dbManager = await GetDbManager();
 
-            if (response == null)
+            List<TaskType> taskTypes = await ServerUtils.RefreshTaskTypes(dbManager);
+
+            if (taskTypes == null)
             {
                 var suppress = AndroidUtils.ReturnToSignIn(this);
                 Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
                 return;
             }
 
-            if (!response.Success)
+            if (taskTypes.Count == 0)
             {
                 return;
             }
 
-            // TODO make sure to remove this after updating the iOS version!!
-
-            List<TaskType> tempTypes = new List<TaskType>(response.Data)
-            {
-                new TaskType
-                {
-                    Id = 14,
-                    Order = 10,
-                    IdName = "SCAN_QR",
-                    ReqFileUpload = false,
-                    DisplayName = "Scan the QR Code",
-                    Description = "Find and scan the correct QR code",
-                    IconUrl = ConfidentialData.storage + "icons/scanQR.png"
-                }
-            };
-
-            (await GetDbManager()).AddTaskTypes(tempTypes);
+            dbManager.AddTaskTypes(taskTypes);
         }
 
         public async void LaunchActivity(LearningActivity activity)
         {
             int thisVersion = PackageManager.GetPackageInfo(PackageName, 0).VersionCode;
-            
+
             if (activity.AppVersionNumber > thisVersion)
             {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)

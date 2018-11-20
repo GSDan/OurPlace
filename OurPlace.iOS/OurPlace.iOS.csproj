@@ -675,6 +675,8 @@
     <Compile Include="Cells\TaskCells\TaskCell_NameEntry.designer.cs">
       <DependentUpon>TaskCell_NameEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ScrollExtensions.cs" />
+    <Compile Include="Helpers\ViewExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Infrastructure\SignInExplanationController.cs" />

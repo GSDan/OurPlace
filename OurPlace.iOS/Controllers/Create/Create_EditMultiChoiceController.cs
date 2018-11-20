@@ -32,12 +32,12 @@ using UIKit;
 namespace OurPlace.iOS
 {
     public partial class Create_EditMultiChoiceController : Create_EditTaskController
-	{
+    {
         private CreateMultipleChoiceViewSource viewSource;
 
-		public Create_EditMultiChoiceController (IntPtr handle) : base (handle)
-		{
-		}
+        public Create_EditMultiChoiceController(IntPtr handle) : base(handle)
+        {
+        }
 
         public override void ViewDidLoad()
         {
@@ -63,8 +63,6 @@ namespace OurPlace.iOS
 
         private void AddOptionPressed(object sender, EventArgs e)
         {
-            keyboardManagedElsewhere = true;
-
             UIAlertController alertController = UIAlertController.Create(
                 "New Option",
                 "Enter your new choice option below:",
@@ -73,7 +71,8 @@ namespace OurPlace.iOS
             UITextField field = null;
 
             // Add and configure text field
-            alertController.AddTextField((textField) => {
+            alertController.AddTextField((textField) =>
+            {
                 // Save the field
                 field = textField;
                 field.ReturnKeyType = UIReturnKeyType.Done;
@@ -81,9 +80,10 @@ namespace OurPlace.iOS
 
             });
 
-            alertController.AddAction(UIAlertAction.Create("Add", UIAlertActionStyle.Default, (actionOK) => {
+            alertController.AddAction(UIAlertAction.Create("Add", UIAlertActionStyle.Default, (actionOK) =>
+            {
 
-                if(!string.IsNullOrWhiteSpace(field.Text))
+                if (!string.IsNullOrWhiteSpace(field.Text))
                 {
                     viewSource.AddRow(field.Text);
                 }
@@ -92,14 +92,14 @@ namespace OurPlace.iOS
             // Add cancel button
             alertController.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
-            PresentViewController(alertController, true, () => { keyboardManagedElsewhere = false; });
+            PresentViewController(alertController, true, () => { });
         }
 
         protected override void FinishButton_TouchUpInside(object sender, EventArgs e)
         {
             if (UpdateBasicTask())
             {
-                if(viewSource.Rows.Count < 2)
+                if (viewSource.Rows.Count < 2)
                 {
                     AppUtils.ShowSimpleDialog(this, "Add More Choices", "At least two possible answers are required.", "Got it");
                     return;
@@ -110,7 +110,7 @@ namespace OurPlace.iOS
                 UpdateActivity();
                 Unwind();
             }
-        } 
+        }
 
-	}
+    }
 }

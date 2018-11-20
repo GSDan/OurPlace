@@ -238,8 +238,7 @@ namespace OurPlace.iOS
 
             if (resp.Success)
             {
-                Storage.DeleteActivityCache(activity);
-                dbManager.DeleteActivity(activity.Id);
+                dbManager.DeleteCachedActivity(activity);
                 Toast.ShowToast("Activity Deleted");
             }
             else

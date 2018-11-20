@@ -32,7 +32,7 @@ using System.CodeDom.Compiler;
 
 namespace OurPlace.iOS
 {
-    [Register ("Create_EditInfoController")]
+    [Register("Create_EditInfoController")]
     partial class Create_EditInfoController
     {
         [Outlet]
@@ -50,42 +50,33 @@ namespace OurPlace.iOS
         [Outlet]
         UIKit.UILabel LinkLabel { get; set; }
 
-        void ReleaseDesignerOutlets ()
+        void ReleaseDesignerOutlets()
         {
-            if (AccompanyingImage != null) {
-                AccompanyingImage.Dispose ();
+            if (AccompanyingImage != null)
+            {
+                AccompanyingImage.Dispose();
                 AccompanyingImage = null;
             }
 
-            if (AddImageButton != null) {
-                AddImageButton.Dispose ();
+            if (AddImageButton != null)
+            {
+                AddImageButton.Dispose();
                 AddImageButton = null;
             }
 
-            if (AddLinkButton != null) {
-                AddLinkButton.Dispose ();
+            if (AddLinkButton != null)
+            {
+                AddLinkButton.Dispose();
                 AddLinkButton = null;
             }
 
-            if (FinishButton != null) {
-                FinishButton.Dispose ();
-                FinishButton = null;
-            }
 
-            if (LinkLabel != null) {
-                LinkLabel.Dispose ();
+            if (LinkLabel != null)
+            {
+                LinkLabel.Dispose();
                 LinkLabel = null;
             }
 
-            if (TaskDescription != null) {
-                TaskDescription.Dispose ();
-                TaskDescription = null;
-            }
-
-            if (TaskTypeIcon != null) {
-                TaskTypeIcon.Dispose ();
-                TaskTypeIcon = null;
-            }
         }
     }
 }
