@@ -96,6 +96,16 @@ namespace OurPlace.iOS
                     thisTask = thisActivity.LearningTasks.ToList()[parentTaskIndex];
                     thisTaskType = thisTask.TaskType;
                 }
+
+                UIBarButtonItem customButton = new UIBarButtonItem(
+                    UIImage.FromFile("ic_delete"),
+                    UIBarButtonItemStyle.Plain,
+                    (s, e) =>
+                    {
+                        ConfirmDelete();
+                    }
+                );
+                NavigationItem.RightBarButtonItem = customButton;
             }
 
             if (thisTaskType == null)
@@ -115,13 +125,27 @@ namespace OurPlace.iOS
             TaskDescription.Layer.CornerRadius = 5;
             TaskDescription.ClipsToBounds = true;
 
-            TaskDescription.Delegate = new TextViewPlaceholderDelegate(TaskDescription, placeholderText);
-
             if (thisTask != null)
             {
                 TaskDescription.Text = thisTask.Description;
                 FinishButton.SetTitle("Save Changes", UIControlState.Normal);
             }
+            else
+            {
+                // Add placeholder text
+                TaskDescription.Delegate = new TextViewPlaceholderDelegate(TaskDescription, placeholderText);
+            }
+        }
+
+        private void ConfirmDelete()
+        {
+            var alertController = UIAlertController.Create("Confirm Delete", "Are you sure you want to delete this task?", UIAlertControllerStyle.Alert);
+            alertController.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (obj) =>
+            {
+                RemoveFromActivityAndReturn();
+            }));
+            alertController.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, (obj) => { }));
+            PresentViewController(alertController, true, null);
         }
 
         protected bool UpdateBasicTask()
@@ -183,6 +207,18 @@ namespace OurPlace.iOS
             }
 
             thisActivity.LearningTasks = tasks;
+        }
+
+        protected void RemoveFromActivityAndReturn()
+        {
+            List<LearningTask> tasks = thisActivity.LearningTasks.ToList();
+
+            int thisIndex = tasks.FindIndex((LearningTask task) => task.Id == thisTask.Id);
+            if (thisIndex == -1) return;
+
+            tasks.RemoveAt(thisIndex);
+            thisActivity.LearningTasks = tasks;
+            Unwind();
         }
 
         protected void Unwind()

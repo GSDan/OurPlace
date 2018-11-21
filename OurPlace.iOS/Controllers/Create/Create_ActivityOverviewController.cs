@@ -38,16 +38,16 @@ using UIKit;
 namespace OurPlace.iOS
 {
     public partial class Create_ActivityOverviewController : UITableViewController
-	{
+    {
         public LearningActivity thisActivity;
         private bool canFinish;
 
         private int taskToEditIndex;
 
-		public Create_ActivityOverviewController (IntPtr handle) : base (handle)
-		{
-            
-		}
+        public Create_ActivityOverviewController(IntPtr handle) : base(handle)
+        {
+
+        }
 
         public override void ViewDidLoad()
         {
@@ -79,7 +79,7 @@ namespace OurPlace.iOS
             {
                 ActivityName.Text = thisActivity.Name;
                 ActivityDescription.Text = thisActivity.Description;
-                if(!string.IsNullOrWhiteSpace(thisActivity.ImageUrl))
+                if (!string.IsNullOrWhiteSpace(thisActivity.ImageUrl))
                 {
                     ImageService.Instance.LoadFile(
                         AppUtils.GetPathForLocalFile(thisActivity.ImageUrl))
@@ -91,7 +91,7 @@ namespace OurPlace.iOS
                 }
             }
 
-            if(thisActivity == null || 
+            if (thisActivity == null ||
                thisActivity.LearningTasks == null ||
                thisActivity.LearningTasks.ToList().Count == 0)
             {
@@ -159,7 +159,7 @@ namespace OurPlace.iOS
         {
             base.PrepareForSegue(segue, sender);
 
-            if(segue.Identifier.Equals("EditChildren"))
+            if (segue.Identifier.Equals("EditChildren"))
             {
                 var viewController = (Create_ChildTasksOverviewController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
@@ -170,7 +170,7 @@ namespace OurPlace.iOS
                 var viewController = (Create_ActivityMetaController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
             }
-            else if(new string[]{
+            else if (new string[]{
                     "EditParentTask",
                     "EditChoosePhotoTask",
                     "EditLocationHuntTask",
@@ -178,21 +178,21 @@ namespace OurPlace.iOS
                     "EditMultiChoiceTask",
                     "EditInfoTask",
                     "EditListenAudioTask"
-                }.Contains(segue.Identifier)) 
+                }.Contains(segue.Identifier))
             {
                 var viewController = (Create_EditTaskController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
                 viewController.parentTaskIndex = taskToEditIndex;
                 viewController.childTaskIndex = null;
             }
-            else if(segue.Identifier.Equals("ChooseTaskType"))
+            else if (segue.Identifier.Equals("ChooseTaskType"))
             {
                 var viewController = (Create_ChooseTaskTypeController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
                 viewController.parentTaskIndex = (thisActivity.LearningTasks == null) ? 0 : thisActivity.LearningTasks.Count();
                 viewController.childTaskIndex = null;
             }
-            else if(segue.Identifier.Equals("FinishCreate"))
+            else if (segue.Identifier.Equals("FinishCreate"))
             {
                 var viewController = (Create_FinishController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
@@ -201,7 +201,7 @@ namespace OurPlace.iOS
 
         private void FooterButton_TouchUpInside(object sender, EventArgs e)
         {
-            if(canFinish)
+            if (canFinish)
             {
                 PerformSegue("FinishCreate", this);
             }
@@ -219,9 +219,9 @@ namespace OurPlace.iOS
 
             var sourceController = segue.SourceViewController as Create_BaseSegueController;
 
-            if(sourceController != null)
+            if (sourceController != null)
             {
-                if(sourceController.wasCancelled && thisActivity == null)
+                if (sourceController.wasCancelled && thisActivity == null)
                 {
                     // If the user cancelled without any info being saved, 
                     // return to the previous screen
@@ -229,7 +229,15 @@ namespace OurPlace.iOS
                     return;
                 }
 
-                thisActivity = sourceController.thisActivity;
+                if (sourceController.thisActivity != null)
+                {
+                    thisActivity = sourceController.thisActivity;
+                    if (TableView.Source != null)
+                    {
+                        (TableView.Source as CreateViewSource).Rows = (List<LearningTask>)thisActivity.LearningTasks;
+                        TableView.ReloadData();
+                    }
+                }
 
                 var suppress = SaveProgress();
             }
