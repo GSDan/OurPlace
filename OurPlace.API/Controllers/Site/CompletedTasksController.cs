@@ -108,16 +108,8 @@ namespace OurPlace.API.Controllers.Site
         // GET: CompletedTasks/Download?submissionId=0
         public async Task Download(int submissionId)
         {
-            if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
-            {
-                return;
-            }
-
-            ApplicationUser thisUser = UserManager.FindByName(User.Identity.Name);
-
-            CompletedActivity activity = db.CompletedActivities.Where(act => act.Id == submissionId).FirstOrDefault();
+            CompletedActivity activity = db.CompletedActivities.FirstOrDefault(act => act.Id == submissionId);
             if (activity == null) return;
-            if (activity.User.Id != thisUser.Id) return;
 
             CloudBlobContainer container = GetCloudBlobContainer();
 
@@ -127,30 +119,25 @@ namespace OurPlace.API.Controllers.Site
             foreach (CompletedTask task in tasks)
             {
                 string idName = task.EventTask.TaskType.IdName;
-                if (linkTasks.Contains(idName))
+                if (!linkTasks.Contains(idName)) continue;
+
+                string[] links = JsonConvert.DeserializeObject<string[]>(task.JsonData);
+                if (links == null) continue;
+
+                for (int i = 0; i < links.Length; i++)
                 {
-                    string[] links = JsonConvert.DeserializeObject<string[]>(task.JsonData);
-                    if (links == null) continue;
-
-                    for (int i = 0; i < links.Length; i++)
+                    toDl.Add(new DownloadStruct
                     {
-                        toDl.Add(new DownloadStruct
-                        {
-                            Blob = container.GetBlockBlobReference(links[i]),
-                            Filename = string.Format("{0}_{1}-{2:00}.{3}",
-                                task.Id,
-                                task.EventTask.TaskType.IdName,
-                                i,
-                                Common.ServerUtils.GetFileExtension(idName))
-                        });
-                    }
-
+                        Blob = container.GetBlockBlobReference(links[i]),
+                        Filename =
+                            $"{task.Id}_{task.EventTask.TaskType.IdName}-{i:00}.{Common.ServerUtils.GetFileExtension(idName)}"
+                    });
                 }
             }
 
             await MakeLog(new Dictionary<string, string>() { { "submissionId", submissionId.ToString() } });
 
-            ZipFilesToResponse(Response, string.Format("OurPlace-{0}", submissionId), toDl);
+            ZipFilesToResponse(Response, $"OurPlace-{submissionId}", toDl);
         }
 
         protected override void Dispose(bool disposing)
