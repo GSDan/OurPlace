@@ -106,6 +106,7 @@ namespace OurPlace.API.Controllers.Site
         }
 
         // GET: CompletedTasks/Download?submissionId=0
+        [AllowAnonymous]
         public async Task Download(int submissionId)
         {
             CompletedActivity activity = db.CompletedActivities.FirstOrDefault(act => act.Id == submissionId);

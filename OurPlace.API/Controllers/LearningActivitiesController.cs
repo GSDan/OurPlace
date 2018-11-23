@@ -23,7 +23,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
-using OurPlace.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -301,30 +300,33 @@ namespace OurPlace.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != learningActivity.Id)
+            LearningActivity existing = db.LearningActivities.FirstOrDefault(a => a.Id == id);
+
+            if (existing == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            db.Entry(learningActivity).State = EntityState.Modified;
-
-            try
+            ApplicationUser thisUser = await GetUser();
+            if (thisUser == null || thisUser.Id != existing.Author.Id)
             {
-                await db.SaveChangesAsync();
+                return Unauthorized();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LearningActivityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                
+            existing.AppVersionNumber = learningActivity.AppVersionNumber;
+            existing.Approved = thisUser.Trusted;
+            existing.CreatedAt = DateTime.UtcNow;
+            existing.Description = learningActivity.Description;
+            existing.ImageUrl = learningActivity.ImageUrl;
+            existing.Name = learningActivity.Name;
+            existing.RequireUsername = learningActivity.RequireUsername;
+            existing.IsPublic = learningActivity.IsPublic;
 
-            return StatusCode(HttpStatusCode.NoContent);
+            db.Entry(existing).State = EntityState.Modified;
+
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.OK);
         }
 
         // POST: api/LearningActivities
