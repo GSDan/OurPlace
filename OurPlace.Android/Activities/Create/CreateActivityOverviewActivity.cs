@@ -68,7 +68,7 @@ namespace OurPlace.Android.Activities.Create
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
             newActivity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            adapter = new CreatedTasksAdapter(this, newActivity, SaveProgress);
+            adapter = new CreatedTasksAdapter(this, newActivity, editingSubmitted, SaveProgress);
             adapter.EditActivityClick += Adapter_EditActivityClick;
             adapter.FinishClick += Adapter_FinishClick;
             adapter.EditItemClick += Adapter_EditItemClick;
@@ -151,12 +151,10 @@ namespace OurPlace.Android.Activities.Create
                         dbManager.AddUser(dbManager.currentUser);
                         Finish();
                     }
-                    
                 })
                 .Show();
 
             return true;
-
         }
 
         private void Adapter_ManageChildrenItemClick(object sender, int position)
@@ -234,6 +232,13 @@ namespace OurPlace.Android.Activities.Create
 
         public async void SaveProgress()
         {
+            newActivity.LearningTasks = adapter.Data;
+
+            // Hide the prompt if the user has added a task
+            fabPrompt.Visibility =
+                (newActivity.LearningTasks != null && newActivity.LearningTasks.Any())
+                    ? ViewStates.Gone : ViewStates.Visible;
+
             // Don't save changes to uploaded activities until we're ready to submit
             if (editingSubmitted) return;
 
@@ -241,13 +246,6 @@ namespace OurPlace.Android.Activities.Create
             {
                 dbManager = await GetDatabaseManager();
             }
-
-            newActivity.LearningTasks = adapter.Data;
-
-            // Hide the prompt if the user has added a task
-            fabPrompt.Visibility =
-                (newActivity.LearningTasks != null && newActivity.LearningTasks.Any())
-                ? ViewStates.Gone : ViewStates.Visible;
 
             // Add/update this new activity in the user's inprogress cache
             string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;

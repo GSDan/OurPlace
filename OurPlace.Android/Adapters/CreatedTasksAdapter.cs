@@ -45,9 +45,12 @@ namespace OurPlace.Android.Adapters
         public List<LearningTask> Data;
         private readonly Context context;
         private LearningActivity learningActivity;
+        private bool editingSubmitted;
 
-        public CreatedTasksAdapter(Context context, LearningActivity learningAct, Action save)
+        public CreatedTasksAdapter(Context context, LearningActivity learningAct, bool editingSubmitted, Action save)
         {
+            this.editingSubmitted = editingSubmitted;
+
             if (learningAct.LearningTasks != null)
             {
                 Data = (List<LearningTask>)learningAct.LearningTasks;
@@ -148,7 +151,15 @@ namespace OurPlace.Android.Adapters
                 avh.Title.Text = learningActivity.Name;
                 avh.Description.Text = learningActivity.Description;
 
-                if (!string.IsNullOrWhiteSpace(learningActivity.ImageUrl))
+                if (string.IsNullOrWhiteSpace(learningActivity.ImageUrl)) return;
+
+                if (editingSubmitted)
+                {
+                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(learningActivity.ImageUrl))
+                        .Transform(new CircleTransformation())
+                        .Into(avh.TaskTypeIcon);
+                }
+                else
                 {
                     ImageService.Instance.LoadFile(learningActivity.ImageUrl)
                         .Transform(new CircleTransformation())
