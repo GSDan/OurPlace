@@ -19,26 +19,27 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.Design.Widget;
+using Android.Support.V7.App;
+using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
 using Android.Views;
 using Android.Widget;
-using Android.Support.V7.App;
-using OurPlace.Common.Models;
-using Android.Support.V7.Widget;
-using OurPlace.Android.Adapters;
 using Newtonsoft.Json;
-using Android.Support.Design.Widget;
+using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
-using Android.Support.V7.Widget.Helper;
-using static OurPlace.Common.LocalData.Storage;
 using OurPlace.Common.LocalData;
+using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using OurPlace.Common;
+using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -109,9 +110,48 @@ namespace OurPlace.Android.Activities.Create
                 .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
                 {
                 })
-                .SetPositiveButton(Resource.String.DeleteBtn, (a, e) =>
+                .SetPositiveButton(Resource.String.DeleteBtn, async (a, e) =>
                 {
-                    // TODO delete activity
+                    if (editingSubmitted)
+                    {
+                        ProgressDialog prog = new ProgressDialog(this);
+                        prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+                        prog.Show();
+                        ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + newActivity.Id);
+                        prog.Dismiss();
+
+                        if (resp == null)
+                        {
+                            var suppress = AndroidUtils.ReturnToSignIn(this);
+                            Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                            return;
+                        }
+
+                        if (resp.Success)
+                        {
+                            Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show();
+                            MainMyActivitiesFragment.ForceRefresh = true;
+                            Finish();
+                        }
+                        else
+                        {
+                            Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show();
+                        }
+                    }
+                    else
+                    {
+                        if (dbManager == null)
+                        {
+                            dbManager = await GetDatabaseManager();
+                        }
+
+                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.currentUser.LocalCreatedActivitiesJson);
+                        localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
+                        dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                        dbManager.AddUser(dbManager.currentUser);
+                        Finish();
+                    }
+                    
                 })
                 .Show();
 
