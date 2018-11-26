@@ -32,7 +32,6 @@ using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
 using OurPlace.Common;
 using OurPlace.Common.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -54,14 +53,9 @@ namespace OurPlace.Android.Activities.Create
             SetContentView(Resource.Layout.CreateChooseLocationActivity);
 
             string chosenData = Intent.GetStringExtra("CHOSEN") ?? "";
-            if(!string.IsNullOrWhiteSpace(chosenData))
-            {
-                previouslyChosen = JsonConvert.DeserializeObject<List<Common.Models.Place>>(chosenData);
-            }
-            else
-            {
-                previouslyChosen = new List<Place>();
-            }
+            previouslyChosen = !string.IsNullOrWhiteSpace(chosenData) ? 
+                JsonConvert.DeserializeObject<List<Place>>(chosenData) : 
+                new List<Place>();
 
             dialog = new ProgressDialog(this);
             dialog.SetMessage(Resources.GetString(Resource.String.Connecting));
@@ -70,7 +64,7 @@ namespace OurPlace.Android.Activities.Create
             string targetData = Intent.GetStringExtra("TARGET") ?? "";
             if (!string.IsNullOrWhiteSpace(targetData))
             {
-                targetLoc = JsonConvert.DeserializeObject<Common.Models.Map_Location>(targetData);
+                targetLoc = JsonConvert.DeserializeObject<Map_Location>(targetData);
                 LoadData();
             }
             else
@@ -112,7 +106,7 @@ namespace OurPlace.Android.Activities.Create
             List<GooglePlaceResult> final = new List<GooglePlaceResult>();
             foreach(GooglePlaceResult res in resp.Data.results)
             {
-                if(!previouslyChosen.Any(p => p.GooglePlaceId == res.place_id))
+                if(previouslyChosen.All(p => p.GooglePlaceId != res.place_id))
                 {
                     final.Add(res);
                 }
@@ -130,19 +124,13 @@ namespace OurPlace.Android.Activities.Create
 
         protected override void OnStart()
         {
-            if(googleApiClient != null)
-            {
-                googleApiClient.Connect();
-            }
+            googleApiClient?.Connect();
             base.OnStart();
         }
 
         protected override void OnStop()
         {
-            if (googleApiClient != null)
-            {
-                googleApiClient.Disconnect();
-            }
+            googleApiClient?.Disconnect();
             base.OnStop();
         }
 
@@ -171,7 +159,7 @@ namespace OurPlace.Android.Activities.Create
 
             Intent myIntent = new Intent(this, typeof(CreateFinishActivity));
             myIntent.PutExtra("JSON", json);
-            SetResult(global::Android.App.Result.Ok, myIntent);
+            SetResult(Result.Ok, myIntent);
             Finish();
         }
 

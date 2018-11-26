@@ -135,7 +135,7 @@ namespace OurPlace.Android.Activities.Create
                 MaxDepth = 5
             });
 
-            Intent myIntent = new Intent(this, typeof(CreateManageTasksActivity));
+            Intent myIntent = new Intent(this, typeof(CreateActivityOverviewActivity));
             myIntent.PutExtra("JSON", json);
             myIntent.PutExtra("PARENT", parentInd);
             SetResult(global::Android.App.Result.Ok, myIntent);

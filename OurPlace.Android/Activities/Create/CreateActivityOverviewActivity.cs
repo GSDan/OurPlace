@@ -42,10 +42,11 @@ using OurPlace.Common.LocalData;
 
 namespace OurPlace.Android.Activities.Create
 {
-    [Activity(Label = "Add Tasks", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTask)]
-    public class CreateManageTasksActivity : AppCompatActivity
+    [Activity(Label = "Edit Activity", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTask)]
+    public class CreateActivityOverviewActivity : AppCompatActivity
     {
         private LearningActivity newActivity;
+        private bool editingSubmitted;
         private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private CreatedTasksAdapter adapter;
@@ -62,6 +63,7 @@ namespace OurPlace.Android.Activities.Create
 
             SetContentView(Resource.Layout.CreateManageTasksActivity);
 
+            editingSubmitted = Intent.GetBooleanExtra("EDITING_SUBMITTED", false);
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
             newActivity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
@@ -86,6 +88,35 @@ namespace OurPlace.Android.Activities.Create
 
             FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.createTaskFab);
             fab.Click += Fab_Click;
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.MediaViewerMenu, menu);
+            return base.OnPrepareOptionsMenu(menu);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId != Resource.Id.menudelete)
+            {
+                return base.OnOptionsItemSelected(item);
+            }
+
+            new global::Android.Support.V7.App.AlertDialog.Builder(this)
+                .SetTitle(Resource.String.deleteTitle)
+                .SetMessage(Resource.String.deleteMessage)
+                .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
+                {
+                })
+                .SetPositiveButton(Resource.String.DeleteBtn, (a, e) =>
+                {
+                    // TODO delete activity
+                })
+                .Show();
+
+            return true;
+
         }
 
         private void Adapter_ManageChildrenItemClick(object sender, int position)
@@ -124,10 +155,7 @@ namespace OurPlace.Android.Activities.Create
         private void Adapter_EditItemClick(object sender, int position)
         {
             LearningTask thisTask = adapter.Data[position - 1];
-            if (thisTask == null || thisTask.TaskType == null)
-            {
-                return;
-            }
+            if (thisTask?.TaskType == null) return;
 
             Type activityType = AndroidUtils.GetTaskCreationActivityType(thisTask.TaskType.IdName);
             Intent intent = new Intent(this, activityType);
@@ -145,7 +173,7 @@ namespace OurPlace.Android.Activities.Create
         {
             Intent intent = new Intent(this, typeof(CreateFinishActivity));
 
-            for (int i = 0; i < adapter.Data.Count(); i++)
+            for (int i = 0; i < adapter.Data.Count; i++)
             {
                 adapter.Data[i].Order = i;
             }
@@ -166,6 +194,9 @@ namespace OurPlace.Android.Activities.Create
 
         public async void SaveProgress()
         {
+            // Don't save changes to uploaded activities until we're ready to submit
+            if (editingSubmitted) return;
+
             if(dbManager == null)
             {
                 dbManager = await GetDatabaseManager();

@@ -233,7 +233,7 @@ namespace OurPlace.Android.Activities.Create
                 newActivity.ImageUrl = selectedImage.Path;
             }
 
-            Intent addTasksActivity = new Intent(this, typeof(CreateManageTasksActivity));
+            Intent addTasksActivity = new Intent(this, typeof(CreateActivityOverviewActivity));
             string json = JsonConvert.SerializeObject(newActivity, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,

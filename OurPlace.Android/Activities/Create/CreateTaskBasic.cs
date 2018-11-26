@@ -106,20 +106,10 @@ namespace OurPlace.Android.Activities.Create
                 MaxDepth = 5
             });
 
-            if(editing)
-            {
-                Intent myIntent = new Intent(this, typeof(CreateManageTasksActivity));
-                myIntent.PutExtra("JSON", json);
-                SetResult(Result.Ok, myIntent);
-                Finish();
-            }
-            else
-            {
-                Intent myIntent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
-                myIntent.PutExtra("JSON", json);
-                SetResult(Result.Ok, myIntent);
-                Finish();
-            }
+            Intent myIntent = new Intent(this, typeof(CreateActivityOverviewActivity));
+            myIntent.PutExtra("JSON", json);
+            SetResult(Result.Ok, myIntent);
+            Finish();
         }
     }
 }

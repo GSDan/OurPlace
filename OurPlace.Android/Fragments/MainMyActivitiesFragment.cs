@@ -299,33 +299,27 @@ namespace OurPlace.Android.Fragments
 
             bool inProgress = unsubmittedActivities != null && unsubmittedActivities.Exists((la) => chosen.Id == la.Id);
 
-            if(inProgress)
+            if (inProgress)
             {
-                new AlertDialog.Builder(Activity)
-                    .SetTitle(chosen.Name)
-                    .SetMessage(Resource.String.createdActivityDialogUnfinishedMessage)
-                    .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditLocalActivity(chosen); })
-                    .SetNegativeButton(Resource.String.createdActivityDialogDelete, (a, b) => { DeleteLocalActivity(chosen); })
-                    .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
-                    .SetCancelable(true)
-                    .Show();
+                EditActivity(chosen, true);
             }
             else
             {
                 new AlertDialog.Builder(Activity)
                     .SetTitle(chosen.Name)
-                    .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosen.InviteCode)))
-                    .SetPositiveButton(Resource.String.createdActivityDialogOpen, (a, b) => { ((MainActivity)Activity).LaunchActivity(chosen); })
-                    .SetNegativeButton(Resource.String.createdActivityDialogDelete, (a, b) => { DeleteServerActivity(chosen); })
+                    .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditActivity(chosen, false); })
                     .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
                     .SetCancelable(true)
+                    .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosen.InviteCode)))
+                    .SetNegativeButton(Resource.String.createdActivityDialogOpen,
+                    (a, b) => { ((MainActivity)Activity).LaunchActivity(chosen); })
                     .Show();
             }
         }
 
-        private void EditLocalActivity(LearningActivity chosen)
+        private void EditActivity(LearningActivity chosen, bool isLocalOnly)
         {
-            Intent addTasksActivity = new Intent(Activity, typeof(CreateManageTasksActivity));
+            Intent addTasksActivity = new Intent(Activity, typeof(CreateActivityOverviewActivity));
             string json = JsonConvert.SerializeObject(chosen, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
@@ -333,6 +327,7 @@ namespace OurPlace.Android.Fragments
                 MaxDepth = 5
             });
             addTasksActivity.PutExtra("JSON", json);
+            addTasksActivity.PutExtra("EDITING_SUBMITTED", !isLocalOnly);
             StartActivity(addTasksActivity);
         }
 

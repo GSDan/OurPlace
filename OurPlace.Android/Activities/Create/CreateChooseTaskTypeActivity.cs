@@ -128,7 +128,7 @@ namespace OurPlace.Android.Activities.Create
             // If successful return pass the json data back to the parent activity
             if (resultCode == global::Android.App.Result.Ok)
             {
-                Intent myIntent = new Intent(this, typeof(CreateManageTasksActivity));
+                Intent myIntent = new Intent(this, typeof(CreateActivityOverviewActivity));
                 myIntent.PutExtra("JSON", data.GetStringExtra("JSON"));
                 SetResult(global::Android.App.Result.Ok, myIntent);
                 base.Finish();

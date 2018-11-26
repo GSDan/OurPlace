@@ -3018,6 +3018,9 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c006f
 			public const int default_activity_button = 2131492975;
 			
+			// aapt resource value: 0x7f0c0137
+			public const int deleteActivity = 2131493175;
+			
 			// aapt resource value: 0x7f0c00d7
 			public const int deleteBtn = 2131493079;
 			
@@ -3228,23 +3231,23 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0c010a
 			public const int media_actions = 2131493130;
 			
-			// aapt resource value: 0x7f0c013c
-			public const int menudelete = 2131493180;
-			
-			// aapt resource value: 0x7f0c013a
-			public const int menuhelp = 2131493178;
-			
-			// aapt resource value: 0x7f0c0138
-			public const int menuscan = 2131493176;
-			
-			// aapt resource value: 0x7f0c0137
-			public const int menusearch = 2131493175;
+			// aapt resource value: 0x7f0c013d
+			public const int menudelete = 2131493181;
 			
 			// aapt resource value: 0x7f0c013b
-			public const int menusettings = 2131493179;
+			public const int menuhelp = 2131493179;
 			
 			// aapt resource value: 0x7f0c0139
-			public const int menuuploads = 2131493177;
+			public const int menuscan = 2131493177;
+			
+			// aapt resource value: 0x7f0c0138
+			public const int menusearch = 2131493176;
+			
+			// aapt resource value: 0x7f0c013c
+			public const int menusettings = 2131493180;
+			
+			// aapt resource value: 0x7f0c013a
+			public const int menuuploads = 2131493178;
 			
 			// aapt resource value: 0x7f0c0132
 			public const int message = 2131493170;
@@ -4141,10 +4144,13 @@ namespace OurPlace.Android
 		{
 			
 			// aapt resource value: 0x7f100000
-			public const int MainMenu = 2131755008;
+			public const int CreateActivityOverviewMenu = 2131755008;
 			
 			// aapt resource value: 0x7f100001
-			public const int MediaViewerMenu = 2131755009;
+			public const int MainMenu = 2131755009;
+			
+			// aapt resource value: 0x7f100002
+			public const int MediaViewerMenu = 2131755010;
 			
 			static Menu()
 			{
