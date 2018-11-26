@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 /*
     OurPlace is a mobile learning platform, designed to support communities
     in creating and sharing interactive learning activities about the places they care most about.
@@ -19,27 +19,21 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System.Collections.Generic;
-
-namespace OurPlace.API.Models
+namespace OurPlace.API.Migrations
 {
-    public class LearningTask : Model
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class softDeleteTasks : DbMigration
     {
-        public string ImageUrl { get; set; }
-        public string Description { get; set; }
-        public int Order { get; set; }
-        public string JsonData { get; set; }
-
-        public bool SoftDeleted { get; set; }
-
-        public int? LearningActivityId { get; set; }
-        public virtual LearningActivity LearningActivity { get; set; }
-
-        public int? ParentTaskId { get; set; }
-        public virtual LearningTask ParentTask { get; set; }
-
-        public virtual ICollection<LearningTask> ChildTasks { get; set; }
-        public virtual TaskType TaskType { get; set; }
-        public virtual ApplicationUser Author { get; set; }
+        public override void Up()
+        {
+            AddColumn("dbo.LearningTasks", "SoftDeleted", c => c.Boolean(nullable: false));
+        }
+        
+        public override void Down()
+        {
+            DropColumn("dbo.LearningTasks", "SoftDeleted");
+        }
     }
 }

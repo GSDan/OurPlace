@@ -442,6 +442,10 @@
     <Compile Include="Migrations\201810151251243_TaskImages.Designer.cs">
       <DependentUpon>201810151251243_TaskImages.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811261107432_softDeleteTasks.cs" />
+    <Compile Include="Migrations\201811261107432_softDeleteTasks.Designer.cs">
+      <DependentUpon>201811261107432_softDeleteTasks.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -717,6 +721,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810151251243_TaskImages.resx">
       <DependentUpon>201810151251243_TaskImages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811261107432_softDeleteTasks.resx">
+      <DependentUpon>201811261107432_softDeleteTasks.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
