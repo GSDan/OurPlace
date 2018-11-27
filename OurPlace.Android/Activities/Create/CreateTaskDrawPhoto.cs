@@ -38,6 +38,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -83,11 +84,11 @@ namespace OurPlace.Android.Activities.Create
             Prepare();
         }
 
-        private async void Prepare()
+        private void Prepare()
         {
             LearningTask passedTask = JsonConvert.DeserializeObject<LearningTask>(Intent.GetStringExtra("PARENT") ?? "");
 
-            if (passedTask != null && passedTask.TaskType != null)
+            if (passedTask?.TaskType != null)
             {
                 isChild = true;
                 string[] supportedParents = { "TAKE_PHOTO", "MATCH_PHOTO", "DRAW", "DRAW_PHOTO" };
@@ -136,15 +137,18 @@ namespace OurPlace.Android.Activities.Create
             }
             else
             {
-                // Copy the existing file, in case the user overwrites it but then doesn't want to save changes
-                editCachePath = Path.Combine(
-                    Common.LocalData.Storage.GetCacheFolder(null),
-                    "editcache-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
+                if (!newTask.JsonData.StartsWith("upload"))
+                {
+                    // Copy the existing file, in case the user overwrites it but then doesn't want to save changes
+                    editCachePath = Path.Combine(
+                        Common.LocalData.Storage.GetCacheFolder(),
+                        "editcache-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
 
-                File.Copy(newTask.JsonData, editCachePath, true);
+                    File.Copy(newTask.JsonData, editCachePath, true);
 
-                Java.IO.File cachedFile = new Java.IO.File(editCachePath);
-                selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
+                    Java.IO.File cachedFile = new Java.IO.File(editCachePath);
+                    selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
+                }
 
                 ShowImage();
             }
@@ -232,6 +236,15 @@ namespace OurPlace.Android.Activities.Create
                 chosenTaskTextview.Visibility = global::Android.Views.ViewStates.Gone;
                 useParent = false;
             }
+            else if (newTask != null && newTask.JsonData.StartsWith("upload"))
+            {
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(newTask.JsonData))
+                    .Transform(new CircleTransformation())
+                    .Into(chosenImageView);
+                chosenLayout.Visibility = global::Android.Views.ViewStates.Visible;
+                chosenTaskTextview.Visibility = global::Android.Views.ViewStates.Gone;
+                useParent = false;
+            }
         }
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
@@ -281,7 +294,9 @@ namespace OurPlace.Android.Activities.Create
                 return;
             }
 
-            if (selectedImage == null && useParent == false)
+            if (selectedImage == null &&
+                useParent == false &&
+                (newTask == null || string.IsNullOrWhiteSpace(newTask.JsonData)))
             {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)
                     .SetTitle(Resource.String.ErrorTitle)
@@ -308,9 +323,9 @@ namespace OurPlace.Android.Activities.Create
                     newTask.JsonData = selectedImage.Path;
                 }
             }
-            else
+            else if(useParent)
             {
-                newTask.JsonData = "TASK::" + parentTask.Id.ToString();
+                newTask.JsonData = "TASK::" + parentTask.Id;
                 if (outputFileUri != null && File.Exists(outputFileUri.Path))
                 {
                     File.Delete(outputFileUri.Path);
