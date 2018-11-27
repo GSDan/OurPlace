@@ -153,7 +153,7 @@ namespace OurPlace.Android.Adapters
 
                 if (string.IsNullOrWhiteSpace(learningActivity.ImageUrl)) return;
 
-                if (editingSubmitted)
+                if (learningActivity.ImageUrl.StartsWith("upload"))
                 {
                     ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(learningActivity.ImageUrl))
                         .Transform(new CircleTransformation())

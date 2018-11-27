@@ -35,6 +35,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -87,8 +88,17 @@ namespace OurPlace.Android.Activities.Create
 
                 if (!string.IsNullOrWhiteSpace(newActivity.ImageUrl))
                 {
-                    selectedImage = global::Android.Net.Uri.FromFile(new Java.IO.File(newActivity.ImageUrl));
-                    ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    if (newActivity.ImageUrl.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(newActivity.ImageUrl))
+                            .Transform(new CircleTransformation())
+                            .Into(imageView);
+                    }
+                    else
+                    {
+                        selectedImage = global::Android.Net.Uri.FromFile(new Java.IO.File(newActivity.ImageUrl));
+                        ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    }
                 }
             }
         }
