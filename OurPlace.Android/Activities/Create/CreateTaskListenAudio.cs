@@ -21,22 +21,21 @@
 #endregion
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
+using Android.Media;
 using Android.OS;
+using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
-using Android.Runtime;
-using System.IO;
-using Android.Support.V4.Content;
-using Android.Content.PM;
 using System.Globalization;
-using Android.Media;
-using System.Threading.Tasks;
-using OurPlace.Common;
+using System.IO;
 
 namespace OurPlace.Android.Activities.Create
 {

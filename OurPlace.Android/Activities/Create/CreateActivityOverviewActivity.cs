@@ -218,6 +218,7 @@ namespace OurPlace.Android.Activities.Create
 
             newActivity.LearningTasks = adapter.Data;
             intent.PutExtra("JSON", JsonConvert.SerializeObject(newActivity));
+            intent.PutExtra("EDITING_SUBMITTED", editingSubmitted);
             StartActivity(intent);
         }
 
