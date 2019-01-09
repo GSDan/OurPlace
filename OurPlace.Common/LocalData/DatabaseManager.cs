@@ -58,12 +58,7 @@ namespace OurPlace.Common.LocalData
 
         public void SaveActivityProgress(LearningActivity activity, ICollection<AppTask> progress, string enteredUsername)
         {
-            List<AppTask> trimmed = new List<AppTask>();
-
-            foreach (AppTask t in progress)
-            {
-                if (t != null) trimmed.Add(t);
-            }
+            List<AppTask> trimmed = progress.Where(t => t != null).ToList();
 
             ActivityProgress latestProg = new ActivityProgress
             {

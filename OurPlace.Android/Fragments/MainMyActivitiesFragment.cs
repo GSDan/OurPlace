@@ -144,6 +144,18 @@ namespace OurPlace.Android.Fragments
                     });
                 dbManager.AddUser(dbManager.currentUser);
 
+                List<LearningActivity> recentlyOpened = dbManager.GetActivities();
+                foreach (LearningActivity cachedActivity in recentlyOpened)
+                {
+                    LearningActivity refreshedVersion = results.Data.FirstOrDefault(act => act.Id == cachedActivity.Id);
+                    if (refreshedVersion != null &&
+                        refreshedVersion.ActivityVersionNumber > cachedActivity.ActivityVersionNumber)
+                    {
+                        dbManager.DeleteCachedActivity(cachedActivity);
+                        MainLandingFragment.ForceRefresh = true;
+                    }
+                }
+
                 LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
 
                 refreshingData = false;
