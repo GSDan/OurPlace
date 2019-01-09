@@ -95,7 +95,21 @@ namespace OurPlace.API.Controllers.Site
                 { "code", code }
             });
 
-            ViewData["data"] = await db.CompletedTasks.Where(ct => ct.ParentSubmission.Id == activity.Id).OrderBy(ct => ct.EventTask.Order).ToListAsync();
+            List<CompletedTask> completedTasks = await db.CompletedTasks.Where(ct => ct.ParentSubmission.Id == activity.Id).OrderBy(ct => ct.EventTask.Order).ToListAsync();
+            List<CompletedTask> tempList = new List<CompletedTask>(completedTasks);
+
+            // make sure follow-up tasks appear below the parent ones
+            for (int i = tempList.Count - 1; i >= 0; i--)
+            {
+                if (tempList[i].EventTask.ParentTask != null)
+                {
+                    int parentIndex = completedTasks.FindIndex(task => task.EventTask.Id == tempList[i].EventTask.ParentTask.Id);
+                    completedTasks.Remove(tempList[i]);
+                    completedTasks.Insert(parentIndex + 1, tempList[i]);
+                }
+            }
+
+            ViewData["data"] = completedTasks;
             ViewData["submissionId"] = activity.Id;        
             ViewData["storage"] = ConfidentialData.storage;
             ViewData["imageTasks"] = imageTasks;
