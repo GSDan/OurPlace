@@ -77,7 +77,7 @@ namespace OurPlace.Android.Activities
             dbManager = await Storage.GetDatabaseManager();
 
             // Load this activity's progress from the database if available
-            ActivityProgress progress = dbManager.GetProgress(learningActivity.Id);
+            ActivityProgress progress = dbManager.GetProgress(learningActivity);
             List<AppTask> appTasks = null;
 
             try

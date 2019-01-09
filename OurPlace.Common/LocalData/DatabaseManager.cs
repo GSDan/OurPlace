@@ -68,6 +68,7 @@ namespace OurPlace.Common.LocalData
             ActivityProgress latestProg = new ActivityProgress
             {
                 ActivityId = activity.Id,
+                ActivityVersion = activity.ActivityVersionNumber,
                 EnteredUsername = enteredUsername,
                 JsonData = JsonConvert.SerializeObject(activity,
                     new JsonSerializerSettings
@@ -193,9 +194,10 @@ namespace OurPlace.Common.LocalData
             connection.Delete<ActivityProgress>(activityId);
         }
 
-        public ActivityProgress GetProgress(int activityId)
+        public ActivityProgress GetProgress(LearningActivity activity)
         {
-            return connection.Table<ActivityProgress>().Where(prog => prog.ActivityId == activityId).FirstOrDefault();
+            return connection.Table<ActivityProgress>().FirstOrDefault(prog => prog.ActivityId == activity.Id &&
+                                                                               prog.ActivityVersion == activity.ActivityVersionNumber);
         }
 
         public List<ActivityProgress> GetProgress()

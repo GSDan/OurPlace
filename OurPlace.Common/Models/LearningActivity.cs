@@ -46,5 +46,6 @@ namespace OurPlace.Common.Models
         public Application Application { get; set; }
 
         public int AppVersionNumber { get; set; }
+        public int ActivityVersionNumber { get; set; }
     }
 }

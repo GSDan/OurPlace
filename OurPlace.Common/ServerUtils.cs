@@ -411,6 +411,73 @@ namespace OurPlace.Common
         }
 
         /// <summary>
+        /// Performs a POST request to the given route
+        /// </summary>
+        /// <typeparam name="T">Data type expected to be returned within the response</typeparam>
+        /// <param name="route">The controller route (with first slash)</param>
+        /// <param name="data">The data to be posted</param>
+        /// <param name="reqAccessToken">If an access token should be sent</param>
+        /// <returns>Server response with returned data. If return is null, user should be logged out</returns>
+        public static async Task<ServerResponse<T>> Put<T>(string route, object data, bool reqAccessToken = true)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+
+                    if (reqAccessToken)
+                    {
+                        string accessToken = await GetAccessToken();
+
+                        // Access and refresh tokens invalid, prompt new sign-in
+                        if (accessToken == null) return null;
+
+                        if (accessToken == ServerErr)
+                        {
+                            throw new Exception("There was an issue contacting the server");
+                        }
+
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                    }
+
+                    string jsonContent = JsonConvert.SerializeObject(data, new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 5,
+                        Formatting = Formatting.None
+                    });
+
+                    HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    HttpResponseMessage resp = await client.PutAsync(ConfidentialData.api + route, content);
+                    string json = await resp.Content.ReadAsStringAsync();
+
+                    ServerResponse<T> toRet = new ServerResponse<T>
+                    {
+                        Success = resp.IsSuccessStatusCode,
+                        Message = resp.ReasonPhrase,
+                        StatusCode = resp.StatusCode,
+                    };
+
+                    if (toRet.Success && typeof(T) != typeof(string))
+                    {
+                        toRet.Data = JsonConvert.DeserializeObject<T>(json);
+                    }
+
+                    return toRet;
+                }
+            }
+            catch (Exception e)
+            {
+                return new ServerResponse<T>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+        }
+
+        /// <summary>
         /// Uploads a stream to the given route
         /// </summary>
         /// <typeparam name="T">Data type expected to be returned within the response</typeparam>
@@ -500,7 +567,7 @@ namespace OurPlace.Common
             return await Post<string>(uploadRoute, results);
         }
 
-        public static Task<ServerResponse<string>> UploadNewActivity(AppDataUpload upload)
+        public static Task<ServerResponse<string>> UploadActivity(AppDataUpload upload, bool updateExisting = false)
         {
             LearningActivity activity = JsonConvert.DeserializeObject<LearningActivity>(upload.JsonData);
             List<FileUpload> files = JsonConvert.DeserializeObject<List<FileUpload>>(upload.FilesJson);
@@ -522,19 +589,20 @@ namespace OurPlace.Common
                     parentTask.JsonData = newJson;
                 }
 
-                if (parentTask.ChildTasks != null)
+                if (parentTask.ChildTasks == null) continue;
+
+                foreach (LearningTask childTask in parentTask.ChildTasks)
                 {
-                    foreach (LearningTask childTask in parentTask.ChildTasks)
+                    string newChildJson = GetNewTaskJsonData(childTask, files);
+                    if (!string.IsNullOrWhiteSpace(newChildJson))
                     {
-                        string newChildJson = GetNewTaskJsonData(childTask, files);
-                        if (!string.IsNullOrWhiteSpace(newChildJson))
-                        {
-                            childTask.JsonData = newChildJson;
-                        }
+                        childTask.JsonData = newChildJson;
                     }
                 }
             }
-            return Post<string>(upload.UploadRoute, activity);
+
+            return updateExisting ? Put<string>(upload.UploadRoute, activity) :
+                Post<string>(upload.UploadRoute, activity);
         }
 
         private static string GetNewTaskJsonData(LearningTask task, List<FileUpload> files)

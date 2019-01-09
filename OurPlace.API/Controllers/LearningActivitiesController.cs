@@ -61,6 +61,7 @@ namespace OurPlace.API.Controllers
                    InviteCode = a.InviteCode,
                    RequireUsername = a.RequireUsername,
                    AppVersionNumber = a.AppVersionNumber,
+                   ActivityVersionNumber = a.ActivityVersionNumber,
                    Application = new Common.Models.Application
                    {
                        Id = a.Application.Id,
@@ -314,6 +315,7 @@ namespace OurPlace.API.Controllers
             }
                 
             existing.AppVersionNumber = learningActivity.AppVersionNumber;
+            existing.ActivityVersionNumber = learningActivity.ActivityVersionNumber;
             existing.Approved = thisUser.Trusted;
             existing.CreatedAt = DateTime.UtcNow;
             existing.Description = learningActivity.Description;

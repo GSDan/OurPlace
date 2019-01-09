@@ -21,25 +21,20 @@
 #endregion
 using Android.App;
 using Android.Content;
-using Android.Content.PM;
+using Android.Gms.Common;
+using Android.Gms.Location.Places;
+using Android.Gms.Location.Places.UI;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Text.Method;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using OurPlace.Common.LocalData;
-using Android.Gms.Location;
-using Android.Gms.Location.Places.UI;
-using Android.Gms.Common;
-using Android.Gms.Location.Places;
 using System.Threading.Tasks;
 using Place = OurPlace.Common.Models.Place;
 
@@ -189,7 +184,9 @@ namespace OurPlace.Android.Activities.Create
             activity.RequireUsername = reqUsername.Checked;
             activity.Places = chosenPlaces;
 
-            var uploadData = await Storage.PrepCreatedActivityForUpload(activity);
+            activity.ActivityVersionNumber = (editingSubmitted) ? activity.ActivityVersionNumber + 1 : 0;
+
+            var uploadData = await Storage.PrepCreatedActivityForUpload(activity, editingSubmitted);
 
             Intent intent = new Intent(this, typeof(UploadsActivity));
             StartActivity(intent);

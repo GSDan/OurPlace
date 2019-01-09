@@ -90,7 +90,8 @@ namespace OurPlace.Android.Activities.Create
                 {
                     if (newActivity.ImageUrl.StartsWith("upload"))
                     {
-                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(newActivity.ImageUrl))
+                        selectedImage = global::Android.Net.Uri.Parse(newActivity.ImageUrl);
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(selectedImage.ToString()))
                             .Transform(new CircleTransformation())
                             .Into(imageView);
                     }
@@ -156,11 +157,11 @@ namespace OurPlace.Android.Activities.Create
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
         {
-            bool success = resultCode == global::Android.App.Result.Ok;
+            bool success = resultCode == Result.Ok;
 
             if (requestCode == PhotoRequestCode && success)
             {
-                if (previousFileUri != null)
+                if (previousFileUri != null && !previousFileUri.ToString().StartsWith("upload"))
                 {
                     try
                     {
