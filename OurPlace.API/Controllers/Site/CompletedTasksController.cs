@@ -19,8 +19,6 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
@@ -30,7 +28,6 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using static OurPlace.API.ServerUtils;
 
@@ -40,8 +37,8 @@ namespace OurPlace.API.Controllers.Site
     [RequireHttps]
     public class CompletedTasksController : OurPlaceSiteController
     {
-        private List<string> imageTasks;
-        private List<string> linkTasks;
+        private readonly List<string> imageTasks;
+        private readonly List<string> linkTasks;
 
         public CompletedTasksController()
         {
@@ -62,7 +59,7 @@ namespace OurPlace.API.Controllers.Site
                 activity = await db.CompletedActivities.Where(act => act.Share.ShareCode == code).FirstOrDefaultAsync();
                 if(activity == null) return new HttpNotFoundResult();
             }
-            else if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
+            else if (User?.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -103,8 +100,8 @@ namespace OurPlace.API.Controllers.Site
             {
                 if (tempList[i].EventTask.ParentTask != null)
                 {
-                    int parentIndex = completedTasks.FindIndex(task => task.EventTask.Id == tempList[i].EventTask.ParentTask.Id);
                     completedTasks.Remove(tempList[i]);
+                    int parentIndex = completedTasks.FindIndex(task => task.EventTask.Id == tempList[i].EventTask.ParentTask.Id);
                     completedTasks.Insert(parentIndex + 1, tempList[i]);
                 }
             }

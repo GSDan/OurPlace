@@ -54,6 +54,7 @@ namespace OurPlace.Android.Activities.Create
         private const int EditTaskIntent = 198;
         private const int AddTaskIntent = 200;
         private int parentInd;
+        private bool editingSubmitted;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -62,6 +63,7 @@ namespace OurPlace.Android.Activities.Create
             SetContentView(Resource.Layout.CreateManageChildTasksActivity);
 
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
+            editingSubmitted = Intent.GetBooleanExtra("EDITING_SUBMITTED", false);
             parentInd = Intent.GetIntExtra("PARENT", -1);
 
             learningActivity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
@@ -156,6 +158,9 @@ namespace OurPlace.Android.Activities.Create
             fabPrompt.Visibility =
                 (parentTask.ChildTasks != null && parentTask.ChildTasks.Count() > 0)
                 ? ViewStates.Gone : ViewStates.Visible;
+
+            // Don't save changes to uploaded activities until we're ready to submit
+            if (editingSubmitted) return;
 
             // Add/update this new activity in the user's inprogress cache
             string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;

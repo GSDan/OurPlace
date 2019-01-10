@@ -193,6 +193,7 @@ namespace OurPlace.Android.Activities.Create
             });
             manageChildTasksAct.PutExtra("JSON", json);
             manageChildTasksAct.PutExtra("PARENT", position - 1);
+            manageChildTasksAct.PutExtra("EDITING_SUBMITTED", editingSubmitted);
             StartActivityForResult(manageChildTasksAct, ManageChildrenIntent);
         }
 
@@ -297,6 +298,7 @@ namespace OurPlace.Android.Activities.Create
         protected override void OnResume()
         {
             SaveProgress();
+            adapter?.NotifyDataSetChanged();
             base.OnResume();
         }
 
