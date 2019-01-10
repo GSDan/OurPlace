@@ -59,6 +59,7 @@ namespace OurPlace.Android.Fragments
         private TextView uploadsHint;
         private bool refreshingData = true;
         private bool viewLoaded;
+        private Intent requiresStorageIntent;
         public static bool ForceRefresh;
 
         public override async void OnCreate(Bundle savedInstanceState)
@@ -251,6 +252,13 @@ namespace OurPlace.Android.Fragments
 
         private void Fab_Click(object sender, EventArgs e)
         {
+            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
+            requiresStorageIntent = new Intent(Activity, typeof(CreateNewActivity));
+            LaunchWithStoragePermissions();
+        }
+
+        private void LaunchWithStoragePermissions()
+        {
             const string permission = global::Android.Manifest.Permission.ReadExternalStorage;
             Permission currentPerm = ContextCompat.CheckSelfPermission(Activity, permission);
 
@@ -279,7 +287,7 @@ namespace OurPlace.Android.Fragments
             }
             else
             {
-                StartCreate();
+                StartStorageIntent();
             }
         }
 
@@ -288,15 +296,16 @@ namespace OurPlace.Android.Fragments
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == PermReqId && grantResults.All((p) => p == Permission.Granted))
             {
-                StartCreate();
+                StartStorageIntent();
             }
         }
 
-        private void StartCreate()
+        private void StartStorageIntent()
         {
-            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
-            Intent intent = new Intent(Activity, typeof(CreateNewActivity));
-            StartActivity(intent);
+            if (requiresStorageIntent != null)
+            {
+                StartActivity(requiresStorageIntent);
+            }
         }
 
         private void OnItemClick(object sender, int position)
@@ -331,16 +340,16 @@ namespace OurPlace.Android.Fragments
 
         private void EditActivity(LearningActivity chosen, bool isLocalOnly)
         {
-            Intent addTasksActivity = new Intent(Activity, typeof(CreateActivityOverviewActivity));
+            requiresStorageIntent = new Intent(Activity, typeof(CreateActivityOverviewActivity));
             string json = JsonConvert.SerializeObject(chosen, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });
-            addTasksActivity.PutExtra("JSON", json);
-            addTasksActivity.PutExtra("EDITING_SUBMITTED", !isLocalOnly);
-            StartActivity(addTasksActivity);
+            requiresStorageIntent.PutExtra("JSON", json);
+            requiresStorageIntent.PutExtra("EDITING_SUBMITTED", !isLocalOnly);
+            LaunchWithStoragePermissions();
         }
     }
 }
