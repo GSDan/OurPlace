@@ -97,8 +97,31 @@ namespace OurPlace.Android.Activities.Create
             return base.OnPrepareOptionsMenu(menu);
         }
 
+        public override void OnBackPressed()
+        {
+            if (editingSubmitted)
+            {
+                new global::Android.Support.V7.App.AlertDialog.Builder(this)
+                    .SetTitle(Resource.String.WarningTitle)
+                    .SetMessage(Resource.String.editActivityBackWarning)
+                    .SetNegativeButton(Resource.String.dialog_cancel, (a, e) => { })
+                    .SetPositiveButton(Resource.String.editActivityBackWarningAccept, (a, e) => { base.OnBackPressed(); })
+                    .Show();
+            }
+            else
+            {
+                base.OnBackPressed();
+            }
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            if (item.ItemId == global::Android.Resource.Id.Home)
+            {
+                OnBackPressed();
+                return true;
+            }
+
             if (item.ItemId != Resource.Id.menudelete)
             {
                 return base.OnOptionsItemSelected(item);
