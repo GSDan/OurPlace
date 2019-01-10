@@ -32,7 +32,7 @@ namespace OurPlace.Common
             return HttpUtility.ParseQueryString(uri.Query).Get(query);
         }
 
-        public static int AppVersionNumber = 38;
+        public static int AppVersionNumber = 42;
 
         public static IList<T> Swap<T>(this IList<T> list, int indexA, int indexB)
         {
