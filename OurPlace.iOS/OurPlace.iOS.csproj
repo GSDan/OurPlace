@@ -39,14 +39,14 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <CodesignKey>iPhone Distribution: University of Newcastle upon Tyne (J3676MPZ85)</CodesignKey>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <AssemblyName>OurPlace.iOS</AssemblyName>
-    <CodesignProvision>VS: uk.ac.ncl.openlab.ourplace Development</CodesignProvision>
+    <CodesignProvision>OurPlace DIST</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -56,13 +56,13 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
+    <CodesignKey>iPhone Distribution: University of Newcastle upon Tyne (J3676MPZ85)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>i386, x86_64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
-    <CodesignProvision>VS: uk.ac.ncl.openlab.ourplace Development</CodesignProvision>
+    <CodesignProvision>OurPlace Dist</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
