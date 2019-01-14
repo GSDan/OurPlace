@@ -25,15 +25,14 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using FFImageLoading;
 using FFImageLoading.Transformations;
 using Foundation;
 using MobileCoreServices;
-using OurPlace.iOS.Controllers.Create;
 using OurPlace.Common.Models;
+using OurPlace.iOS.Controllers.Create;
 using UIKit;
-using OurPlace.Common.LocalData;
-using System.Threading.Tasks;
 
 namespace OurPlace.iOS
 {

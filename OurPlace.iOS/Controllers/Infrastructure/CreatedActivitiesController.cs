@@ -137,28 +137,8 @@ namespace OurPlace.iOS
 
         private void LocalActivityTapped(LearningActivity activity)
         {
-            UIAlertController alert = UIAlertController.Create("What do you want to do?", "This activity has yet to be uploaded" + activity.InviteCode, UIAlertControllerStyle.ActionSheet);
-            alert.AddAction(UIAlertAction.Create("Continue Editing", UIAlertActionStyle.Default, (a) =>
-            {
-                activityToEdit = activity;
-                PerformSegue("CreateActivitySegue", this);
-            }));
-            alert.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (a) =>
-            {
-                PromptDelete(activity, false);
-            }));
-            alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-
-            // On iPad, it's a pop up. Stick it in the center of the screen
-            UIPopoverPresentationController popCont = alert.PopoverPresentationController;
-            if (popCont != null)
-            {
-                popCont.SourceView = View;
-                popCont.SourceRect = new CGRect(View.Bounds.GetMidX(), View.Bounds.GetMidY(), 0, 0);
-                popCont.PermittedArrowDirections = 0;
-            }
-
-            PresentViewController(alert, true, null);
+            activityToEdit = activity;
+            PerformSegue("CreateActivitySegue", this);
         }
 
         private void RemoteActivityTapped(LearningActivity activity)
@@ -176,7 +156,7 @@ namespace OurPlace.iOS
             }));
             alert.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (a) =>
             {
-                PromptDelete(activity, true);
+                //PromptDelete(activity, true);
             }));
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
@@ -190,63 +170,6 @@ namespace OurPlace.iOS
             }
 
             PresentViewController(alert, true, null);
-        }
-
-        private void PromptDelete(LearningActivity activity, bool isRemote)
-        {
-            AppUtils.ShowChoiceDialog(
-                this,
-                string.Format("Delete '{0}'?", activity.Name),
-                "Are you sure you want to delete this activity? This can't be undone.",
-                "Delete", (res) =>
-                {
-                    if (isRemote)
-                    {
-                        var suppress = DeleteRemoteActivity(res);
-                    }
-                    else
-                    {
-                        DeleteLocalActivity(activity);
-                    }
-
-                },
-                "Cancel",
-                null, activity);
-        }
-
-        private void DeleteLocalActivity(LearningActivity activity)
-        {
-            Storage.DeleteInProgress(activity);
-            unsubmittedActivities.Remove(activity);
-            dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
-            dbManager.AddUser(dbManager.currentUser);
-            Toast.ShowToast("Activity Deleted");
-            RefreshFeed();
-        }
-
-        private async Task DeleteRemoteActivity(LearningActivity activity)
-        {
-            ShowLoadingOverlay();
-            ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + activity.Id);
-            HideLoadingOverlay();
-
-            if (resp == null)
-            {
-                var suppress = AppUtils.SignOut(this);
-                return;
-            }
-
-            if (resp.Success)
-            {
-                dbManager.DeleteCachedActivity(activity);
-                Toast.ShowToast("Activity Deleted");
-            }
-            else
-            {
-                Toast.ShowToast("Error connecting to the server");
-            }
-
-            RefreshFeed();
         }
 
         public override void ViewDidAppear(bool animated)
@@ -267,6 +190,12 @@ namespace OurPlace.iOS
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
             base.PrepareForSegue(segue, sender);
+
+            if (TabBarController != null)
+            {
+                // remove back button title
+                TabBarController.NavigationItem.BackBarButtonItem = new UIBarButtonItem("", UIBarButtonItemStyle.Plain, null);
+            }
 
             if (segue.Identifier.Equals("CreateActivitySegue"))
             {

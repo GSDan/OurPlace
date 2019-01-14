@@ -28,12 +28,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using FFImageLoading;
 using Foundation;
+using GlobalToast;
 using Newtonsoft.Json;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using OurPlace.iOS.Controllers.Create;
 using OurPlace.iOS.ViewSources;
 using UIKit;
+using System.Linq;
 
 namespace OurPlace.iOS
 {
@@ -64,8 +66,10 @@ namespace OurPlace.iOS
             FooterButton.TouchUpInside += FooterButton_TouchUpInside;
 
             NavigationItem.Title = "Edit Activity";
-            NavigationItem.RightBarButtonItem = new UIBarButtonItem(
-                UIBarButtonSystemItem.Add, AddNewTask);
+            NavigationItem.RightBarButtonItems = new UIBarButtonItem[] {
+            new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewTask),
+            new UIBarButtonItem(UIBarButtonSystemItem.Trash, DeleteTask),
+                };
 
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 180;
@@ -148,6 +152,65 @@ namespace OurPlace.iOS
         private void AddNewTask(object sender, EventArgs e)
         {
             PerformSegue("ChooseTaskType", this);
+        }
+
+        private void DeleteTask(object sender, EventArgs e)
+        {
+            AppUtils.ShowChoiceDialog(
+                this,
+                string.Format("Delete '{0}'?", thisActivity.Name),
+                "Are you sure you want to delete this activity? This can't be undone.",
+                "Delete", (res) =>
+                {
+                    if (false) // TODO
+                    {
+                        var suppress = DeleteRemoteActivity();
+                    }
+                    else
+                    {
+                        var suppress = DeleteLocalActivity();
+                    }
+
+                },
+                "Cancel",
+                null, thisActivity);
+        }
+
+        private async Task DeleteLocalActivity()
+        {
+            Storage.DeleteInProgress(thisActivity);
+            DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
+            List<LearningActivity> unsubmittedActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.currentUser.LocalCreatedActivitiesJson);
+            unsubmittedActivities.RemoveAll((LearningActivity obj) => obj.Id == thisActivity.Id);
+            dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
+            dbManager.AddUser(dbManager.currentUser);
+            Toast.ShowToast("Activity Deleted");
+            NavigationController.PopViewController(true);
+        }
+
+        private async Task DeleteRemoteActivity()
+        {
+            //ShowLoadingOverlay();
+            //ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + activity.Id);
+            //HideLoadingOverlay();
+
+            //if (resp == null)
+            //{
+            //    var suppress = AppUtils.SignOut(this);
+            //    return;
+            //}
+
+            //if (resp.Success)
+            //{
+            //    dbManager.DeleteCachedActivity(activity);
+            //    Toast.ShowToast("Activity Deleted");
+            //}
+            //else
+            //{
+            //    Toast.ShowToast("Error connecting to the server");
+            //}
+
+            //RefreshFeed();
         }
 
         private void EditMetaButton_TouchUpInside(object sender, EventArgs e)
