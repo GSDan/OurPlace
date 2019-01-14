@@ -115,7 +115,7 @@ namespace OurPlace.iOS
                 thisActivity.Places = new Common.Models.Place[] { chosenPlace };
             }
 
-            var uploadData = await Storage.PrepCreatedActivityForUpload(thisActivity);
+            var uploadData = await Storage.PrepCreatedActivityForUpload(thisActivity, false);
 
             NavigationController.PopToRootViewController(true);
         }
