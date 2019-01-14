@@ -19,33 +19,35 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.Design.Widget;
+using Android.Support.V7.App;
+using Android.Support.V7.Widget;
+using Android.Support.V7.Widget.Helper;
 using Android.Views;
 using Android.Widget;
-using Android.Support.V7.App;
-using OurPlace.Common.Models;
-using Android.Support.V7.Widget;
-using OurPlace.Android.Adapters;
 using Newtonsoft.Json;
-using Android.Support.Design.Widget;
+using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
-using Android.Support.V7.Widget.Helper;
-using static OurPlace.Common.LocalData.Storage;
 using OurPlace.Common.LocalData;
+using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using OurPlace.Common;
+using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
 {
-    [Activity(Label = "Add Tasks", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTask)]
-    public class CreateManageTasksActivity : AppCompatActivity
+    [Activity(Label = "Edit Activity", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTask)]
+    public class CreateActivityOverviewActivity : AppCompatActivity
     {
         private LearningActivity newActivity;
+        private bool editingSubmitted;
         private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private CreatedTasksAdapter adapter;
@@ -62,10 +64,11 @@ namespace OurPlace.Android.Activities.Create
 
             SetContentView(Resource.Layout.CreateManageTasksActivity);
 
+            editingSubmitted = Intent.GetBooleanExtra("EDITING_SUBMITTED", false);
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
             newActivity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            adapter = new CreatedTasksAdapter(this, newActivity, SaveProgress);
+            adapter = new CreatedTasksAdapter(this, newActivity, editingSubmitted, SaveProgress);
             adapter.EditActivityClick += Adapter_EditActivityClick;
             adapter.FinishClick += Adapter_FinishClick;
             adapter.EditItemClick += Adapter_EditItemClick;
@@ -88,6 +91,95 @@ namespace OurPlace.Android.Activities.Create
             fab.Click += Fab_Click;
         }
 
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.MediaViewerMenu, menu);
+            return base.OnPrepareOptionsMenu(menu);
+        }
+
+        public override void OnBackPressed()
+        {
+            if (editingSubmitted)
+            {
+                new global::Android.Support.V7.App.AlertDialog.Builder(this)
+                    .SetTitle(Resource.String.WarningTitle)
+                    .SetMessage(Resource.String.editActivityBackWarning)
+                    .SetNegativeButton(Resource.String.dialog_cancel, (a, e) => { })
+                    .SetPositiveButton(Resource.String.editActivityBackWarningAccept, (a, e) => { base.OnBackPressed(); })
+                    .Show();
+            }
+            else
+            {
+                base.OnBackPressed();
+            }
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (item.ItemId == global::Android.Resource.Id.Home)
+            {
+                OnBackPressed();
+                return true;
+            }
+
+            if (item.ItemId != Resource.Id.menudelete)
+            {
+                return base.OnOptionsItemSelected(item);
+            }
+
+            new global::Android.Support.V7.App.AlertDialog.Builder(this)
+                .SetTitle(Resource.String.deleteTitle)
+                .SetMessage(Resource.String.deleteMessage)
+                .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
+                {
+                })
+                .SetPositiveButton(Resource.String.DeleteBtn, async (a, e) =>
+                {
+                    if (editingSubmitted)
+                    {
+                        ProgressDialog prog = new ProgressDialog(this);
+                        prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+                        prog.Show();
+                        ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + newActivity.Id);
+                        prog.Dismiss();
+
+                        if (resp == null)
+                        {
+                            var suppress = AndroidUtils.ReturnToSignIn(this);
+                            Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                            return;
+                        }
+
+                        if (resp.Success)
+                        {
+                            Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show();
+                            MainMyActivitiesFragment.ForceRefresh = true;
+                            Finish();
+                        }
+                        else
+                        {
+                            Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show();
+                        }
+                    }
+                    else
+                    {
+                        if (dbManager == null)
+                        {
+                            dbManager = await GetDatabaseManager();
+                        }
+
+                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.currentUser.LocalCreatedActivitiesJson);
+                        localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
+                        dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                        dbManager.AddUser(dbManager.currentUser);
+                        Finish();
+                    }
+                })
+                .Show();
+
+            return true;
+        }
+
         private void Adapter_ManageChildrenItemClick(object sender, int position)
         {
             SaveProgress();
@@ -101,6 +193,7 @@ namespace OurPlace.Android.Activities.Create
             });
             manageChildTasksAct.PutExtra("JSON", json);
             manageChildTasksAct.PutExtra("PARENT", position - 1);
+            manageChildTasksAct.PutExtra("EDITING_SUBMITTED", editingSubmitted);
             StartActivityForResult(manageChildTasksAct, ManageChildrenIntent);
         }
 
@@ -124,10 +217,7 @@ namespace OurPlace.Android.Activities.Create
         private void Adapter_EditItemClick(object sender, int position)
         {
             LearningTask thisTask = adapter.Data[position - 1];
-            if (thisTask == null || thisTask.TaskType == null)
-            {
-                return;
-            }
+            if (thisTask?.TaskType == null) return;
 
             Type activityType = AndroidUtils.GetTaskCreationActivityType(thisTask.TaskType.IdName);
             Intent intent = new Intent(this, activityType);
@@ -145,13 +235,14 @@ namespace OurPlace.Android.Activities.Create
         {
             Intent intent = new Intent(this, typeof(CreateFinishActivity));
 
-            for (int i = 0; i < adapter.Data.Count(); i++)
+            for (int i = 0; i < adapter.Data.Count; i++)
             {
                 adapter.Data[i].Order = i;
             }
 
             newActivity.LearningTasks = adapter.Data;
             intent.PutExtra("JSON", JsonConvert.SerializeObject(newActivity));
+            intent.PutExtra("EDITING_SUBMITTED", editingSubmitted);
             StartActivity(intent);
         }
 
@@ -166,17 +257,20 @@ namespace OurPlace.Android.Activities.Create
 
         public async void SaveProgress()
         {
-            if(dbManager == null)
-            {
-                dbManager = await GetDatabaseManager();
-            }
-
             newActivity.LearningTasks = adapter.Data;
 
             // Hide the prompt if the user has added a task
             fabPrompt.Visibility =
                 (newActivity.LearningTasks != null && newActivity.LearningTasks.Any())
-                ? ViewStates.Gone : ViewStates.Visible;
+                    ? ViewStates.Gone : ViewStates.Visible;
+
+            // Don't save changes to uploaded activities until we're ready to submit
+            if (editingSubmitted) return;
+
+            if(dbManager == null)
+            {
+                dbManager = await GetDatabaseManager();
+            }
 
             // Add/update this new activity in the user's inprogress cache
             string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;
@@ -204,6 +298,7 @@ namespace OurPlace.Android.Activities.Create
         protected override void OnResume()
         {
             SaveProgress();
+            adapter?.NotifyDataSetChanged();
             base.OnResume();
         }
 

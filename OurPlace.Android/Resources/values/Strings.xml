@@ -91,6 +91,8 @@
   <string name="createNewActivityTaskInstruct">Write instructions for this task!</string>
   <string name="createNewActivityTaskAddTask">Save and Add Task</string>
   <string name="createNewActivityChildTasks">\n\nAdditional tasks:</string>
+  <string name="editActivityBackWarning">Leaving this screen without tapping \'Finish\' will lose any unsaved changes. Are you sure you want to leave?</string>
+  <string name="editActivityBackWarningAccept">Leave</string>
   <string name="createNewInfoPrompt">Information for the learner</string>
   <string name="createNewInfoUrlPrompt">Link to a web page with more information (optional)</string>
   <string name="createNewInfoUrlInvalid">That isn\'t a valid URL!</string>

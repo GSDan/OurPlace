@@ -188,7 +188,7 @@ namespace OurPlace.Android.Activities.Create
             });
 
             Intent myIntent = (editing) ?
-                new Intent(this, typeof(CreateManageTasksActivity)) :
+                new Intent(this, typeof(CreateActivityOverviewActivity)) :
                 new Intent(this, typeof(CreateChooseTaskTypeActivity));
             myIntent.PutExtra("JSON", json);
             SetResult(global::Android.App.Result.Ok, myIntent);

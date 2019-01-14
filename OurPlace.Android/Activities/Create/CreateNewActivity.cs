@@ -35,6 +35,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -87,8 +88,18 @@ namespace OurPlace.Android.Activities.Create
 
                 if (!string.IsNullOrWhiteSpace(newActivity.ImageUrl))
                 {
-                    selectedImage = global::Android.Net.Uri.FromFile(new Java.IO.File(newActivity.ImageUrl));
-                    ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    if (newActivity.ImageUrl.StartsWith("upload"))
+                    {
+                        selectedImage = global::Android.Net.Uri.Parse(newActivity.ImageUrl);
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(selectedImage.ToString()))
+                            .Transform(new CircleTransformation())
+                            .Into(imageView);
+                    }
+                    else
+                    {
+                        selectedImage = global::Android.Net.Uri.FromFile(new Java.IO.File(newActivity.ImageUrl));
+                        ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    }
                 }
             }
         }
@@ -146,11 +157,11 @@ namespace OurPlace.Android.Activities.Create
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
         {
-            bool success = resultCode == global::Android.App.Result.Ok;
+            bool success = resultCode == Result.Ok;
 
             if (requestCode == PhotoRequestCode && success)
             {
-                if (previousFileUri != null)
+                if (previousFileUri != null && !previousFileUri.ToString().StartsWith("upload"))
                 {
                     try
                     {
@@ -233,7 +244,7 @@ namespace OurPlace.Android.Activities.Create
                 newActivity.ImageUrl = selectedImage.Path;
             }
 
-            Intent addTasksActivity = new Intent(this, typeof(CreateManageTasksActivity));
+            Intent addTasksActivity = new Intent(this, typeof(CreateActivityOverviewActivity));
             string json = JsonConvert.SerializeObject(newActivity, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,

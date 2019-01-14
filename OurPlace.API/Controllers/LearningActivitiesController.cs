@@ -23,7 +23,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
-using OurPlace.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -38,6 +37,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using LearningTask = OurPlace.API.Models.LearningTask;
 
 namespace OurPlace.API.Controllers
 {
@@ -61,6 +61,7 @@ namespace OurPlace.API.Controllers
                    InviteCode = a.InviteCode,
                    RequireUsername = a.RequireUsername,
                    AppVersionNumber = a.AppVersionNumber,
+                   ActivityVersionNumber = a.ActivityVersionNumber,
                    Application = new Common.Models.Application
                    {
                        Id = a.Application.Id,
@@ -83,7 +84,7 @@ namespace OurPlace.API.Controllers
                        Latitude = p.Latitude,
                        Longitude = p.Longitude
                    }),
-                   LearningTasks = a.LearningTasks.Select(t => new Common.Models.LearningTask
+                   LearningTasks = a.LearningTasks.Where(t => !t.SoftDeleted).Select(t => new Common.Models.LearningTask
                    {
                        Id = t.Id,
                        Description = t.Description,
@@ -98,7 +99,7 @@ namespace OurPlace.API.Controllers
                            ReqFileUpload = t.TaskType.ReqFileUpload,
                            IdName = t.TaskType.IdName
                        },
-                       ChildTasks = t.ChildTasks.Select(ct => new Common.Models.LearningTask
+                       ChildTasks = t.ChildTasks.Where(ct => !ct.SoftDeleted).Select(ct => new Common.Models.LearningTask
                        {
                            Id = ct.Id,
                            Description = ct.Description,
@@ -301,30 +302,177 @@ namespace OurPlace.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != learningActivity.Id)
+            LearningActivity existing = db.LearningActivities.FirstOrDefault(a => a.Id == id);
+            if (existing == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            db.Entry(learningActivity).State = EntityState.Modified;
-
-            try
+            ApplicationUser thisUser = await GetUser();
+            if (thisUser == null || thisUser.Id != existing.Author.Id)
             {
-                await db.SaveChangesAsync();
+                return Unauthorized();
             }
-            catch (DbUpdateConcurrencyException)
+                
+            existing.AppVersionNumber = learningActivity.AppVersionNumber;
+            existing.ActivityVersionNumber = learningActivity.ActivityVersionNumber;
+            existing.Approved = thisUser.Trusted;
+            existing.CreatedAt = DateTime.UtcNow;
+            existing.Description = learningActivity.Description;
+            existing.ImageUrl = learningActivity.ImageUrl;
+            existing.Name = learningActivity.Name;
+            existing.RequireUsername = learningActivity.RequireUsername;
+            existing.IsPublic = learningActivity.IsPublic;
+            existing.Places = await ProcessPlaces(learningActivity.Places, thisUser);
+            existing.LearningTasks = await ProcessTasks(learningActivity, thisUser, true);
+
+            db.Entry(existing).State = EntityState.Modified;
+
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.OK);
+        }
+
+        private async Task<List<Place>> ProcessPlaces(ICollection<Place> places, ApplicationUser currentUser)
+        {
+            // Go through the activity's Places, adding them to the database if necessary
+            List<Place> finalPlaces = new List<Place>();
+            if (places == null) return finalPlaces;
+
+            for (int i = 0; i < places.Count; i++)
             {
-                if (!LearningActivityExists(id))
+                Place thisPlace = places.ElementAt(i);
+                Place existing = await db.Places.Where(p => p.GooglePlaceId == thisPlace.GooglePlaceId).FirstOrDefaultAsync();
+                if (existing != null)
                 {
-                    return NotFound();
+                    finalPlaces.Add(existing);
                 }
                 else
                 {
-                    throw;
+                    Common.Models.GMapsResult result;
+
+                    using (HttpClient client = new HttpClient())
+                    {
+                        string reqUrl = string.Format("https://maps.googleapis.com/maps/api/place/details/json?placeid={0}&key={1}",
+                            thisPlace.GooglePlaceId, Common.ConfidentialData.mapsk);
+                        var response = await client.GetStringAsync(reqUrl);
+                        result = JsonConvert.DeserializeObject<Common.Models.GMapsResult>(response);
+                    }
+                    if (result.status == "OK")
+                    {
+                        double lat = result.result.geometry.location.lat;
+                        double lon = result.result.geometry.location.lng;
+
+                        Place finalPlace = new Place
+                        {
+                            GooglePlaceId = result.result.place_id,
+                            Latitude = new decimal(lat),
+                            Longitude = new decimal(lon),
+                            Name = result.result.name,
+                            CreatedAt = DateTime.UtcNow,
+                            AddedBy = currentUser
+                        };
+
+                        // Check for parent locality
+                        PlaceLocality locality = await LocationLogic.GetLocality(lat, lon);
+                        if (locality != null)
+                        {
+                            PlaceLocality existingLocality = await db.PlaceLocalities
+                                .Where(p => p.GooglePlaceId == locality.GooglePlaceId).FirstOrDefaultAsync();
+                            if (existingLocality == null)
+                            {
+                                finalPlace.Locality = db.PlaceLocalities.Add(locality);
+                                await db.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                finalPlace.Locality = existingLocality;
+                            }
+                        }
+
+                        finalPlaces.Add(db.Places.Add(finalPlace));
+                    }
+
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            return finalPlaces;
+        }
+
+        private async Task<LearningTask> AddTaskIfNeeded(LearningTask thisTask, ApplicationUser currentUser, bool checkUpdated = false)
+        {
+            if (checkUpdated)
+            {
+                LearningTask existingTask = await db.LearningActivityTasks.FirstOrDefaultAsync(t => t.Id == thisTask.Id);
+
+                if (existingTask != null)
+                {
+                    if (existingTask.Description == thisTask.Description &&
+                        existingTask.ImageUrl == thisTask.ImageUrl &&
+                        existingTask.JsonData == thisTask.JsonData &&
+                        existingTask.Order == thisTask.Order)
+                    {
+                        // nothing has changed
+                        return existingTask;
+                    }
+
+                    // else something has changed - make a new task so that existing responses don't break
+                    existingTask.SoftDeleted = true;
+                }
+            }
+
+            LearningTask dbTask = db.LearningActivityTasks.Add(new LearningTask
+            {
+                Author = currentUser,
+                Description = thisTask.Description,
+                JsonData = thisTask.JsonData,
+                TaskType = await db.TaskTypes.SingleAsync(tt => tt.Id == thisTask.TaskType.Id),
+                ParentTask = thisTask.ParentTask,
+                Order = thisTask.Order
+            });
+
+            if (dbTask.TaskType.IdName == "SCAN_QR")
+            {
+                await db.SaveChangesAsync();
+                dbTask.JsonData = await GenerateQR($"task-{dbTask.Id}", Common.ServerUtils.GetTaskQRCodeData(dbTask.Id));
+            }
+
+            await db.SaveChangesAsync();
+
+            return dbTask;
+        }
+
+        private async Task<List<LearningTask>> ProcessTasks(LearningActivity learningActivity, ApplicationUser currentUser, bool checkUpdated = false)
+        {
+            //Add each task in the activity to the database
+            //If a task has child tasks, add those first
+            List<LearningTask> finalTasks = new List<LearningTask>();
+            int orderCount = 0;
+
+            for (int i = 0; i < learningActivity.LearningTasks.Count(); i++)
+            {
+                LearningTask thisTask = learningActivity.LearningTasks.ElementAt(i);
+                thisTask.Order = orderCount++;
+
+                LearningTask dbTask = await AddTaskIfNeeded(thisTask, currentUser, checkUpdated);
+
+                List<LearningTask> finalChildTasks = new List<LearningTask>();
+
+                if (thisTask.ChildTasks != null)
+                {
+                    foreach (LearningTask childTask in thisTask.ChildTasks)
+                    {
+                        childTask.ParentTask = dbTask;
+                        finalChildTasks.Add(await AddTaskIfNeeded(childTask, currentUser, checkUpdated));
+                    }
+                }
+
+                dbTask.ChildTasks = finalChildTasks;
+                await db.SaveChangesAsync();
+                finalTasks.Add(dbTask);
+            }
+
+            return finalTasks;
         }
 
         // POST: api/LearningActivities
@@ -343,124 +491,9 @@ namespace OurPlace.API.Controllers
 
             Application thisApp = db.Applications.AsEnumerable().FirstOrDefault();
 
-            // Go through the activity's Places, adding them to the database if necessary
-            List<Place> finalPlaces = new List<Place>();
-            for(int i = 0; i < learningActivity.Places?.Count; i++)
-            {
-                Place thisPlace = learningActivity.Places.ElementAt(i);
-                Place existing = await db.Places.Where(p => p.GooglePlaceId == thisPlace.GooglePlaceId).FirstOrDefaultAsync();
-                if(existing != null)
-                {
-                    finalPlaces.Add(existing);
-                }
-                else
-                {
-                    Common.Models.GMapsResult result;
+            learningActivity.Places = await ProcessPlaces(learningActivity.Places, thisUser);
 
-                    using (HttpClient client = new HttpClient())
-                    {
-                        string reqUrl = string.Format("https://maps.googleapis.com/maps/api/place/details/json?placeid={0}&key={1}", 
-                            thisPlace.GooglePlaceId, Common.ConfidentialData.mapsk);
-                        var response = await client.GetStringAsync(reqUrl);
-                        result = JsonConvert.DeserializeObject<Common.Models.GMapsResult>(response);
-                    }
-                    if(result.status == "OK")
-                    {
-                        double lat = result.result.geometry.location.lat;
-                        double lon = result.result.geometry.location.lng;
-
-                        Place finalPlace = new Place
-                        {
-                            GooglePlaceId = result.result.place_id,
-                            Latitude = new decimal(lat),
-                            Longitude = new decimal(lon),
-                            Name = result.result.name,
-                            CreatedAt = DateTime.UtcNow,
-                            AddedBy = thisUser
-                        };
-
-                        // Check for parent locality
-                        PlaceLocality locality = await LocationLogic.GetLocality(lat, lon);
-                        if(locality != null)
-                        {
-                            PlaceLocality existingLocality = await db.PlaceLocalities
-                                .Where(p => p.GooglePlaceId == locality.GooglePlaceId).FirstOrDefaultAsync();
-                            if(existingLocality == null)
-                            {
-                                finalPlace.Locality = db.PlaceLocalities.Add(locality);
-                                await db.SaveChangesAsync();
-                            }
-                            else
-                            {
-                                finalPlace.Locality = existingLocality;
-                            }
-                        }
-
-                        finalPlaces.Add(db.Places.Add(finalPlace));
-                    }
-
-                }
-            }
-            learningActivity.Places = finalPlaces;
-
-            //Add each task in the activity to the database
-            //If a task has child tasks, add those first
-            List<LearningTask> finalTasks = new List<LearningTask>();
-            int orderCount = 0;
-
-            for(int i = 0; i < learningActivity.LearningTasks.Count(); i++)
-            {
-                LearningTask thisTask = learningActivity.LearningTasks.ElementAt(i);
-                thisTask.Order = orderCount++;
-
-                if(thisTask.ChildTasks != null)
-                {
-                    List<LearningTask> finalChildTasks = new List<LearningTask>();
-                    for (int j = 0; j < thisTask.ChildTasks.Count(); j++)
-                    {
-                        LearningTask thisChild = thisTask.ChildTasks.ElementAt(j);
-                        LearningTask dbChildTask = db.LearningActivityTasks.Add(new LearningTask
-                        {
-                            Author = thisUser,
-                            Description = thisChild.Description,
-                            JsonData = thisChild.JsonData,
-                            TaskType = await db.TaskTypes.SingleAsync(tt => tt.Id == thisChild.TaskType.Id),
-                            Order = orderCount++
-                        });
-
-                        if (dbChildTask.TaskType.IdName == "SCAN_QR")
-                        {
-                            await db.SaveChangesAsync();
-                            dbChildTask.JsonData = await GenerateQR(string.Format("task-{0}", dbChildTask.Id),
-                                Common.ServerUtils.GetTaskQRCodeData(dbChildTask.Id));
-                        }
-
-                        finalChildTasks.Add(dbChildTask);
-                    }
-                    thisTask.ChildTasks = finalChildTasks;
-                }
-
-                LearningTask dbTask = db.LearningActivityTasks.Add(new LearningTask
-                {
-                    Author = thisUser,
-                    Description = thisTask.Description,
-                    JsonData = thisTask.JsonData,
-                    TaskType = await db.TaskTypes.SingleAsync(tt => tt.Id == thisTask.TaskType.Id),
-                    ChildTasks = thisTask.ChildTasks,
-                    Order = thisTask.Order
-                });
-
-                if(dbTask.TaskType.IdName == "SCAN_QR")
-                {
-                    await db.SaveChangesAsync();
-                    dbTask.JsonData = await GenerateQR(string.Format("task-{0}", dbTask.Id),
-                        Common.ServerUtils.GetTaskQRCodeData(dbTask.Id));
-                }
-
-                finalTasks.Add(dbTask);
-            }
-
-            learningActivity.LearningTasks = finalTasks;
+            learningActivity.LearningTasks = await ProcessTasks(learningActivity, thisUser);
             learningActivity.Author = thisUser;
             learningActivity.CreatedAt = DateTime.UtcNow;
             learningActivity.Approved = thisUser.Trusted;

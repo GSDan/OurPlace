@@ -21,25 +21,22 @@
 #endregion
 using Android.App;
 using Android.Content;
-using Android.Content.PM;
+using Android.Gms.Common;
+using Android.Gms.Location.Places;
+using Android.Gms.Location.Places.UI;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Text.Method;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
-using OurPlace.Common.LocalData;
-using Android.Gms.Location;
-using Android.Gms.Location.Places.UI;
-using Android.Gms.Common;
-using Android.Gms.Location.Places;
 using System.Threading.Tasks;
+using Place = OurPlace.Common.Models.Place;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -50,16 +47,20 @@ namespace OurPlace.Android.Activities.Create
         private CheckBox activityPublic;
         private CheckBox reqUsername;
         private const int placePickerReq = 112;
-        private List<Common.Models.Place> chosenPlaces;
+        private List<Place> chosenPlaces;
         private LinearLayout choicesRoot;
         private Random rand;
+        private bool editingSubmitted;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.CreateFinishActivity);
 
+            rand = new Random();
+
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
+            editingSubmitted = Intent.GetBooleanExtra("EDITING_SUBMITTED", false);
             activity = JsonConvert.DeserializeObject<LearningActivity>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
             FindViewById<Button>(Resource.Id.uploadBtn).Click += FinishClicked;
@@ -68,11 +69,25 @@ namespace OurPlace.Android.Activities.Create
             choicesRoot = FindViewById<LinearLayout>(Resource.Id.placesRoot);
             activityPublic = FindViewById<CheckBox>(Resource.Id.checkboxPublic);
             reqUsername = FindViewById<CheckBox>(Resource.Id.checkboxReqName);
-            chosenPlaces = new List<Common.Models.Place>();
-            rand = new Random();
+
+            chosenPlaces = new List<Place>();
+
+            if (editingSubmitted)
+            {
+                activityPublic.Checked = activity.IsPublic;
+                reqUsername.Checked = activity.RequireUsername;
+
+                if (activity.Places != null)
+                {
+                    foreach (Place place in activity.Places)
+                    {
+                        AddPlace(place);
+                    }
+                }
+            }
         }
 
-        private void AddPlaceClicked(object sender, System.EventArgs args)
+        private void AddPlaceClicked(object sender, EventArgs args)
         {
             try
             {
@@ -93,33 +108,37 @@ namespace OurPlace.Android.Activities.Create
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
         {
-            if (requestCode == placePickerReq && resultCode == Result.Ok)
+            if (requestCode != placePickerReq || resultCode != Result.Ok) return;
+
+            IPlace place = PlaceAutocomplete.GetPlace(this, data);
+
+            Place newPlace = new Place
             {
-                IPlace place = PlaceAutocomplete.GetPlace(this, data);
+                GooglePlaceId = place.Id,
+                Latitude = new decimal(place.LatLng.Latitude),
+                Longitude = new decimal(place.LatLng.Longitude),
+                Name = place.NameFormatted.ToString()
+            };
 
-                Common.Models.Place newPlace = new Common.Models.Place
-                {
-                    GooglePlaceId = place.Id,
-                    Latitude = new decimal(place.LatLng.Latitude),
-                    Longitude = new decimal(place.LatLng.Longitude),
-                    Name = place.NameFormatted.ToString()
-                };
+            AddPlace(newPlace);
+        }
 
-                if (chosenPlaces.Exists((p) => p.GooglePlaceId == place.Id))
-                {
-                    Toast.MakeText(this, string.Format("Already added '{0}'", newPlace.Name), ToastLength.Long).Show();
-                    return;
-                }
-
-                View child = LayoutInflater.Inflate(Resource.Layout.CreateTaskMultipleChoiceEntry, null);
-                child.FindViewById<TextView>(Resource.Id.option).Text = newPlace.Name;
-                child.FindViewById<ImageButton>(Resource.Id.deleteButton).Click += DeletePlace;
-                child.Id = rand.Next();
-
-                chosenPlaces.Add(newPlace);
-                choicesRoot.AddView(child);
-                choicesRoot.Visibility = ViewStates.Visible;
+        private void AddPlace(Place newPlace)
+        {
+            if (chosenPlaces.Exists((p) => p.GooglePlaceId == newPlace.GooglePlaceId))
+            {
+                Toast.MakeText(this, $"Already added '{newPlace.Name}'", ToastLength.Long).Show();
+                return;
             }
+
+            View child = LayoutInflater.Inflate(Resource.Layout.CreateTaskMultipleChoiceEntry, null);
+            child.FindViewById<TextView>(Resource.Id.option).Text = newPlace.Name;
+            child.FindViewById<ImageButton>(Resource.Id.deleteButton).Click += DeletePlace;
+            child.Id = rand.Next();
+
+            chosenPlaces.Add(newPlace);
+            choicesRoot.AddView(child);
+            choicesRoot.Visibility = ViewStates.Visible;
         }
 
         private void DeletePlace(object sender, EventArgs e)
@@ -154,7 +173,7 @@ namespace OurPlace.Android.Activities.Create
             }
         }
 
-        private void FinishClicked(object sender, System.EventArgs e)
+        private void FinishClicked(object sender, EventArgs e)
         {
             var suppress = SaveAndFinish();
         }
@@ -165,7 +184,9 @@ namespace OurPlace.Android.Activities.Create
             activity.RequireUsername = reqUsername.Checked;
             activity.Places = chosenPlaces;
 
-            var uploadData = await Storage.PrepCreatedActivityForUpload(activity);
+            activity.ActivityVersionNumber = (editingSubmitted) ? activity.ActivityVersionNumber + 1 : 0;
+
+            var uploadData = await Storage.PrepCreatedActivityForUpload(activity, editingSubmitted);
 
             Intent intent = new Intent(this, typeof(UploadsActivity));
             StartActivity(intent);

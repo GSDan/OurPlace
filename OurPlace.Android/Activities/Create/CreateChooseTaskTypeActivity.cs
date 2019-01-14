@@ -31,6 +31,9 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.Widget;
+using OurPlace.Common;
+using OurPlace.Common.LocalData;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
@@ -63,17 +66,20 @@ namespace OurPlace.Android.Activities.Create
                 progDialog.SetMessage(Resources.GetString(Resource.String.Connecting));
                 progDialog.Show();
 
-                Common.ServerResponse<TaskType[]> response = await Common.ServerUtils.GetTaskTypes();
+                DatabaseManager dbManager = await GetDatabaseManager();
+                List<TaskType> loadedTypes = await ServerUtils.RefreshTaskTypes(dbManager);
 
                 progDialog.Dismiss();
 
-                if (response.Success)
+                if (loadedTypes == null)
                 {
-                    (await GetDatabaseManager()).AddTaskTypes(response.Data);
-                    taskTypes = response.Data.ToList();
-                    SetupAdaptors();
+                    // can't get a valid token, return to sign in to re-authorise
+                    var suppress = AndroidUtils.ReturnToSignIn(this);
+                    Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                    return;
                 }
-                else
+
+                if (loadedTypes.Count == 0)
                 {
                     new global::Android.Support.V7.App.AlertDialog.Builder(this)
                         .SetTitle(Resource.String.ErrorTitle)
@@ -81,7 +87,14 @@ namespace OurPlace.Android.Activities.Create
                         .SetCancelable(false)
                         .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { base.Finish(); })
                         .Show();
+                    return;
                 }
+
+                dbManager.AddTaskTypes(loadedTypes);
+
+                taskTypes = loadedTypes;
+                SetupAdaptors();
+
             }
 
             SetupAdaptors();
@@ -115,7 +128,7 @@ namespace OurPlace.Android.Activities.Create
             // If successful return pass the json data back to the parent activity
             if (resultCode == global::Android.App.Result.Ok)
             {
-                Intent myIntent = new Intent(this, typeof(CreateManageTasksActivity));
+                Intent myIntent = new Intent(this, typeof(CreateActivityOverviewActivity));
                 myIntent.PutExtra("JSON", data.GetStringExtra("JSON"));
                 SetResult(global::Android.App.Result.Ok, myIntent);
                 base.Finish();

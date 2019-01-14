@@ -104,6 +104,12 @@ namespace OurPlace.Android.Fragments
             base.OnStop();
         }
 
+        public override void OnPause()
+        {
+            base.OnPause();
+            viewLoaded = true;
+        }
+
         public override void OnResume()
         {
             base.OnResume();

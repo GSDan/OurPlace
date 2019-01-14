@@ -35,6 +35,7 @@ using OurPlace.Common.Models;
 using System;
 using System.Globalization;
 using System.IO;
+using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -73,7 +74,7 @@ namespace OurPlace.Android.Activities.Create
             Prepare();
         }
 
-        private async void Prepare()
+        private void Prepare()
         {
             // Check if this is editing an existing task: if so, populate fields
             string editJson = Intent.GetStringExtra("EDIT") ?? "";
@@ -88,15 +89,26 @@ namespace OurPlace.Android.Activities.Create
                 taskType = newTask.TaskType;
                 editing = true;
 
-                if (!string.IsNullOrWhiteSpace(addData.ImageUrl) && File.Exists(addData.ImageUrl))
+                if (!string.IsNullOrWhiteSpace(addData.ImageUrl))
                 {
-                    editCachePath = Path.Combine(
-                        Common.LocalData.Storage.GetCacheFolder(null),
-                        "editcache-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
-                    File.Copy(addData.ImageUrl, editCachePath, true);
-                    Java.IO.File cachedFile = new Java.IO.File(editCachePath);
-                    selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
-                    ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    if (addData.ImageUrl.StartsWith("upload"))
+                    {
+                        string imageUrl = ServerUtils.GetUploadUrl(addData.ImageUrl);
+                        ImageService.Instance.LoadUrl(imageUrl)
+                            .Transform(new CircleTransformation())
+                            .Into(imageView);
+                    }
+                    else
+                    {
+                        editCachePath = Path.Combine(
+                            Common.LocalData.Storage.GetCacheFolder(null),
+                            "editcache-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
+                        File.Copy(addData.ImageUrl, editCachePath, true);
+                        Java.IO.File cachedFile = new Java.IO.File(editCachePath);
+                        selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
+                        ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(imageView);
+                    }
+
                     originalPath = addData.ImageUrl;
                 }
             }
@@ -105,11 +117,13 @@ namespace OurPlace.Android.Activities.Create
                 // If edit is null, get the tasktype from JSON
                 string jsonData = Intent.GetStringExtra("JSON") ?? "";
                 taskType = JsonConvert.DeserializeObject<TaskType>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
-                newTask = new LearningTask();
-                newTask.TaskType = taskType;
+                newTask = new LearningTask
+                {
+                    TaskType = taskType
+                };
             }
 
-            if (selectedImage == null)
+            if (selectedImage == null && originalPath == null)
             {
                 ImageService.Instance.LoadUrl(taskType.IconUrl).Into(imageView);
             }
@@ -240,7 +254,7 @@ namespace OurPlace.Android.Activities.Create
                 data.ExternalUrl = uriResult.AbsoluteUri;
             }
 
-            if (selectedImage == null)
+            if (selectedImage == null && originalPath == null)
             {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)
                     .SetTitle(Resource.String.WarningTitle)
@@ -252,7 +266,7 @@ namespace OurPlace.Android.Activities.Create
                 return;
             }
 
-            if (!editing || selectedImage.Path != editCachePath)
+            if (selectedImage != null && (!editing || selectedImage.Path != editCachePath))
             {
                 data.ImageUrl = selectedImage.Path;
             }
@@ -282,7 +296,7 @@ namespace OurPlace.Android.Activities.Create
             });
 
             Intent myIntent = (editing) ?
-                new Intent(this, typeof(CreateManageTasksActivity)) :
+                new Intent(this, typeof(CreateActivityOverviewActivity)) :
                 new Intent(this, typeof(CreateChooseTaskTypeActivity));
 
             myIntent.PutExtra("JSON", json);

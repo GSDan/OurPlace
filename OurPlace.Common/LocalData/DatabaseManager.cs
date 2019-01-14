@@ -58,16 +58,12 @@ namespace OurPlace.Common.LocalData
 
         public void SaveActivityProgress(LearningActivity activity, ICollection<AppTask> progress, string enteredUsername)
         {
-            List<AppTask> trimmed = new List<AppTask>();
-
-            foreach (AppTask t in progress)
-            {
-                if (t != null) trimmed.Add(t);
-            }
+            List<AppTask> trimmed = progress.Where(t => t != null).ToList();
 
             ActivityProgress latestProg = new ActivityProgress
             {
                 ActivityId = activity.Id,
+                ActivityVersion = activity.ActivityVersionNumber,
                 EnteredUsername = enteredUsername,
                 JsonData = JsonConvert.SerializeObject(activity,
                     new JsonSerializerSettings
@@ -193,9 +189,10 @@ namespace OurPlace.Common.LocalData
             connection.Delete<ActivityProgress>(activityId);
         }
 
-        public ActivityProgress GetProgress(int activityId)
+        public ActivityProgress GetProgress(LearningActivity activity)
         {
-            return connection.Table<ActivityProgress>().Where(prog => prog.ActivityId == activityId).FirstOrDefault();
+            return connection.Table<ActivityProgress>().FirstOrDefault(prog => prog.ActivityId == activity.Id &&
+                                                                               prog.ActivityVersion == activity.ActivityVersionNumber);
         }
 
         public List<ActivityProgress> GetProgress()

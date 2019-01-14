@@ -207,9 +207,10 @@ namespace OurPlace.Android.Activities.Create
 
             ServerResponse<string> resp = new ServerResponse<string>();
 
-            if (uploads[position].UploadType == UploadType.NewActivity)
+            if (uploads[position].UploadType == UploadType.NewActivity ||
+                uploads[position].UploadType == UploadType.UpdatedActivity)
             {
-                resp = await ServerUtils.UploadNewActivity(uploads[position]);
+                resp = await ServerUtils.UploadActivity(uploads[position], uploads[position].UploadType == UploadType.UpdatedActivity);
             }
             else
             {

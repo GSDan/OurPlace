@@ -1,5 +1,5 @@
-﻿#region copyright
-/*
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<!--
     OurPlace is a mobile learning platform, designed to support communities
     in creating and sharing interactive learning activities about the places they care most about.
     https://github.com/GSDan/OurPlace
@@ -17,29 +17,14 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.
-*/
-#endregion
-using System.Collections.Generic;
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
-namespace OurPlace.API.Models
-{
-    public class LearningTask : Model
-    {
-        public string ImageUrl { get; set; }
-        public string Description { get; set; }
-        public int Order { get; set; }
-        public string JsonData { get; set; }
+  <item
+    android:id="@+id/deleteActivity"
+    android:title="@string/DeleteBtn"
+    android:icon="@drawable/baseline_delete_forever_white_24"
+    app:showAsAction="always"/>
 
-        public bool SoftDeleted { get; set; }
-
-        public int? LearningActivityId { get; set; }
-        public virtual LearningActivity LearningActivity { get; set; }
-
-        public int? ParentTaskId { get; set; }
-        public virtual LearningTask ParentTask { get; set; }
-
-        public virtual ICollection<LearningTask> ChildTasks { get; set; }
-        public virtual TaskType TaskType { get; set; }
-        public virtual ApplicationUser Author { get; set; }
-    }
-}
+</menu>

@@ -19,8 +19,6 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
@@ -30,7 +28,6 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using static OurPlace.API.ServerUtils;
 
@@ -40,8 +37,8 @@ namespace OurPlace.API.Controllers.Site
     [RequireHttps]
     public class CompletedTasksController : OurPlaceSiteController
     {
-        private List<string> imageTasks;
-        private List<string> linkTasks;
+        private readonly List<string> imageTasks;
+        private readonly List<string> linkTasks;
 
         public CompletedTasksController()
         {
@@ -62,7 +59,7 @@ namespace OurPlace.API.Controllers.Site
                 activity = await db.CompletedActivities.Where(act => act.Share.ShareCode == code).FirstOrDefaultAsync();
                 if(activity == null) return new HttpNotFoundResult();
             }
-            else if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
+            else if (User?.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -95,7 +92,21 @@ namespace OurPlace.API.Controllers.Site
                 { "code", code }
             });
 
-            ViewData["data"] = await db.CompletedTasks.Where(ct => ct.ParentSubmission.Id == activity.Id).OrderBy(ct => ct.EventTask.Order).ToListAsync();
+            List<CompletedTask> completedTasks = await db.CompletedTasks.Where(ct => ct.ParentSubmission.Id == activity.Id).OrderBy(ct => ct.EventTask.Order).ToListAsync();
+            List<CompletedTask> tempList = new List<CompletedTask>(completedTasks);
+
+            // make sure follow-up tasks appear below the parent ones
+            for (int i = tempList.Count - 1; i >= 0; i--)
+            {
+                if (tempList[i].EventTask.ParentTask != null)
+                {
+                    completedTasks.Remove(tempList[i]);
+                    int parentIndex = completedTasks.FindIndex(task => task.EventTask.Id == tempList[i].EventTask.ParentTask.Id);
+                    completedTasks.Insert(parentIndex + 1, tempList[i]);
+                }
+            }
+
+            ViewData["data"] = completedTasks;
             ViewData["submissionId"] = activity.Id;        
             ViewData["storage"] = ConfidentialData.storage;
             ViewData["imageTasks"] = imageTasks;
@@ -106,18 +117,11 @@ namespace OurPlace.API.Controllers.Site
         }
 
         // GET: CompletedTasks/Download?submissionId=0
+        [AllowAnonymous]
         public async Task Download(int submissionId)
         {
-            if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
-            {
-                return;
-            }
-
-            ApplicationUser thisUser = UserManager.FindByName(User.Identity.Name);
-
-            CompletedActivity activity = db.CompletedActivities.Where(act => act.Id == submissionId).FirstOrDefault();
+            CompletedActivity activity = db.CompletedActivities.FirstOrDefault(act => act.Id == submissionId);
             if (activity == null) return;
-            if (activity.User.Id != thisUser.Id) return;
 
             CloudBlobContainer container = GetCloudBlobContainer();
 
@@ -127,30 +131,25 @@ namespace OurPlace.API.Controllers.Site
             foreach (CompletedTask task in tasks)
             {
                 string idName = task.EventTask.TaskType.IdName;
-                if (linkTasks.Contains(idName))
+                if (!linkTasks.Contains(idName)) continue;
+
+                string[] links = JsonConvert.DeserializeObject<string[]>(task.JsonData);
+                if (links == null) continue;
+
+                for (int i = 0; i < links.Length; i++)
                 {
-                    string[] links = JsonConvert.DeserializeObject<string[]>(task.JsonData);
-                    if (links == null) continue;
-
-                    for (int i = 0; i < links.Length; i++)
+                    toDl.Add(new DownloadStruct
                     {
-                        toDl.Add(new DownloadStruct
-                        {
-                            Blob = container.GetBlockBlobReference(links[i]),
-                            Filename = string.Format("{0}_{1}-{2:00}.{3}",
-                                task.Id,
-                                task.EventTask.TaskType.IdName,
-                                i,
-                                Common.ServerUtils.GetFileExtension(idName))
-                        });
-                    }
-
+                        Blob = container.GetBlockBlobReference(links[i]),
+                        Filename =
+                            $"{task.Id}_{task.EventTask.TaskType.IdName}-{i:00}.{Common.ServerUtils.GetFileExtension(idName)}"
+                    });
                 }
             }
 
             await MakeLog(new Dictionary<string, string>() { { "submissionId", submissionId.ToString() } });
 
-            ZipFilesToResponse(Response, string.Format("OurPlace-{0}", submissionId), toDl);
+            ZipFilesToResponse(Response, $"OurPlace-{submissionId}", toDl);
         }
 
         protected override void Dispose(bool disposing)

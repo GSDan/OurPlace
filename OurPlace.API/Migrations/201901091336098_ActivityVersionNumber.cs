@@ -1,9 +1,9 @@
-﻿#region copyright
+#region copyright
 /*
     OurPlace is a mobile learning platform, designed to support communities
     in creating and sharing interactive learning activities about the places they care most about.
     https://github.com/GSDan/OurPlace
-    Copyright (C) 2018 Dan Richardson
+    Copyright (C) 2019 Dan Richardson
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,27 +19,21 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System.Collections.Generic;
-
-namespace OurPlace.API.Models
+namespace OurPlace.API.Migrations
 {
-    public class LearningTask : Model
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class ActivityVersionNumber : DbMigration
     {
-        public string ImageUrl { get; set; }
-        public string Description { get; set; }
-        public int Order { get; set; }
-        public string JsonData { get; set; }
-
-        public bool SoftDeleted { get; set; }
-
-        public int? LearningActivityId { get; set; }
-        public virtual LearningActivity LearningActivity { get; set; }
-
-        public int? ParentTaskId { get; set; }
-        public virtual LearningTask ParentTask { get; set; }
-
-        public virtual ICollection<LearningTask> ChildTasks { get; set; }
-        public virtual TaskType TaskType { get; set; }
-        public virtual ApplicationUser Author { get; set; }
+        public override void Up()
+        {
+            AddColumn("dbo.LearningActivities", "ActivityVersionNumber", c => c.Int(nullable: false));
+        }
+        
+        public override void Down()
+        {
+            DropColumn("dbo.LearningActivities", "ActivityVersionNumber");
+        }
     }
 }

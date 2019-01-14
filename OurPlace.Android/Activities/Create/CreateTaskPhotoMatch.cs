@@ -36,6 +36,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -90,9 +91,18 @@ namespace OurPlace.Android.Activities.Create
                 taskType = newTask.TaskType;
                 instructions.Text = newTask.Description;
                 editCachePath = Path.Combine(Common.LocalData.Storage.GetCacheFolder(null), "editcache-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
-                File.Copy(newTask.JsonData, editCachePath, true);
-                Java.IO.File cachedFile = new Java.IO.File(editCachePath);
-                selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
+
+                if (newTask.JsonData.StartsWith("upload"))
+                {
+                    selectedImage = global::Android.Net.Uri.Parse(newTask.JsonData);
+                }
+                else
+                {
+                    File.Copy(newTask.JsonData, editCachePath, true);
+                    Java.IO.File cachedFile = new Java.IO.File(editCachePath);
+                    selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
+                }
+                
                 ShowImage();
             }
             else
@@ -188,11 +198,20 @@ namespace OurPlace.Android.Activities.Create
 
         private void ShowImage()
         {
-            if (selectedImage != null)
+            if (selectedImage == null) return;
+
+            if (selectedImage.ToString().StartsWith("upload"))
             {
-                ImageService.Instance.LoadFile(selectedImage.Path).Transform(new CircleTransformation()).Into(chosenImageView);
-                chosenLayout.Visibility = global::Android.Views.ViewStates.Visible;
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(selectedImage.ToString()))
+                    .Transform(new CircleTransformation()).Into(chosenImageView);
             }
+            else
+            {
+                ImageService.Instance.LoadFile(selectedImage.Path)
+                    .Transform(new CircleTransformation()).Into(chosenImageView);
+            }
+            
+            chosenLayout.Visibility = global::Android.Views.ViewStates.Visible;
         }
 
         private void FirePhotoIntent(bool includeCamera)

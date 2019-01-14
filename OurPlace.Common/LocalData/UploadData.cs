@@ -24,7 +24,7 @@ using System;
 
 namespace OurPlace.Common.LocalData
 {
-    public enum UploadType { NewActivity, Result }
+    public enum UploadType { NewActivity, Result, UpdatedActivity }
 
     public class AppDataUpload
     {
@@ -59,6 +59,7 @@ namespace OurPlace.Common.LocalData
     {
         [PrimaryKey]
         public int ActivityId { get; set; }
+        public int ActivityVersion { get; set; }
         public string JsonData { get; set; }
         public string AppTaskJson { get; set; }
         public string EnteredUsername { get; set; }

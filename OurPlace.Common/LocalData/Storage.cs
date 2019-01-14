@@ -322,19 +322,19 @@ namespace OurPlace.Common.LocalData
             return uploads;
         }
 
-        public static async Task<AppDataUpload> PrepCreatedActivityForUpload(LearningActivity created)
+        public static async Task<AppDataUpload> PrepCreatedActivityForUpload(LearningActivity created, bool updatingRemote)
         {
             created.AppVersionNumber = Helpers.AppVersionNumber;
 
             AppDataUpload uploadData = new AppDataUpload
             {
                 ItemId = created.Id,
-                UploadRoute = "api/learningactivities",
+                UploadRoute = (updatingRemote) ? "api/learningactivities?id=" + created.Id : "api/learningactivities",
                 Name = created.Name,
                 CreatedAt = created.CreatedAt,
                 Description = created.Description,
                 ImageUrl = created.ImageUrl,
-                UploadType = UploadType.NewActivity,
+                UploadType = (updatingRemote)? UploadType.UpdatedActivity : UploadType.NewActivity,
                 JsonData = JsonConvert.SerializeObject(created,
                     new JsonSerializerSettings
                     {
@@ -395,7 +395,7 @@ namespace OurPlace.Common.LocalData
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(created.ImageUrl))
+            if (!string.IsNullOrWhiteSpace(created.ImageUrl) && !created.ImageUrl.StartsWith("upload"))
             {
                 files.Add(new FileUpload
                 {
@@ -427,7 +427,7 @@ namespace OurPlace.Common.LocalData
                     break;
             }
 
-            return thisFile;
+            return thisFile == null || thisFile.StartsWith("upload") ? null : thisFile;
         }
 
         /// <summary>

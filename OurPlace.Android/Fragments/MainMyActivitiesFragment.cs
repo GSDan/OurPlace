@@ -59,6 +59,7 @@ namespace OurPlace.Android.Fragments
         private TextView uploadsHint;
         private bool refreshingData = true;
         private bool viewLoaded;
+        private Intent requiresStorageIntent;
         public static bool ForceRefresh;
 
         public override async void OnCreate(Bundle savedInstanceState)
@@ -143,6 +144,18 @@ namespace OurPlace.Android.Fragments
                         MaxDepth = 5
                     });
                 dbManager.AddUser(dbManager.currentUser);
+
+                List<LearningActivity> recentlyOpened = dbManager.GetActivities();
+                foreach (LearningActivity cachedActivity in recentlyOpened)
+                {
+                    LearningActivity refreshedVersion = results.Data.FirstOrDefault(act => act.Id == cachedActivity.Id);
+                    if (refreshedVersion != null &&
+                        refreshedVersion.ActivityVersionNumber > cachedActivity.ActivityVersionNumber)
+                    {
+                        dbManager.DeleteCachedActivity(cachedActivity);
+                        MainLandingFragment.ForceRefresh = true;
+                    }
+                }
 
                 LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
 
@@ -239,6 +252,13 @@ namespace OurPlace.Android.Fragments
 
         private void Fab_Click(object sender, EventArgs e)
         {
+            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
+            requiresStorageIntent = new Intent(Activity, typeof(CreateNewActivity));
+            LaunchWithStoragePermissions();
+        }
+
+        private void LaunchWithStoragePermissions()
+        {
             const string permission = global::Android.Manifest.Permission.ReadExternalStorage;
             Permission currentPerm = ContextCompat.CheckSelfPermission(Activity, permission);
 
@@ -267,7 +287,7 @@ namespace OurPlace.Android.Fragments
             }
             else
             {
-                StartCreate();
+                StartStorageIntent();
             }
         }
 
@@ -276,15 +296,16 @@ namespace OurPlace.Android.Fragments
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             if (requestCode == PermReqId && grantResults.All((p) => p == Permission.Granted))
             {
-                StartCreate();
+                StartStorageIntent();
             }
         }
 
-        private void StartCreate()
+        private void StartStorageIntent()
         {
-            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
-            Intent intent = new Intent(Activity, typeof(CreateNewActivity));
-            StartActivity(intent);
+            if (requiresStorageIntent != null)
+            {
+                StartActivity(requiresStorageIntent);
+            }
         }
 
         private void OnItemClick(object sender, int position)
@@ -299,105 +320,36 @@ namespace OurPlace.Android.Fragments
 
             bool inProgress = unsubmittedActivities != null && unsubmittedActivities.Exists((la) => chosen.Id == la.Id);
 
-            if(inProgress)
+            if (inProgress)
             {
-                new AlertDialog.Builder(Activity)
-                    .SetTitle(chosen.Name)
-                    .SetMessage(Resource.String.createdActivityDialogUnfinishedMessage)
-                    .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditLocalActivity(chosen); })
-                    .SetNegativeButton(Resource.String.createdActivityDialogDelete, (a, b) => { DeleteLocalActivity(chosen); })
-                    .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
-                    .SetCancelable(true)
-                    .Show();
+                EditActivity(chosen, true);
             }
             else
             {
                 new AlertDialog.Builder(Activity)
                     .SetTitle(chosen.Name)
-                    .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosen.InviteCode)))
-                    .SetPositiveButton(Resource.String.createdActivityDialogOpen, (a, b) => { ((MainActivity)Activity).LaunchActivity(chosen); })
-                    .SetNegativeButton(Resource.String.createdActivityDialogDelete, (a, b) => { DeleteServerActivity(chosen); })
+                    .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditActivity(chosen, false); })
                     .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
                     .SetCancelable(true)
+                    .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosen.InviteCode)))
+                    .SetNegativeButton(Resource.String.createdActivityDialogOpen,
+                    (a, b) => { ((MainActivity)Activity).LaunchActivity(chosen); })
                     .Show();
             }
         }
 
-        private void EditLocalActivity(LearningActivity chosen)
+        private void EditActivity(LearningActivity chosen, bool isLocalOnly)
         {
-            Intent addTasksActivity = new Intent(Activity, typeof(CreateManageTasksActivity));
+            requiresStorageIntent = new Intent(Activity, typeof(CreateActivityOverviewActivity));
             string json = JsonConvert.SerializeObject(chosen, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });
-            addTasksActivity.PutExtra("JSON", json);
-            StartActivity(addTasksActivity);
-        }
-
-        private void DeleteLocalActivity(LearningActivity chosen)
-        {
-            Analytics.TrackEvent("MainMyActivitiesFragment_DeleteLocalActivity");
-
-            new AlertDialog.Builder(Activity)
-            .SetTitle(Resource.String.deleteTitle)
-            .SetMessage(Resource.String.deleteMessage)
-            .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
-            .SetCancelable(true)
-            .SetPositiveButton(Resource.String.DeleteBtn, async (a, b) =>
-            {
-                // Remove this activity from the user's inprogress cache
-                if (unsubmittedActivities != null)
-                {
-                    unsubmittedActivities.Remove(chosen);
-                    DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
-                    dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
-                    dbManager.AddUser(dbManager.currentUser);
-                }
-                LoadRemoteData();
-            })
-            .Show();
-        }
-
-        private void DeleteServerActivity(LearningActivity chosen)
-        {
-            new AlertDialog.Builder(Activity)
-                .SetTitle(Resource.String.deleteTitle)
-                .SetMessage(Resource.String.deleteMessage)
-                .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => {})
-                .SetCancelable(true)
-                .SetPositiveButton(Resource.String.DeleteBtn, (a, b) => {
-                    Delete(chosen);
-                })
-                .Show();
-        }
-
-        private async void Delete(LearningActivity chosen)
-        {
-            ProgressDialog prog = new ProgressDialog(Activity);
-            prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
-            prog.Show();
-            ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + chosen.Id);
-            prog.Dismiss();
-
-            if (resp == null)
-            {
-                var suppress = AndroidUtils.ReturnToSignIn(Activity);
-                Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
-                return;
-            }
-
-            if (resp.Success)
-            {
-                Toast.MakeText(Activity, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show();
-            }
-            else
-            {
-                Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
-            }
-
-            LoadRemoteData();
+            requiresStorageIntent.PutExtra("JSON", json);
+            requiresStorageIntent.PutExtra("EDITING_SUBMITTED", !isLocalOnly);
+            LaunchWithStoragePermissions();
         }
     }
 }

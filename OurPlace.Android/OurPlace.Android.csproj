@@ -245,7 +245,7 @@
     <Compile Include="Activities\Create\CreateChooseTaskTypeActivity.cs" />
     <Compile Include="Activities\Create\CreateFinishActivity.cs" />
     <Compile Include="Activities\Create\CreateManageChildTasksActivity.cs" />
-    <Compile Include="Activities\Create\CreateManageTasksActivity.cs" />
+    <Compile Include="Activities\Create\CreateActivityOverviewActivity.cs" />
     <Compile Include="Activities\Create\CreateNewActivity.cs" />
     <Compile Include="Activities\Create\CreateTaskBasic.cs" />
     <Compile Include="Activities\Create\CreateTaskDrawPhoto.cs" />
@@ -923,6 +923,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\array.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\CreateActivityOverviewMenu.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

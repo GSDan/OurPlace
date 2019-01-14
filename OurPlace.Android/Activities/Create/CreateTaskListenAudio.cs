@@ -21,21 +21,21 @@
 #endregion
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
+using Android.Media;
 using Android.OS;
+using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
-using Android.Runtime;
-using System.IO;
-using Android.Support.V4.Content;
-using Android.Content.PM;
 using System.Globalization;
-using Android.Media;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -48,9 +48,9 @@ namespace OurPlace.Android.Activities.Create
         private Button listenBtn;
         private Button addTaskBtn;
         private bool loaded = false;
-        private int existingReqCode = 22;
-        private int newReqCode = 11;
-        private int permReqCode = 33;
+        private const int ExistingReqCode = 22;
+        private const int NewReqCode = 11;
+        private const int PermReqCode = 33;
         private MediaPlayer player;
 
         private LearningTask newTask;
@@ -87,14 +87,22 @@ namespace OurPlace.Android.Activities.Create
                 taskType = newTask.TaskType;
                 instructions.Text = newTask.Description;
                 addTaskBtn.SetText(Resource.String.saveChanges);
-
+                fileTextView.SetText(Resource.String.createNewListenChosen);
                 editCachePath = Path.Combine(
                     Common.LocalData.Storage.GetCacheFolder(null),
                     "editcache-" + DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss-fff"));
-                File.Copy(newTask.JsonData, editCachePath, true);
-                Java.IO.File cachedFile = new Java.IO.File(editCachePath);
-                outputFileUri = global::Android.Net.Uri.FromFile(cachedFile);
-                fileTextView.SetText(Resource.String.createNewListenChosen);
+
+                if (!newTask.JsonData.StartsWith("upload"))
+                {
+                    File.Copy(newTask.JsonData, editCachePath, true);
+                    Java.IO.File cachedFile = new Java.IO.File(editCachePath);
+                    outputFileUri = global::Android.Net.Uri.FromFile(cachedFile);
+                }
+                else
+                {
+                    outputFileUri = global::Android.Net.Uri.Parse(newTask.JsonData);
+                }
+
                 AudioLoaded();
             }
             else
@@ -125,7 +133,10 @@ namespace OurPlace.Android.Activities.Create
             }
             else
             {
-                player.SetDataSource(outputFileUri.Path);
+                player.SetDataSource(outputFileUri.ToString().StartsWith("upload")
+                    ? ServerUtils.GetUploadUrl(outputFileUri.ToString())
+                    : outputFileUri.Path);
+
                 player.Prepare();
                 player.Start();
                 listenBtn.Text = Resources.GetString(Resource.String.StopBtn);
@@ -186,7 +197,7 @@ namespace OurPlace.Android.Activities.Create
                 if (currentPerm != Permission.Granted)
                 {
                     AndroidUtils.CheckGetPermission(permission,
-                    this, permReqCode, base.Resources.GetString(Resource.String.permissionMicTitle),
+                    this, PermReqCode, base.Resources.GetString(Resource.String.permissionMicTitle),
                     base.Resources.GetString(Resource.String.permissionMicExplanation));
                 }
                 else
@@ -203,7 +214,7 @@ namespace OurPlace.Android.Activities.Create
                 base.StartActivityForResult(Intent.CreateChooser(
                     intent,
                     new Java.Lang.String(base.Resources.GetString(Resource.String.createNewListenAudioBtn))),
-                    existingReqCode);
+                    ExistingReqCode);
             })
             .Show();
         }
@@ -211,7 +222,7 @@ namespace OurPlace.Android.Activities.Create
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            if (requestCode == permReqCode && grantResults[0] == Permission.Granted)
+            if (requestCode == PermReqCode && grantResults[0] == Permission.Granted)
             {
                 StartRecordIntent();
             }
@@ -222,18 +233,18 @@ namespace OurPlace.Android.Activities.Create
             UpdateFiles();
             Intent myIntent = new Intent(this, typeof(ListenAudioRecordActivity));
             myIntent.PutExtra("JSON", outputFileUri.Path);
-            StartActivityForResult(myIntent, newReqCode);
+            StartActivityForResult(myIntent, NewReqCode);
         }
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
 
-            if (requestCode == newReqCode && resultCode == global::Android.App.Result.Ok && File.Exists(outputFileUri.Path))
+            if (requestCode == NewReqCode && resultCode == global::Android.App.Result.Ok && File.Exists(outputFileUri.Path))
             {
                 AudioLoaded();
             }
-            if (requestCode == existingReqCode && resultCode == global::Android.App.Result.Ok)
+            if (requestCode == ExistingReqCode && resultCode == global::Android.App.Result.Ok)
             {
                 if (data != null && data.Data != null)
                 {
@@ -299,7 +310,7 @@ namespace OurPlace.Android.Activities.Create
             });
 
             Intent myIntent = (editing) ?
-                new Intent(this, typeof(CreateManageTasksActivity)) :
+                new Intent(this, typeof(CreateActivityOverviewActivity)) :
                 new Intent(this, typeof(CreateChooseTaskTypeActivity));
 
             myIntent.PutExtra("JSON", json);

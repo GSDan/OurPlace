@@ -44,5 +44,6 @@ namespace OurPlace.API.Models
         public virtual Application Application { get; set; }
 
         public int AppVersionNumber { get; set; }
+        public int ActivityVersionNumber { get; set; }
     }
 }
