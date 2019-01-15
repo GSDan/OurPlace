@@ -93,10 +93,10 @@ namespace OurPlace.iOS
         }
 
         public static void ShowChoiceDialog<T>(UIViewController viewController, string title, string message, string choice1,
-                                               Action<T> choice1Action, string choice2, Action<T> choice2Action, T data)
+                                               Action<T> choice1Action, string choice2, Action<T> choice2Action, T data, UIAlertActionStyle choice1Style = UIAlertActionStyle.Default)
         {
             var alertController = UIAlertController.Create(title, message, UIAlertControllerStyle.Alert);
-            alertController.AddAction(UIAlertAction.Create(choice1, UIAlertActionStyle.Default, (obj) =>
+            alertController.AddAction(UIAlertAction.Create(choice1, choice1Style, (obj) =>
             {
                 choice1Action?.Invoke(data);
             }));
@@ -106,6 +106,7 @@ namespace OurPlace.iOS
             }));
             viewController.PresentViewController(alertController, true, null);
         }
+
 
         public static void ShowThreeChoiceDialog<T>(UIViewController viewController, string title, string message, string choice1,
                                                     Action<T> choice1Action, string choice2, Action<T> choice2Action,

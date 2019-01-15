@@ -217,7 +217,7 @@
                     <tabBarItem key="tabBarItem" title="My Activities" image="MyActivitiesIcon" id="b6x-ck-KG3"/>
                     <connections>
                         <outlet property="collectionView" destination="CKZ-Aq-hP7" id="l36-IX-iLy"/>
-                        <segue destination="Zcy-Uf-hM6" kind="show" identifier="CreateActivitySegue" id="e6z-QP-r3e"/>
+                        <segue destination="pcU-lZ-hKG" kind="presentation" identifier="CreateActivitySegue" id="e6z-QP-r3e"/>
                     </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Zqz-h5-3sk" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -758,6 +758,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="9ao-Sy-eg5"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="ActivityDescription" destination="zXl-K5-Tmn" id="dJi-wU-zB0"/>
                         <outlet property="ActivityImage" destination="cwy-gh-c5z" id="b7O-bU-P5p"/>
@@ -779,7 +780,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sTa-LJ-w01" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-175" y="-1525"/>
+            <point key="canvasLocation" x="764" y="-1525.1874062968518"/>
         </scene>
         <!--Create Child Tasks Overview Controller-->
         <scene sceneID="Oak-GS-8q5">
@@ -921,7 +922,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dqk-Hd-Toj" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="hcR-CP-cMs" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="678" y="-1494"/>
+            <point key="canvasLocation" x="1616.8" y="-1494.6026986506747"/>
         </scene>
         <!--Choose Task Type Controller-->
         <scene sceneID="6jp-bA-nlA">
@@ -1023,10 +1024,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Bbs-5k-5Xx">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="009-gO-90X" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="whF-U4-ijS">
                                                 <rect key="frame" x="12" y="12" width="351" height="100"/>
@@ -1039,7 +1040,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tY1-wJ-OgZ">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
@@ -1106,29 +1107,29 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HRK-9M-i2X">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IZi-Xh-ghH" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S2J-8r-fnt">
                                                 <rect key="frame" x="12" y="12" width="351" height="113.5"/>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5zv-hB-K5x">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rUf-AR-DKv">
-                                                <rect key="frame" x="12" y="303" width="351" height="129"/>
+                                                <rect key="frame" x="12" y="294" width="351" height="120.5"/>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ful-vV-G5D">
-                                                <rect key="frame" x="12" y="444" width="351" height="32"/>
+                                                <rect key="frame" x="12" y="426.5" width="351" height="32"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <state key="normal" title="Choose Target Image"/>
                                             </button>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="cyg-MW-lHQ">
-                                                <rect key="frame" x="12" y="149.5" width="351" height="129.5"/>
+                                                <rect key="frame" x="12" y="149.5" width="351" height="120.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -1206,34 +1207,34 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="47H-jj-Ekd">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yfw-IM-lXJ" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uhT-W0-eIZ">
-                                                <rect key="frame" x="12" y="12" width="351" height="110"/>
+                                                <rect key="frame" x="12" y="12" width="351" height="102.5"/>
                                             </imageView>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="MrW-B8-Aho">
-                                                <rect key="frame" x="12" y="146" width="351" height="129.5"/>
+                                                <rect key="frame" x="12" y="138.5" width="351" height="120.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bKM-Zy-IkN">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Location Chosen" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="iXC-MG-Xjd">
-                                                <rect key="frame" x="12" y="437" width="351" height="21"/>
+                                                <rect key="frame" x="12" y="420.5" width="351" height="21"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DGh-fz-Sji">
-                                                <rect key="frame" x="12" y="393" width="351" height="32"/>
+                                                <rect key="frame" x="12" y="376.5" width="351" height="32"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <state key="normal" title="Choose Location"/>
                                                 <connections>
@@ -1241,20 +1242,20 @@
                                                 </connections>
                                             </button>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kJz-Hq-sVp">
-                                                <rect key="frame" x="314" y="287.5" width="51" height="31"/>
+                                                <rect key="frame" x="314" y="271" width="51" height="31"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="31" id="51A-tZ-Dbe"/>
                                                     <constraint firstAttribute="width" constant="49" id="7Yl-Oh-NwR"/>
                                                 </constraints>
                                             </switch>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Allow the user to view on a map" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="Qlm-nn-EgH">
-                                                <rect key="frame" x="12" y="292.5" width="290" height="20.5"/>
+                                                <rect key="frame" x="12" y="276.5" width="290" height="20.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unchecking this means users will only know their current proximity to the target" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="EdR-WH-zj4">
-                                                <rect key="frame" x="12" y="330.5" width="351" height="38.5"/>
+                                                <rect key="frame" x="12" y="314" width="351" height="38.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -1339,11 +1340,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Trp-Su-Eph" userLabel="MapView" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="20" width="375" height="467"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="467"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap the map to choose a location." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OKR-YU-tnY">
-                                <rect key="frame" x="16" y="510" width="343" height="21.5"/>
+                                <rect key="frame" x="16" y="554" width="343" height="21.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1394,55 +1395,55 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yvx-PD-N3o">
-                                <rect key="frame" x="310" y="43" width="51" height="31"/>
+                                <rect key="frame" x="310" y="87" width="51" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="49" id="hOx-PQ-Sch"/>
                                 </constraints>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="I want this activity to be publicly accessible" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lqL-pc-ewu">
-                                <rect key="frame" x="16" y="38" width="286" height="41"/>
+                                <rect key="frame" x="16" y="82" width="286" height="41"/>
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Untick this is you only want to share your activity privately." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2UX-55-ZsG">
-                                <rect key="frame" x="16" y="89" width="343" height="38.5"/>
+                                <rect key="frame" x="16" y="133" width="343" height="38.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your Activity's Location" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MK6-Q7-hdb">
-                                <rect key="frame" x="16" y="162.5" width="343" height="21"/>
+                                <rect key="frame" x="16" y="206.5" width="343" height="21"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You can optionally assign a location to your activity" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yft-tb-MGL">
-                                <rect key="frame" x="16" y="195.5" width="343" height="41"/>
+                                <rect key="frame" x="16" y="239.5" width="343" height="41"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Th5-6I-W5i">
-                                <rect key="frame" x="16" y="248.5" width="343" height="32"/>
+                                <rect key="frame" x="16" y="292.5" width="343" height="32"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <state key="normal" title="Choose Location"/>
                             </button>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="gYb-Ct-3A9">
-                                <rect key="frame" x="310" y="320.5" width="51" height="31"/>
+                                <rect key="frame" x="310" y="364.5" width="51" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="Ylz-mJ-U4e"/>
                                     <constraint firstAttribute="width" constant="49" id="a6j-CW-OQG"/>
                                 </constraints>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Require that users enter their name(s)" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Chx-Sa-3t3">
-                                <rect key="frame" x="16" y="315.5" width="286" height="41"/>
+                                <rect key="frame" x="16" y="359.5" width="286" height="41"/>
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is useful if you expect several users to be sharing devices and/or accounts" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kld-mv-gTn">
-                                <rect key="frame" x="16" y="368.5" width="343" height="38.5"/>
+                                <rect key="frame" x="16" y="412.5" width="343" height="38.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1886,7 +1887,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Record Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dyX-9o-dhe">
-                                <rect key="frame" x="16" y="35" width="343" height="30"/>
+                                <rect key="frame" x="16" y="79" width="343" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="aHu-gm-Qic"/>
                                 </constraints>
@@ -1895,7 +1896,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Task description" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="2K0-Kv-hqC">
-                                <rect key="frame" x="16" y="256.5" width="343" height="100.5"/>
+                                <rect key="frame" x="16" y="300.5" width="343" height="100.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1912,13 +1913,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nf9-us-mHY">
-                                <rect key="frame" x="16" y="377" width="343" height="155"/>
+                                <rect key="frame" x="16" y="421" width="343" height="111"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MicrophoneIcon" translatesAutoresizingMaskIntoConstraints="NO" id="19e-4A-jnG">
-                                <rect key="frame" x="22" y="90" width="331" height="146.5"/>
+                                <rect key="frame" x="22" y="134" width="331" height="146.5"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -2330,62 +2331,62 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1t2-ss-jrO">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cDQ-iX-13D" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Tpn-39-uPs">
-                                                <rect key="frame" x="12" y="12" width="351" height="110"/>
+                                                <rect key="frame" x="12" y="12" width="351" height="102.5"/>
                                             </imageView>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="j0J-Tk-rOd">
-                                                <rect key="frame" x="12" y="134" width="351" height="129.5"/>
+                                                <rect key="frame" x="12" y="126.5" width="351" height="120.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SDA-zl-cpY">
-                                                <rect key="frame" x="243" y="275.5" width="120" height="85"/>
+                                                <rect key="frame" x="243" y="259" width="120" height="85"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="85" id="4d8-F6-CLW"/>
                                                     <constraint firstAttribute="width" constant="120" id="rbN-Rg-dql"/>
                                                 </constraints>
                                             </pickerView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Min required number of markers" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qXE-7q-bmr">
-                                                <rect key="frame" x="12" y="297.5" width="219" height="41"/>
+                                                <rect key="frame" x="12" y="281" width="219" height="41"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="okV-uc-Z8l">
-                                                <rect key="frame" x="243" y="372.5" width="120" height="85"/>
+                                                <rect key="frame" x="243" y="356" width="120" height="85"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="120" id="an8-k1-lVE"/>
                                                     <constraint firstAttribute="height" constant="85" id="kjZ-ve-2cF"/>
                                                 </constraints>
                                             </pickerView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Max number of markers" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bg9-qE-TpX">
-                                                <rect key="frame" x="12" y="404.5" width="219" height="20.5"/>
+                                                <rect key="frame" x="12" y="388.5" width="219" height="20.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="cei-Rn-XtM">
-                                                <rect key="frame" x="314" y="485.5" width="51" height="30"/>
+                                                <rect key="frame" x="314" y="469.5" width="51" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="VEF-Ab-vxZ"/>
                                                     <constraint firstAttribute="width" constant="49" id="pm5-tK-7pr"/>
                                                 </constraints>
                                             </switch>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" text="Only allow users to place markers on their current location" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="6DJ-eS-URf">
-                                                <rect key="frame" x="12" y="481.5" width="290" height="38.5"/>
+                                                <rect key="frame" x="12" y="465" width="290" height="38.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Ly-lf-bK7">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="aXM-KY-MKs"/>
                                                 </constraints>
@@ -2473,23 +2474,23 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rw3-Uw-BLS">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c2Y-nd-87o" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Pic-xY-lxq">
-                                                <rect key="frame" x="12" y="12" width="351" height="77.5"/>
+                                                <rect key="frame" x="12" y="12" width="351" height="72.5"/>
                                             </imageView>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="x2x-nN-Gbv">
-                                                <rect key="frame" x="12" y="101.5" width="351" height="110"/>
+                                                <rect key="frame" x="12" y="96.5" width="351" height="102.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyj-rE-dq5">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="MH5-MM-cH7"/>
                                                 </constraints>
@@ -2497,7 +2498,7 @@
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
                                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bQf-PZ-zZB">
-                                                <rect key="frame" x="12" y="223.5" width="351" height="259"/>
+                                                <rect key="frame" x="12" y="211" width="351" height="241"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <prototypes>
                                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CreateMultipleChoiceCell" rowHeight="68" id="C96-LP-I42" customClass="CreateMultipleChoiceCell">
@@ -2538,7 +2539,7 @@
                                                 </prototypes>
                                             </tableView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zwk-jF-4ay">
-                                                <rect key="frame" x="12" y="494.5" width="351" height="32"/>
+                                                <rect key="frame" x="12" y="464" width="351" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="hgF-ln-lnW"/>
                                                 </constraints>
@@ -2617,32 +2618,32 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zMD-kv-d7E">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SIS-EP-1vQ" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="P8W-9Z-XHo">
-                                                <rect key="frame" x="12" y="12" width="351" height="77.5"/>
+                                                <rect key="frame" x="12" y="12" width="351" height="72.5"/>
                                             </imageView>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="AOt-7H-kEZ">
-                                                <rect key="frame" x="12" y="101.5" width="351" height="129.5"/>
+                                                <rect key="frame" x="12" y="96.5" width="351" height="120.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap below to add a link to an external website (optional)" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="9y8-lH-azx">
-                                                <rect key="frame" x="12" y="243" width="351" height="41"/>
+                                                <rect key="frame" x="12" y="229" width="351" height="24.5"/>
                                                 <fontDescription key="fontDescription" type="italicSystem" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="K7G-hG-wdm">
-                                                <rect key="frame" x="12" y="353" width="351" height="162"/>
+                                                <rect key="frame" x="12" y="322.5" width="351" height="150.5"/>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MN5-AW-cpg">
-                                                <rect key="frame" x="12" y="527" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="485" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="Rfh-0M-riy"/>
                                                 </constraints>
@@ -2650,7 +2651,7 @@
                                                 <state key="normal" title="Add an Accompanying Image (optional)"/>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Td8-mo-ew8">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="c3h-JZ-zSs"/>
                                                 </constraints>
@@ -2658,7 +2659,7 @@
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZYc-di-yPj">
-                                                <rect key="frame" x="12" y="296" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="265.5" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="iLO-KM-8mc"/>
                                                 </constraints>
@@ -2744,30 +2745,30 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bHD-V9-GID">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jrL-2u-ZLB" userLabel="ContentView">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Qea-7Z-wna">
-                                                <rect key="frame" x="12" y="12" width="351" height="110"/>
+                                                <rect key="frame" x="12" y="12" width="351" height="102.5"/>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="izr-NX-wtb">
-                                                <rect key="frame" x="12" y="341.5" width="351" height="30"/>
+                                                <rect key="frame" x="12" y="325" width="351" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="Cqh-12-K4l"/>
                                                 </constraints>
                                                 <state key="normal" title="Listen to Chosen Audio"/>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="51E-AY-1Gh">
-                                                <rect key="frame" x="12" y="287.5" width="351" height="30"/>
+                                                <rect key="frame" x="12" y="271" width="351" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="IlH-iv-olB"/>
                                                 </constraints>
                                                 <state key="normal" title="Choose Audio"/>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ba6-wD-fAI">
-                                                <rect key="frame" x="12" y="594" width="351" height="33"/>
+                                                <rect key="frame" x="12" y="550" width="351" height="33"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="33" id="7QM-gH-gJJ"/>
                                                 </constraints>
@@ -2775,7 +2776,7 @@
                                                 <state key="normal" title="Save and Add Task"/>
                                             </button>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="cfg-Is-Jjq">
-                                                <rect key="frame" x="12" y="134" width="351" height="129.5"/>
+                                                <rect key="frame" x="12" y="126.5" width="351" height="120.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </string>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -2839,6 +2840,24 @@
                 <exit id="NzL-au-tMr" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1556" y="757"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Nxv-cS-xWM">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="pcU-lZ-hKG" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="qXS-I0-KVN">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Zcy-Uf-hM6" kind="relationship" relationship="rootViewController" id="bOV-EQ-NLh"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4I4-EY-HqH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-175.19999999999999" y="-1525.1874062968518"/>
         </scene>
     </scenes>
     <resources>

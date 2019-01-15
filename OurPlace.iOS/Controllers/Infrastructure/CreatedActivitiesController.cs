@@ -24,20 +24,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using CoreGraphics;
 using Foundation;
 using GlobalToast;
 using Newtonsoft.Json;
-using OurPlace.iOS.Cells;
-using OurPlace.iOS.Delegates;
-using OurPlace.iOS.ViewSources;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
-using UIKit;
-using System.Threading.Tasks;
-using CoreGraphics;
+using OurPlace.iOS.Cells;
+using OurPlace.iOS.Delegates;
 using OurPlace.iOS.Helpers;
-using OurPlace.Common;
-using System.Linq;
+using OurPlace.iOS.ViewSources;
+using UIKit;
 
 namespace OurPlace.iOS
 {
@@ -154,9 +152,10 @@ namespace OurPlace.iOS
                 clipboard.String = activity.InviteCode;
                 Toast.ShowToast("Copied Code");
             }));
-            alert.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (a) =>
+            alert.AddAction(UIAlertAction.Create("Edit", UIAlertActionStyle.Default, (a) =>
             {
-                //PromptDelete(activity, true);
+                activityToEdit = activity;
+                PerformSegue("CreateActivitySegue", this);
             }));
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
@@ -199,8 +198,11 @@ namespace OurPlace.iOS
 
             if (segue.Identifier.Equals("CreateActivitySegue"))
             {
-                var viewController = (Create_ActivityOverviewController)segue.DestinationViewController;
+                UINavigationController navController = (UINavigationController)segue.DestinationViewController;
+
+                var viewController = (Create_ActivityOverviewController)navController.ViewControllers[0];
                 viewController.thisActivity = activityToEdit;
+                viewController.editingSubmitted = !unsubmittedActivities.Contains(activityToEdit);
             }
         }
 

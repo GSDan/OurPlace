@@ -35,13 +35,13 @@ using OurPlace.Common.Models;
 using OurPlace.iOS.Controllers.Create;
 using OurPlace.iOS.ViewSources;
 using UIKit;
-using System.Linq;
 
 namespace OurPlace.iOS
 {
     public partial class Create_ActivityOverviewController : UITableViewController
     {
         public LearningActivity thisActivity;
+        public bool editingSubmitted;
         private bool canFinish;
 
         private int taskToEditIndex;
@@ -70,6 +70,8 @@ namespace OurPlace.iOS
             new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewTask),
             new UIBarButtonItem(UIBarButtonSystemItem.Trash, DeleteTask),
                 };
+
+            NavigationItem.LeftBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, ClosePressed);
 
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 180;
@@ -108,6 +110,11 @@ namespace OurPlace.iOS
                 FooterButton.SetTitle("Finish", UIControlState.Normal);
                 TableView.Source = new CreateViewSource(thisActivity.LearningTasks.ToList(), EditTask, ManageChildren, true);
             }
+        }
+
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
         }
 
         private void EditTask(int index)
@@ -154,6 +161,26 @@ namespace OurPlace.iOS
             PerformSegue("ChooseTaskType", this);
         }
 
+        private void ClosePressed(object sender, EventArgs e)
+        {
+            if (!editingSubmitted)
+            {
+                NavigationController.DismissViewController(true, null);
+                return;
+            }
+
+            AppUtils.ShowChoiceDialog(
+                this,
+                "Cancel editing?",
+                "Going back will discard any changes you've made. Are you sure?",
+                "Discard changes", (res) =>
+                {
+                    NavigationController.DismissViewController(true, null);
+                },
+                "Cancel",
+                null, thisActivity, UIAlertActionStyle.Destructive);
+        }
+
         private void DeleteTask(object sender, EventArgs e)
         {
             AppUtils.ShowChoiceDialog(
@@ -173,7 +200,7 @@ namespace OurPlace.iOS
 
                 },
                 "Cancel",
-                null, thisActivity);
+                null, thisActivity, UIAlertActionStyle.Destructive);
         }
 
         private async Task DeleteLocalActivity()
@@ -185,7 +212,7 @@ namespace OurPlace.iOS
             dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
             dbManager.AddUser(dbManager.currentUser);
             Toast.ShowToast("Activity Deleted");
-            NavigationController.PopViewController(true);
+            NavigationController.DismissViewController(true, null);
         }
 
         private async Task DeleteRemoteActivity()
@@ -288,7 +315,7 @@ namespace OurPlace.iOS
                 {
                     // If the user cancelled without any info being saved, 
                     // return to the previous screen
-                    NavigationController.PopViewController(true);
+                    NavigationController.DismissViewController(true, null);
                     return;
                 }
 
