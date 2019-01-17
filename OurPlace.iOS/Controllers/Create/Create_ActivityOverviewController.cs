@@ -30,6 +30,7 @@ using FFImageLoading;
 using Foundation;
 using GlobalToast;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using OurPlace.iOS.Controllers.Create;
@@ -87,9 +88,18 @@ namespace OurPlace.iOS
                 ActivityDescription.Text = thisActivity.Description;
                 if (!string.IsNullOrWhiteSpace(thisActivity.ImageUrl))
                 {
-                    ImageService.Instance.LoadFile(
+                    if (thisActivity.ImageUrl.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(
+                        ServerUtils.GetUploadUrl(thisActivity.ImageUrl))
+                            .Into(ActivityImage);
+                    }
+                    else
+                    {
+                        ImageService.Instance.LoadFile(
                         AppUtils.GetPathForLocalFile(thisActivity.ImageUrl))
                                 .Into(ActivityImage);
+                    }
                 }
                 else
                 {
