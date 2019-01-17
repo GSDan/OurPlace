@@ -213,10 +213,29 @@ namespace OurPlace.iOS
         {
             List<LearningTask> tasks = thisActivity.LearningTasks.ToList();
 
-            int thisIndex = tasks.FindIndex((LearningTask task) => task.Id == thisTask.Id);
-            if (thisIndex == -1) return;
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                if (tasks[i].Id == thisTask.Id)
+                {
+                    tasks.RemoveAt(i);
+                    goto FoundTask;
+                }
 
-            tasks.RemoveAt(thisIndex);
+                if (tasks[i].ChildTasks == null) continue;
+                for (int j = 0; j < tasks[i].ChildTasks.Count(); j++)
+                {
+                    List<LearningTask> childTasks = tasks[i].ChildTasks.ToList();
+                    if (childTasks[j].Id == thisTask.Id)
+                    {
+                        childTasks.RemoveAt(j);
+                        tasks[i].ChildTasks = childTasks;
+                        goto FoundTask;
+                    }
+                }
+            }
+
+        FoundTask:
+
             thisActivity.LearningTasks = tasks;
             Unwind();
         }
