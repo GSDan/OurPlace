@@ -37,6 +37,7 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
@@ -145,22 +146,26 @@ namespace OurPlace.Android.Activities.Create
             return;
         }
 
-        public async void SaveProgress()
+        public async Task SaveProgress()
         {
-            if(dbManager == null)
-            {
-                dbManager = await GetDatabaseManager();
-            }
-
             parentTask.ChildTasks = adapter.data;
 
             // Hide the prompt if the user has added a task
             fabPrompt.Visibility =
-                (parentTask.ChildTasks != null && parentTask.ChildTasks.Count() > 0)
+                (parentTask.ChildTasks != null && parentTask.ChildTasks.Any())
                 ? ViewStates.Gone : ViewStates.Visible;
+
+            List<LearningTask> lt = learningActivity.LearningTasks.ToList();
+            lt[parentInd] = parentTask;
+            learningActivity.LearningTasks = lt;
 
             // Don't save changes to uploaded activities until we're ready to submit
             if (editingSubmitted) return;
+
+            if (dbManager == null)
+            {
+                dbManager = await GetDatabaseManager();
+            }
 
             // Add/update this new activity in the user's inprogress cache
             string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;
@@ -169,10 +174,6 @@ namespace OurPlace.Android.Activities.Create
                 JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
 
             int existingInd = inProgress.FindIndex((la) => la.Id == learningActivity.Id);
-
-            List<LearningTask> lt = learningActivity.LearningTasks.ToList();
-            lt[parentInd] = parentTask;
-            learningActivity.LearningTasks = lt;
 
             if (existingInd == -1)
             {
@@ -191,7 +192,7 @@ namespace OurPlace.Android.Activities.Create
 
         protected override void OnResume()
         {
-            SaveProgress();
+            var suppress = SaveProgress();
             base.OnResume();
         }
 
@@ -222,7 +223,7 @@ namespace OurPlace.Android.Activities.Create
                         adapter.NotifyDataSetChanged();
                     }
                 }
-                SaveProgress();
+                var suppress = SaveProgress();
             }
         }
     }

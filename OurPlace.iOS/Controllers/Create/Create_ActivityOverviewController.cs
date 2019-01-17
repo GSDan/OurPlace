@@ -264,6 +264,7 @@ namespace OurPlace.iOS
                 var viewController = (Create_ChildTasksOverviewController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
                 viewController.parentTaskIndex = taskToEditIndex;
+                viewController.editingSubmitted = editingSubmitted;
             }
             else if (segue.Identifier.Equals("EditMeta"))
             {

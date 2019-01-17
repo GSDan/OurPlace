@@ -39,6 +39,7 @@ namespace OurPlace.iOS
     public partial class Create_ChildTasksOverviewController : UITableViewController
     {
         public LearningActivity thisActivity;
+        public bool editingSubmitted;
         public int parentTaskIndex;
 
         private LearningTask thisTask;
@@ -183,6 +184,8 @@ namespace OurPlace.iOS
 
         private async Task SaveProgress()
         {
+            if (editingSubmitted) return;
+
             DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
 
             // Add/update this new activity in the user's inprogress cache
