@@ -202,7 +202,16 @@ namespace OurPlace.iOS
 
                 var viewController = (Create_ActivityOverviewController)navController.ViewControllers[0];
                 viewController.thisActivity = activityToEdit;
-                viewController.editingSubmitted = !unsubmittedActivities.Contains(activityToEdit);
+
+                if (unsubmittedActivities == null)
+                {
+                    viewController.editingSubmitted = true;
+                }
+                else
+                {
+                    viewController.editingSubmitted = !unsubmittedActivities.Contains(activityToEdit);
+                }
+
             }
         }
 

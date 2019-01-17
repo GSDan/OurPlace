@@ -68,7 +68,7 @@ namespace OurPlace.iOS
             NavigationItem.Title = "Edit Activity";
             NavigationItem.RightBarButtonItems = new UIBarButtonItem[] {
             new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewTask),
-            new UIBarButtonItem(UIBarButtonSystemItem.Trash, DeleteTask),
+            new UIBarButtonItem(UIBarButtonSystemItem.Trash, DeleteActivity),
                 };
 
             NavigationItem.LeftBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, ClosePressed);
@@ -181,7 +181,7 @@ namespace OurPlace.iOS
                 null, thisActivity, UIAlertActionStyle.Destructive);
         }
 
-        private void DeleteTask(object sender, EventArgs e)
+        private void DeleteActivity(object sender, EventArgs e)
         {
             AppUtils.ShowChoiceDialog(
                 this,
@@ -335,6 +335,9 @@ namespace OurPlace.iOS
 
         private async Task SaveProgress()
         {
+            // Only save changes to 
+            if (editingSubmitted) return;
+
             DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
 
             // Add/update this new activity in the user's inprogress cache
