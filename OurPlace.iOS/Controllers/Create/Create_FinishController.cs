@@ -118,6 +118,7 @@ namespace OurPlace.iOS
             var uploadData = await Storage.PrepCreatedActivityForUpload(thisActivity, false);
 
             NavigationController.PopToRootViewController(true);
+            NavigationController.DismissViewController(true, null);
         }
 
     }

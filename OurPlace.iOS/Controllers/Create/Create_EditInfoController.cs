@@ -29,6 +29,7 @@ using FFImageLoading;
 using Foundation;
 using MobileCoreServices;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using UIKit;
 
@@ -62,9 +63,17 @@ namespace OurPlace.iOS
 
                 if (!string.IsNullOrWhiteSpace(previousImage))
                 {
-                    ImageService.Instance.LoadFile(
-                    AppUtils.GetPathForLocalFile(previousImage))
+                    if (previousImage.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(previousImage))
                             .Into(AccompanyingImage);
+                    }
+                    else
+                    {
+                        ImageService.Instance.LoadFile(
+                            AppUtils.GetPathForLocalFile(previousImage))
+                                    .Into(AccompanyingImage);
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(data.ExternalUrl))
@@ -86,7 +95,7 @@ namespace OurPlace.iOS
             UIAlertController alert = UIAlertController.Create("Choose Image Source", null, UIAlertControllerStyle.ActionSheet);
             alert.AddAction(UIAlertAction.Create("Camera", UIAlertActionStyle.Default, (a) => { OpenCamera(); }));
             alert.AddAction(UIAlertAction.Create("Gallery", UIAlertActionStyle.Default, (a) => { OpenImagePicker(); }));
-            alert.AddAction(UIAlertAction.Create("Other Sources", UIAlertActionStyle.Default, (a) => { OpenDocumentPicker(); }));
+            alert.AddAction(UIAlertAction.Create("Other Sources", UIAlertActionStyle.Default, (a) => { var supress = OpenDocumentPicker(); }));
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
             UIPopoverPresentationController popCont = alert.PopoverPresentationController;
@@ -303,13 +312,15 @@ namespace OurPlace.iOS
                 {
                     currentImagePath = previousImage;
                 }
-                else if (!string.IsNullOrWhiteSpace(previousImage))
+                else if (!string.IsNullOrWhiteSpace(previousImage) && !previousImage.StartsWith("upload"))
                 {
                     // new image replaces old one, delete the previous image
                     File.Delete(AppUtils.GetPathForLocalFile(previousImage));
                 }
 
-                string imgUrl = (string.IsNullOrWhiteSpace(currentImagePath)) ? "" : Path.Combine(Directory.GetParent(currentImagePath).Name, Path.GetFileName(currentImagePath));
+                string imgUrl = (string.IsNullOrWhiteSpace(currentImagePath)) ? "" :
+                currentImagePath.StartsWith("upload") ? currentImagePath :
+                     Path.Combine(Directory.GetParent(currentImagePath).Name, Path.GetFileName(currentImagePath));
 
                 AdditionalInfoData data = new AdditionalInfoData
                 {
@@ -318,7 +329,6 @@ namespace OurPlace.iOS
                 };
 
                 thisTask.JsonData = JsonConvert.SerializeObject(data);
-
 
                 UpdateActivity();
                 Unwind();

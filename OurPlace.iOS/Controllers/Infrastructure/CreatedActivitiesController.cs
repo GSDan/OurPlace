@@ -201,17 +201,19 @@ namespace OurPlace.iOS
                 UINavigationController navController = (UINavigationController)segue.DestinationViewController;
 
                 var viewController = (Create_ActivityOverviewController)navController.ViewControllers[0];
-                viewController.thisActivity = activityToEdit;
 
-                if (unsubmittedActivities == null)
+                if (activityToEdit != null)
                 {
-                    viewController.editingSubmitted = true;
+                    viewController.thisActivity = activityToEdit;
+                    if (unsubmittedActivities == null)
+                    {
+                        viewController.editingSubmitted = true;
+                    }
+                    else
+                    {
+                        viewController.editingSubmitted = !unsubmittedActivities.Contains(activityToEdit);
+                    }
                 }
-                else
-                {
-                    viewController.editingSubmitted = !unsubmittedActivities.Contains(activityToEdit);
-                }
-
             }
         }
 
