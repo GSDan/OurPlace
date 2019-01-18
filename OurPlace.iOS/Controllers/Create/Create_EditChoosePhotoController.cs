@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using FFImageLoading;
 using Foundation;
 using MobileCoreServices;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using UIKit;
 
@@ -73,9 +74,17 @@ namespace OurPlace.iOS
 
                 if (!IsParent(previousImage))
                 {
-                    ImageService.Instance.LoadFile(
+                    if (previousImage.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(previousImage))
+                            .Into(ChosenImage);
+                    }
+                    else
+                    {
+                        ImageService.Instance.LoadFile(
                     AppUtils.GetPathForLocalFile(previousImage))
                             .Into(ChosenImage);
+                    }
                 }
                 else
                 {
@@ -96,7 +105,10 @@ namespace OurPlace.iOS
             if (IsMovingFromParentViewController)
             {
                 // popped - if a file isn't being referenced by the saved data, delete it
-                if (!saved && currentImagePath != null && !IsParent(currentImagePath) && currentImagePath != previousImage)
+                if (!saved && currentImagePath != null &&
+                !IsParent(currentImagePath) &&
+                    currentImagePath != previousImage &&
+                !currentImagePath.StartsWith("upload"))
                 {
                     string path = AppUtils.GetPathForLocalFile(currentImagePath);
                     File.Delete(path);
@@ -132,7 +144,9 @@ namespace OurPlace.iOS
 
         private void UseParent()
         {
-            if (currentImagePath != null && currentImagePath != previousImage)
+            if (currentImagePath != null &&
+            currentImagePath != previousImage &&
+            !currentImagePath.StartsWith("upload"))
             {
                 File.Delete(AppUtils.GetPathForLocalFile(currentImagePath));
             }
@@ -267,7 +281,10 @@ namespace OurPlace.iOS
 
         public void ThisApp_DocumentLoaded(Helpers.GenericTextDocument document)
         {
-            if (currentImagePath != null && !IsParent(currentImagePath) && currentImagePath != previousImage)
+            if (currentImagePath != null &&
+             !IsParent(currentImagePath) &&
+               currentImagePath != previousImage &&
+               !currentImagePath.StartsWith("upload"))
             {
                 File.Delete(AppUtils.GetPathForLocalFile(currentImagePath));
             }
@@ -295,7 +312,9 @@ namespace OurPlace.iOS
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(previousImage) && !IsParent(previousImage))
+                    if (!string.IsNullOrWhiteSpace(previousImage) &&
+                    !IsParent(previousImage) &&
+                        !previousImage.StartsWith("upload"))
                     {
                         // new image replaces old one, delete the previous image
                         File.Delete(AppUtils.GetPathForLocalFile(previousImage));
