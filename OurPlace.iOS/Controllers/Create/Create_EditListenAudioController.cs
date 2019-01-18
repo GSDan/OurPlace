@@ -29,6 +29,10 @@ using Foundation;
 using OurPlace.Common.Models;
 using UIKit;
 using System.Threading.Tasks;
+using OurPlace.Common;
+using System.Net;
+using OurPlace.iOS.Helpers;
+using OurPlace.Common.LocalData;
 
 namespace OurPlace.iOS
 {
@@ -40,6 +44,7 @@ namespace OurPlace.iOS
         private string listenValid = "Listen to Chosen Audio";
         private UIDocumentPickerViewController docPicker;
         private bool saved;
+        private string cachePath;
 
         public Create_EditListenAudioController(IntPtr handle) : base(handle)
         {
@@ -66,9 +71,10 @@ namespace OurPlace.iOS
             }
         }
 
-        private void ListenButton_TouchUpInside(object sender, EventArgs e)
+        private async void ListenButton_TouchUpInside(object sender, EventArgs e)
         {
-            string fullPath = AppUtils.GetPathForLocalFile(currentFile);
+            string fullPath = currentFile.StartsWith("upload") ?
+            await DownloadExisting() : AppUtils.GetPathForLocalFile(currentFile);
 
             if (!File.Exists(fullPath))
             {
@@ -92,6 +98,35 @@ namespace OurPlace.iOS
             NavigationController.PushViewController(listenAudioController, true);
         }
 
+        private async Task<string> DownloadExisting()
+        {
+            var bounds = UIScreen.MainScreen.Bounds;
+            LoadingOverlay loadPop = new LoadingOverlay(bounds);
+            View.Add(loadPop);
+
+            using (WebClient webClient = new WebClient())
+            {
+                Console.WriteLine("Checking file ");
+
+                // Update loading dialog with current progress
+                string thisUrl = ServerUtils.GetUploadUrl(currentFile);
+                cachePath = Storage.GetCacheFilePath(thisUrl, -1, "mp3");
+
+                if (!File.Exists(cachePath))
+                {
+                    Console.WriteLine("Downloading file ");
+
+                    await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
+
+                    Console.WriteLine("Downloaded file ");
+                }
+            }
+
+            loadPop.Hide();
+
+            return cachePath;
+        }
+
         public override void ViewWillDisappear(bool animated)
         {
             base.ViewWillDisappear(animated);
@@ -105,6 +140,13 @@ namespace OurPlace.iOS
                     File.Delete(path);
                     Console.WriteLine("Cleaned up file at " + path);
                 }
+
+                // clear any downloaded files
+                if (!string.IsNullOrEmpty(cachePath))
+                {
+                    File.Delete(cachePath);
+                    Console.WriteLine("Deleted " + cachePath);
+                }
             }
         }
 
@@ -112,7 +154,7 @@ namespace OurPlace.iOS
         {
             UIAlertController alert = UIAlertController.Create("Choose Image Source", null, UIAlertControllerStyle.ActionSheet);
             alert.AddAction(UIAlertAction.Create("Record New", UIAlertActionStyle.Default, (a) => { PerformSegue("CreateRecordAudio", this); }));
-            alert.AddAction(UIAlertAction.Create("Choose Existing File", UIAlertActionStyle.Default, (a) => { OpenMediaPicker(); }));
+            alert.AddAction(UIAlertAction.Create("Choose Existing File", UIAlertActionStyle.Default, (a) => { var suppress = OpenMediaPicker(); }));
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
 
             // On iPad, it's a pop up. Make it appear above the button
@@ -145,7 +187,7 @@ namespace OurPlace.iOS
             await PresentViewControllerAsync(docPicker, false);
         }
 
-        void DocPicker_DidPickDocumentAtUrls(object sender, UIDocumentPickedAtUrlsEventArgs e)
+        private void DocPicker_DidPickDocumentAtUrls(object sender, UIDocumentPickedAtUrlsEventArgs e)
         {
             if (e.Urls == null || e.Urls.Length < 1) return;
 
@@ -197,7 +239,7 @@ namespace OurPlace.iOS
 
         // All activity editing controllers end up back here. 
         [Action("UnwindToCreateListenAudio:")]
-        public void UnwindToLocationHunt(UIStoryboardSegue segue)
+        public void UnwindToCreateListenAudio(UIStoryboardSegue segue)
         {
             var sourceController = segue.SourceViewController as RecordAudioController;
 
@@ -232,7 +274,9 @@ namespace OurPlace.iOS
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(previousFile) && currentFile != previousFile)
+                    if (!string.IsNullOrWhiteSpace(previousFile) &&
+                    currentFile != previousFile &&
+                    !previousFile.StartsWith("upload"))
                     {
                         // new file replaces old one, delete the previous file
                         File.Delete(AppUtils.GetPathForLocalFile(previousFile));

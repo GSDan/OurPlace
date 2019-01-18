@@ -32,8 +32,8 @@ using UIKit;
 
 namespace OurPlace.iOS
 {
-	public partial class ResultMediaViewerController : UIViewController
-	{
+    public partial class ResultMediaViewerController : UIViewController
+    {
         public string FilePath { get; set; }
         public AppTask Task { get; set; }
         public int ResultIndex { get; set; }
@@ -44,22 +44,22 @@ namespace OurPlace.iOS
         private AVPlayerLayer playerLayer;
         private AVPlayerLooper playerLooper;
 
-        public ResultMediaViewerController (IntPtr handle) : base (handle)
-		{
-		}
+        public ResultMediaViewerController(IntPtr handle) : base(handle)
+        {
+        }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
-            if(string.IsNullOrEmpty(FilePath) || !File.Exists(FilePath))
+            if (string.IsNullOrEmpty(FilePath) || !File.Exists(FilePath))
             {
                 NavigationController.PopViewController(true);
             }
 
             string taskType = Task.TaskType.IdName;
 
-            if(taskType == "LISTEN_AUDIO" || taskType == "REC_AUDIO" || taskType == "TAKE_VIDEO")
+            if (taskType == "LISTEN_AUDIO" || taskType == "REC_AUDIO" || taskType == "TAKE_VIDEO")
             {
                 // Load video, play and loop
                 playerItem = AVPlayerItem.FromUrl(NSUrl.FromFilename(FilePath));
@@ -67,7 +67,7 @@ namespace OurPlace.iOS
                 playerLayer = AVPlayerLayer.FromPlayer(player);
                 playerLooper = AVPlayerLooper.FromPlayer(player, playerItem);
 
-                if(taskType == "TAKE_VIDEO")
+                if (taskType == "TAKE_VIDEO")
                 {
                     playerLayer.Frame = View.Frame;
                     View.Layer.AddSublayer(playerLayer);
@@ -84,7 +84,8 @@ namespace OurPlace.iOS
             else
             {
                 // Load image
-                ImageService.Instance.LoadFile(FilePath).Error((e) => {
+                ImageService.Instance.LoadFile(FilePath).Error((e) =>
+                {
                     Console.WriteLine("ERROR LOADING IMAGE: " + e.Message);
                     NavigationController.PopViewController(true);
                 }).Into(ImageView);
@@ -95,7 +96,8 @@ namespace OurPlace.iOS
                 UIBarButtonItem customButton = new UIBarButtonItem(
                     UIImage.FromFile("ic_delete"),
                     UIBarButtonItemStyle.Plain,
-                    (s, e) => {
+                    (s, e) =>
+                    {
                         ConfirmDelete();
                     }
                 );
@@ -107,7 +109,8 @@ namespace OurPlace.iOS
         private void ConfirmDelete()
         {
             var alertController = UIAlertController.Create("Confirm Delete", "Are you sure you want to delete this file?", UIAlertControllerStyle.Alert);
-            alertController.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (obj) => {
+            alertController.AddAction(UIAlertAction.Create("Delete", UIAlertActionStyle.Destructive, (obj) =>
+            {
                 DeleteResult(Task, FilePath, ResultIndex);
                 NavigationController.PopViewController(true);
             }));
@@ -118,12 +121,12 @@ namespace OurPlace.iOS
         public override void ViewDidDisappear(bool animated)
         {
             base.ViewDidDisappear(animated);
-            if(player != null)
+            if (player != null)
             {
                 player.Pause();
                 playerLooper.Dispose();
                 player.Dispose();
             }
         }
-	}
+    }
 }
