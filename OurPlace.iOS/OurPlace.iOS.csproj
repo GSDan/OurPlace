@@ -39,14 +39,14 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Distribution: University of Newcastle upon Tyne (J3676MPZ85)</CodesignKey>
+    <CodesignKey>iPhone Developer: Dan Richardson (JR3T9MH59D)</CodesignKey>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <AssemblyName>OurPlace.iOS</AssemblyName>
-    <CodesignProvision>OurPlace DIST</CodesignProvision>
+    <CodesignProvision>OurPlace Dev</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
