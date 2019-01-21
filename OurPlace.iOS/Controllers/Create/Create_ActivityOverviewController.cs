@@ -297,6 +297,7 @@ namespace OurPlace.iOS
             {
                 var viewController = (Create_FinishController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
+                viewController.editingSubmitted = editingSubmitted;
             }
         }
 
