@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreGraphics;
 using FFImageLoading;
 using Foundation;
 using GlobalToast;
@@ -34,6 +35,7 @@ using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using OurPlace.iOS.Controllers.Create;
+using OurPlace.iOS.Helpers;
 using OurPlace.iOS.ViewSources;
 using UIKit;
 
@@ -44,6 +46,9 @@ namespace OurPlace.iOS
         public LearningActivity thisActivity;
         public bool editingSubmitted;
         private bool canFinish;
+        private CGRect screenBounds;
+        private LoadingOverlay loadPop;
+        private bool loading;
 
         private int taskToEditIndex;
 
@@ -199,7 +204,7 @@ namespace OurPlace.iOS
                 "Are you sure you want to delete this activity? This can't be undone.",
                 "Delete", (res) =>
                 {
-                    if (false) // TODO
+                    if (editingSubmitted)
                     {
                         var suppress = DeleteRemoteActivity();
                     }
@@ -227,27 +232,51 @@ namespace OurPlace.iOS
 
         private async Task DeleteRemoteActivity()
         {
-            //ShowLoadingOverlay();
-            //ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + activity.Id);
-            //HideLoadingOverlay();
+            ShowLoadingOverlay();
+            ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + thisActivity.Id);
+            HideLoadingOverlay();
 
-            //if (resp == null)
-            //{
-            //    var suppress = AppUtils.SignOut(this);
-            //    return;
-            //}
+            if (resp == null)
+            {
+                var suppress = AppUtils.SignOut(this);
+                return;
+            }
 
-            //if (resp.Success)
-            //{
-            //    dbManager.DeleteCachedActivity(activity);
-            //    Toast.ShowToast("Activity Deleted");
-            //}
-            //else
-            //{
-            //    Toast.ShowToast("Error connecting to the server");
-            //}
+            if (resp.Success)
+            {
+                DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
+                dbManager.DeleteCachedActivity(thisActivity);
+                Toast.ShowToast("Activity Deleted");
+                NavigationController.DismissViewController(true, null);
+            }
+            else
+            {
+                Toast.ShowToast("Error connecting to the server");
+            }
+        }
 
-            //RefreshFeed();
+        private void ShowLoadingOverlay()
+        {
+            if (loadPop == null)
+            {
+                loadPop = new LoadingOverlay(screenBounds);
+            }
+
+            if (!loading)
+            {
+                loadPop.loadingLabel.Text = "Loading...";
+                View.Add(loadPop);
+                loading = true;
+            }
+        }
+
+        private void HideLoadingOverlay()
+        {
+            if (loading)
+            {
+                loadPop.Hide();
+                loading = false;
+            }
         }
 
         private void EditMetaButton_TouchUpInside(object sender, EventArgs e)

@@ -120,13 +120,14 @@ namespace OurPlace.iOS
             thisActivity.IsPublic = isPublicSwitch.On;
             thisActivity.RequireUsername = reqNamesSwitch.On;
             thisActivity.CreatedAt = DateTime.UtcNow;
+            thisActivity.ActivityVersionNumber = (editingSubmitted) ? thisActivity.ActivityVersionNumber + 1 : 0;
 
             if (chosenPlace != null)
             {
-                thisActivity.Places = new Common.Models.Place[] { chosenPlace };
+                thisActivity.Places = new Place[] { chosenPlace };
             }
 
-            var uploadData = await Storage.PrepCreatedActivityForUpload(thisActivity, false);
+            var uploadData = await Storage.PrepCreatedActivityForUpload(thisActivity, editingSubmitted);
 
             NavigationController.PopToRootViewController(true);
             NavigationController.DismissViewController(true, null);
