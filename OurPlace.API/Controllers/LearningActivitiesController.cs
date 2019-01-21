@@ -314,6 +314,9 @@ namespace OurPlace.API.Controllers
                 return Unauthorized();
             }
                 
+            List<Place> places = await ProcessPlaces(learningActivity.Places, thisUser, existing.Places.ToList());
+            List<LearningTask> tasks = await ProcessTasks(learningActivity, thisUser, true);
+
             existing.AppVersionNumber = learningActivity.AppVersionNumber;
             existing.ActivityVersionNumber = learningActivity.ActivityVersionNumber;
             existing.Approved = thisUser.Trusted;
@@ -323,8 +326,8 @@ namespace OurPlace.API.Controllers
             existing.Name = learningActivity.Name;
             existing.RequireUsername = learningActivity.RequireUsername;
             existing.IsPublic = learningActivity.IsPublic;
-            existing.Places = await ProcessPlaces(learningActivity.Places, thisUser);
-            existing.LearningTasks = await ProcessTasks(learningActivity, thisUser, true);
+            existing.Places = places;
+            existing.LearningTasks = tasks;
 
             db.Entry(existing).State = EntityState.Modified;
 
@@ -333,10 +336,19 @@ namespace OurPlace.API.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        private async Task<List<Place>> ProcessPlaces(ICollection<Place> places, ApplicationUser currentUser)
+        private async Task<List<Place>> ProcessPlaces(ICollection<Place> places, ApplicationUser currentUser, List<Place> finalPlaces = null)
         {
             // Go through the activity's Places, adding them to the database if necessary
-            List<Place> finalPlaces = new List<Place>();
+            if (finalPlaces == null)
+            {
+                finalPlaces = new List<Place>();
+            }
+            else
+            {
+                // avoiding creating new, which seems to cause conflicts
+                finalPlaces.Clear();
+            }
+
             if (places == null) return finalPlaces;
 
             for (int i = 0; i < places.Count; i++)

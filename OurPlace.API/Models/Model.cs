@@ -19,10 +19,14 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System.ComponentModel.DataAnnotations;
+
 namespace OurPlace.API.Models
 {
     public abstract class Model
     {
+        [Key]
         public int Id { get; set; }
 
         public override int GetHashCode()
