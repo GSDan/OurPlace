@@ -54,8 +54,8 @@
 	<key>CFBundleIdentifier</key>
 	<string>uk.ac.ncl.openlab.ourplace</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
+	<string>2.7</string>
 	<key>CFBundleVersion</key>
-	<string>2.0</string>
+	<string>2.7</string>
 </dict>
 </plist>

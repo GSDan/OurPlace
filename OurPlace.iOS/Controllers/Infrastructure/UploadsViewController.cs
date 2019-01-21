@@ -293,9 +293,10 @@ namespace OurPlace.iOS
 
             ServerResponse<string> resp = new ServerResponse<string>();
 
-            if (upload.UploadType == UploadType.NewActivity)
+            if (upload.UploadType == UploadType.NewActivity ||
+                upload.UploadType == UploadType.UpdatedActivity)
             {
-                resp = await ServerUtils.UploadNewActivity(upload);
+                resp = await ServerUtils.UploadActivity(upload, upload.UploadType == UploadType.UpdatedActivity);
             }
             else
             {

@@ -77,7 +77,7 @@ namespace OurPlace.iOS
             base.ViewWillAppear(animated);
 
             // Load this activity's progress from the database if available
-            ActivityProgress progress = (await GetDatabaseManager()).GetProgress(DisplayedActivity.Id);
+            ActivityProgress progress = (await GetDatabaseManager()).GetProgress(DisplayedActivity);
             List<AppTask> appTasks = null;
 
             if (progress != null)
