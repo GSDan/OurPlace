@@ -19,10 +19,6 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using Microsoft.AspNet.Identity;
-using Microsoft.WindowsAzure.Storage.Blob;
-using OurPlace.API.Models;
-using OurPlace.API.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +26,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.AspNet.Identity;
+using Microsoft.WindowsAzure.Storage.Blob;
+using OurPlace.API.Providers;
 
 namespace OurPlace.API.Controllers
 {

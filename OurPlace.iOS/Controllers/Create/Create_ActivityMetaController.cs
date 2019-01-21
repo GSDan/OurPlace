@@ -25,15 +25,15 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using FFImageLoading;
 using FFImageLoading.Transformations;
 using Foundation;
 using MobileCoreServices;
-using OurPlace.iOS.Controllers.Create;
+using OurPlace.Common;
 using OurPlace.Common.Models;
+using OurPlace.iOS.Controllers.Create;
 using UIKit;
-using OurPlace.Common.LocalData;
-using System.Threading.Tasks;
 
 namespace OurPlace.iOS
 {
@@ -113,10 +113,19 @@ namespace OurPlace.iOS
                     previousImagePath = thisActivity.ImageUrl;
                     Console.WriteLine("Existing image path: " + previousImagePath);
 
-                    string url = AppUtils.GetPathForLocalFile(previousImagePath);
+                    if (thisActivity.ImageUrl.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(previousImagePath))
+                            .Transform(new CircleTransformation())
+                            .Into(ActivityLogo);
+                    }
+                    else
+                    {
+                        string url = AppUtils.GetPathForLocalFile(previousImagePath);
 
-                    var suppress = ImageService.Instance.InvalidateCacheEntryAsync(url, FFImageLoading.Cache.CacheType.All, true);
-                    ImageService.Instance.LoadFile(url).Transform(new CircleTransformation()).Into(ActivityLogo);
+                        var suppress = ImageService.Instance.InvalidateCacheEntryAsync(url, FFImageLoading.Cache.CacheType.All, true);
+                        ImageService.Instance.LoadFile(url).Transform(new CircleTransformation()).Into(ActivityLogo);
+                    }
                 }
             }
 
@@ -266,7 +275,8 @@ namespace OurPlace.iOS
 
         public void ThisApp_DocumentLoaded(Helpers.GenericTextDocument document)
         {
-            if (currentImagePath != null && currentImagePath != previousImagePath)
+            if (currentImagePath != null && currentImagePath != previousImagePath
+            && !currentImagePath.StartsWith("upload"))
             {
                 File.Delete(AppUtils.GetPathForLocalFile(currentImagePath));
             }
@@ -390,7 +400,6 @@ namespace OurPlace.iOS
                 };
             }
 
-            thisActivity.ImageUrl = currentImagePath;
             thisActivity.Name = ActivityTitle.Text;
             thisActivity.Description = ActivityDescription.Text;
 
@@ -398,7 +407,7 @@ namespace OurPlace.iOS
             {
                 thisActivity.ImageUrl = Path.Combine(Directory.GetParent(currentImagePath).Name, Path.GetFileName(currentImagePath));
 
-                if (!string.IsNullOrWhiteSpace(previousImagePath))
+                if (!string.IsNullOrWhiteSpace(previousImagePath) && !previousImagePath.StartsWith("upload"))
                 {
                     // new image replaces old one, delete the previous image
                     File.Delete(AppUtils.GetPathForLocalFile(previousImagePath));

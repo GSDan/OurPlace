@@ -26,12 +26,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreGraphics;
 using FFImageLoading;
 using Foundation;
+using GlobalToast;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using OurPlace.iOS.Controllers.Create;
+using OurPlace.iOS.Helpers;
 using OurPlace.iOS.ViewSources;
 using UIKit;
 
@@ -40,7 +44,10 @@ namespace OurPlace.iOS
     public partial class Create_ActivityOverviewController : UITableViewController
     {
         public LearningActivity thisActivity;
+        public bool editingSubmitted;
         private bool canFinish;
+        private LoadingOverlay loadPop;
+        private bool loading;
 
         private int taskToEditIndex;
 
@@ -64,8 +71,12 @@ namespace OurPlace.iOS
             FooterButton.TouchUpInside += FooterButton_TouchUpInside;
 
             NavigationItem.Title = "Edit Activity";
-            NavigationItem.RightBarButtonItem = new UIBarButtonItem(
-                UIBarButtonSystemItem.Add, AddNewTask);
+            NavigationItem.RightBarButtonItems = new UIBarButtonItem[] {
+            new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewTask),
+            new UIBarButtonItem(UIBarButtonSystemItem.Trash, DeleteActivity),
+                };
+
+            NavigationItem.LeftBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, ClosePressed);
 
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 180;
@@ -81,9 +92,18 @@ namespace OurPlace.iOS
                 ActivityDescription.Text = thisActivity.Description;
                 if (!string.IsNullOrWhiteSpace(thisActivity.ImageUrl))
                 {
-                    ImageService.Instance.LoadFile(
+                    if (thisActivity.ImageUrl.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(
+                        ServerUtils.GetUploadUrl(thisActivity.ImageUrl))
+                            .Into(ActivityImage);
+                    }
+                    else
+                    {
+                        ImageService.Instance.LoadFile(
                         AppUtils.GetPathForLocalFile(thisActivity.ImageUrl))
                                 .Into(ActivityImage);
+                    }
                 }
                 else
                 {
@@ -104,6 +124,11 @@ namespace OurPlace.iOS
                 FooterButton.SetTitle("Finish", UIControlState.Normal);
                 TableView.Source = new CreateViewSource(thisActivity.LearningTasks.ToList(), EditTask, ManageChildren, true);
             }
+        }
+
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
         }
 
         private void EditTask(int index)
@@ -150,6 +175,109 @@ namespace OurPlace.iOS
             PerformSegue("ChooseTaskType", this);
         }
 
+        private void ClosePressed(object sender, EventArgs e)
+        {
+            if (!editingSubmitted)
+            {
+                NavigationController.DismissViewController(true, null);
+                return;
+            }
+
+            AppUtils.ShowChoiceDialog(
+                this,
+                "Cancel editing?",
+                "Going back will discard any changes you've made. Are you sure?",
+                "Discard changes", (res) =>
+                {
+                    NavigationController.DismissViewController(true, null);
+                },
+                "Cancel",
+                null, thisActivity, UIAlertActionStyle.Destructive);
+        }
+
+        private void DeleteActivity(object sender, EventArgs e)
+        {
+            AppUtils.ShowChoiceDialog(
+                this,
+                string.Format("Delete '{0}'?", thisActivity.Name),
+                "Are you sure you want to delete this activity? This can't be undone.",
+                "Delete", (res) =>
+                {
+                    if (editingSubmitted)
+                    {
+                        var suppress = DeleteRemoteActivity();
+                    }
+                    else
+                    {
+                        var suppress = DeleteLocalActivity();
+                    }
+
+                },
+                "Cancel",
+                null, thisActivity, UIAlertActionStyle.Destructive);
+        }
+
+        private async Task DeleteLocalActivity()
+        {
+            Storage.DeleteInProgress(thisActivity);
+            DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
+            List<LearningActivity> unsubmittedActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.currentUser.LocalCreatedActivitiesJson);
+            unsubmittedActivities.RemoveAll((LearningActivity obj) => obj.Id == thisActivity.Id);
+            dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(unsubmittedActivities);
+            dbManager.AddUser(dbManager.currentUser);
+            Toast.ShowToast("Activity Deleted");
+            NavigationController.DismissViewController(true, null);
+        }
+
+        private async Task DeleteRemoteActivity()
+        {
+            ShowLoadingOverlay();
+            ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + thisActivity.Id);
+            HideLoadingOverlay();
+
+            if (resp == null)
+            {
+                var suppress = AppUtils.SignOut(this);
+                return;
+            }
+
+            if (resp.Success)
+            {
+                DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
+                dbManager.DeleteCachedActivity(thisActivity);
+                Toast.ShowToast("Activity Deleted");
+                NavigationController.DismissViewController(true, null);
+            }
+            else
+            {
+                Toast.ShowToast("Error connecting to the server");
+            }
+        }
+
+        private void ShowLoadingOverlay()
+        {
+            if (loadPop == null)
+            {
+                loadPop = new LoadingOverlay(UIScreen.MainScreen.Bounds);
+            }
+
+            if (!loading)
+            {
+                loadPop.loadingLabel.Text = "Loading...";
+                View.Add(loadPop);
+                loading = true;
+            }
+        }
+
+        private void HideLoadingOverlay()
+        {
+            if (loading)
+            {
+                loadPop.Hide();
+                loading = false;
+            }
+        }
+
         private void EditMetaButton_TouchUpInside(object sender, EventArgs e)
         {
             PerformSegue("EditMeta", this);
@@ -164,6 +292,7 @@ namespace OurPlace.iOS
                 var viewController = (Create_ChildTasksOverviewController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
                 viewController.parentTaskIndex = taskToEditIndex;
+                viewController.editingSubmitted = editingSubmitted;
             }
             else if (segue.Identifier.Equals("EditMeta"))
             {
@@ -196,6 +325,7 @@ namespace OurPlace.iOS
             {
                 var viewController = (Create_FinishController)segue.DestinationViewController;
                 viewController.thisActivity = thisActivity;
+                viewController.editingSubmitted = editingSubmitted;
             }
         }
 
@@ -225,7 +355,7 @@ namespace OurPlace.iOS
                 {
                     // If the user cancelled without any info being saved, 
                     // return to the previous screen
-                    NavigationController.PopViewController(true);
+                    NavigationController.DismissViewController(true, null);
                     return;
                 }
 
@@ -245,6 +375,9 @@ namespace OurPlace.iOS
 
         private async Task SaveProgress()
         {
+            // Only save changes to 
+            if (editingSubmitted) return;
+
             DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
 
             // Add/update this new activity in the user's inprogress cache

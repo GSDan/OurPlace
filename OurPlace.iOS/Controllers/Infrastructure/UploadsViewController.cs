@@ -281,7 +281,8 @@ namespace OurPlace.iOS
                     viewSource.UpdateData(dbManager.GetUploadQueue().ToList());
                     upload = viewSource.Rows[index];
                 },
-                (upload.UploadType == UploadType.NewActivity) ? Storage.GetCacheFolder() : Storage.GetUploadsFolder()
+                (upload.UploadType == UploadType.NewActivity ||
+                upload.UploadType == UploadType.UpdatedActivity) ? Storage.GetCacheFolder() : Storage.GetUploadsFolder()
             );
 
             if (!success)
