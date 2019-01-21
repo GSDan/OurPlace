@@ -46,7 +46,6 @@ namespace OurPlace.iOS
         public LearningActivity thisActivity;
         public bool editingSubmitted;
         private bool canFinish;
-        private CGRect screenBounds;
         private LoadingOverlay loadPop;
         private bool loading;
 
@@ -259,7 +258,7 @@ namespace OurPlace.iOS
         {
             if (loadPop == null)
             {
-                loadPop = new LoadingOverlay(screenBounds);
+                loadPop = new LoadingOverlay(UIScreen.MainScreen.Bounds);
             }
 
             if (!loading)
