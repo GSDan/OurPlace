@@ -19,6 +19,9 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+
+using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Media;
 using Java.IO;
@@ -30,8 +33,8 @@ namespace OurPlace.Android.Listeners
 {
     public class ImageAvailableListener : Java.Lang.Object, ImageReader.IOnImageAvailableListener
     {
-        private Camera2Fragment Fragment;
-        private File File;
+        private readonly Camera2Fragment Fragment;
+        private readonly File File;
 
         public ImageAvailableListener(Camera2Fragment frag, File file)
         {
@@ -39,26 +42,24 @@ namespace OurPlace.Android.Listeners
             this.File = file;
         }
 
-        public void OnImageAvailable(ImageReader reader)
+        public async void OnImageAvailable(ImageReader reader)
         {
             Image image = null;
             try
             {
-                image = reader.AcquireLatestImage();
+                // https://stackoverflow.com/questions/36419722/error-unable-to-acquire-a-lockedbuffer-very-likely-client-tries-to-lock-more-t
+                image = reader.AcquireNextImage();
+                //image = reader.AcquireLatestImage();
                 ByteBuffer buffer = image.GetPlanes()[0].Buffer;
                 byte[] bytes = new byte[buffer.Capacity()];
                 buffer.Get(bytes);
-                Save(bytes);
+                await Save(bytes);
 
-                if (Fragment != null && File != null)
-                {
-                    Activity activity = Fragment.Activity;
-                    if (activity != null)
-                    {
-                        Fragment.OnPause();
-                        ((CameraActivity)activity).ReturnWithFile(File.ToString());
-                    }
-                }
+                if (Fragment?.Activity == null || File == null) return;
+
+                Fragment.OnPause();
+
+                ((CameraActivity)Fragment.Activity).ReturnWithFile(File.ToString());
             }
             catch (FileNotFoundException ex)
             {
@@ -70,30 +71,15 @@ namespace OurPlace.Android.Listeners
             }
             finally
             {
-                if (image != null)
-                {
-                    image.Close();
-                }
+                image?.Close();
             }
         }
 
-        private void Save(byte[] bytes)
+        private async Task Save(byte[] bytes)
         {
-            OutputStream output = null;
-            try
+            using (OutputStream output = new FileOutputStream(File))
             {
-                if (File != null)
-                {
-                    output = new FileOutputStream(File);
-                    output.Write(bytes);
-                }
-            }
-            finally
-            {
-                if (output != null)
-                {
-                    output.Close();
-                }
+                output.Write(bytes);
             }
 
             global::Android.Graphics.Bitmap bitmap = global::Android.Graphics.BitmapFactory.DecodeFile(File.AbsolutePath);
@@ -113,7 +99,7 @@ namespace OurPlace.Android.Listeners
                     break;
             }
 
-            var suppress = AndroidUtils.WriteBitmapToFile(File.AbsolutePath, bitmap);
+            await AndroidUtils.WriteBitmapToFile(File.AbsolutePath, bitmap);
         }
     }
 }

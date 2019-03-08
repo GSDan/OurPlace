@@ -354,6 +354,10 @@ namespace OurPlace.Android.Activities
             viewActivity.PutExtra("RES_INDEX", pathIndex);
             viewActivity.PutExtra("ACT_ID", learningActivity.Id);
             viewActivity.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Items[taskIndex]));
+
+            adapter.Items[taskIndex].IsCompleted = true;
+            adapter.CheckForChildren(taskIndex);
+
             StartActivityForResult(viewActivity, MediaPlayerReqCode);
         }
 
@@ -570,6 +574,12 @@ namespace OurPlace.Android.Activities
         /// </summary>
         public void PackageForUpload()
         {
+            if (learningActivity.RequireUsername && string.IsNullOrWhiteSpace(enteredName))
+            {
+                ShowNameEntry(true);
+                return;
+            }
+
             List<AppTask> preppedTasks = new List<AppTask>();
             foreach (AppTask t in adapter.Items)
             {
@@ -597,11 +607,6 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            if (learningActivity.RequireUsername && string.IsNullOrWhiteSpace(enteredName))
-            {
-                ShowNameEntry(true);
-                return;
-            }
 
             ApplicationUser creator = learningActivity.Author;
             if (creator != null && creator.Id != dbManager.currentUser.Id)

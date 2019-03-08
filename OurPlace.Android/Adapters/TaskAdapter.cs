@@ -216,7 +216,7 @@ namespace OurPlace.Android.Adapters
             CheckForChildren(i);
         }
 
-        private void CheckForChildren(int position)
+        public void CheckForChildren(int position)
         {
             AppTask parent = Items[position];
             bool hasChildren = parent.ChildTasks != null && parent.ChildTasks.Any();

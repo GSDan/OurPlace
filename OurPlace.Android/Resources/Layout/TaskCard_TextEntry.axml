@@ -66,13 +66,6 @@
                         android:layout_marginLeft="4dp"
                         android:textSize="16sp"
                         android:paddingBottom="10dp" />
-                    <Button
-                        android:id="@+id/taskBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/TaskBtn"
-                        android:layout_gravity="right"
-                        android:padding="10dp" />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout

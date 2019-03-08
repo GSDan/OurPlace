@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -114,8 +113,8 @@ namespace OurPlace.API.Controllers
                                ReqFileUpload = ct.TaskType.ReqFileUpload,
                                IdName = ct.TaskType.IdName
                            }
-                       })
-                   })
+                       }).OrderBy(ct => ct.Order)
+                   }).OrderBy(t => t.Order)
                }).ToList();
         }
 

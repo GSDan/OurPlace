@@ -290,11 +290,12 @@ namespace OurPlace.Android
 
         public static async Task WriteBitmapToFile(string path, Bitmap bm)
         {
-            using (var stream = new MemoryStream())
+            using (MemoryStream stream = new MemoryStream())
             {
                 await bm.CompressAsync(Bitmap.CompressFormat.Jpeg, 90, stream);
                 byte[] bitmapData = stream.ToArray();
                 WriteDataToFile(path, bitmapData);
+                stream.Dispose();
             }
 
             bm.Recycle();
