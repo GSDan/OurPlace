@@ -36,6 +36,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using OurPlace.Common;
 using LearningTask = OurPlace.API.Models.LearningTask;
 
 namespace OurPlace.API.Controllers
@@ -149,23 +150,32 @@ namespace OurPlace.API.Controllers
             if (thisUser == null)
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Please log in");
 
-            List<Common.Models.LimitedActivityFeedSection> feed = new List<Common.Models.LimitedActivityFeedSection>();
+            // Researcher accounts privvy to all uploaded activities
+            bool isResearcher = Common.ConfidentialData.TestEmails.Contains(thisUser.Email);
 
-            if(lat != 0 || lon != 0)
+            List<Common.Models.LimitedActivityFeedSection> feed = new List<Common.Models.LimitedActivityFeedSection>();
+            
+            if(!lat.AlmostEquals(0, 0.0001) || !lon.AlmostEquals(0, 0.0001))
             {
                 IEnumerable<Place> places = LocationLogic.GetPlacesNear(db, lat, lon, 2500, 3);
 
                 foreach(Place pl in places)
                 {
                     // Get activities which are near the user's position, public and approved
-                    List<Common.Models.LimitedLearningActivity> actsHere = GetAllWhere(a => !a.SoftDeleted && (a.Places.Any(l => l.Id == pl.Id) && (a.Approved || thisUser.Trusted) && a.IsPublic)).Take(12).ToList();
+                    List<Common.Models.LimitedLearningActivity> actsHere = GetAllWhere(a => 
+                        !a.SoftDeleted && 
+                        (a.Places.Any(l => l.Id == pl.Id) &&
+                         (a.Approved || thisUser.Trusted) &&
+                         (isResearcher || a.IsPublic)))
+                        .Take(12).ToList();
 
-                    if(actsHere != null && actsHere.Count > 0)
+                    if(actsHere.Count > 0)
                     {
                         feed.Add(new Common.Models.LimitedActivityFeedSection
                         {
-                            Title = string.Format("Activities at {0}", pl.Name),
-                            Description = string.Format("It looks like you're near {0}! Here are some activities that have been made there.", pl.Name),
+                            Title = $"Activities at {pl.Name}",
+                            Description =
+                                $"It looks like you're near {pl.Name}! Here are some activities that have been made there.",
                             Activities = actsHere
                         });
                     }
@@ -177,8 +187,8 @@ namespace OurPlace.API.Controllers
                 Title = "Recently Uploaded",
                 Description = "Here are some of the latest activities that have been uploaded",
                 // Get the most recent activities which are public and approved, or made by the current user
-                Activities = GetAllWhere(a => !a.SoftDeleted && ((a.IsPublic && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
-                    .OrderByDescending(a => a.CreatedAt).Take(8).ToList()
+                Activities = GetAllWhere(a => !a.SoftDeleted && (((isResearcher || a.IsPublic) && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
+                    .OrderByDescending(a => a.CreatedAt).Take(16).ToList()
             });
 
             var resp = Request.CreateResponse(HttpStatusCode.OK);
