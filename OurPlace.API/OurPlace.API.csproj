@@ -546,12 +546,12 @@
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="appSettings_confidentialData.config" />
+    <Content Include="connections_confidentialData.config" />
     <Content Include="Content\bootstrap-reboot.min.css.map" />
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
-    <Content Include="appSettings_confidentialData.config" />
-    <Content Include="connections_confidentialData.config" />
     <None Include="Properties\PublishProfiles\ParkLearnAPI - Web Deploy.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
