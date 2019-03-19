@@ -18,8 +18,9 @@
             android:fitsSystemWindows="true"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:contentScrim="@color/app_green"
-            app:expandedTitleMarginStart="48dp"
-            app:expandedTitleMarginEnd="64dp">
+			app:expandedTitleTextAppearance="@style/ExpandedAppBar"
+            app:expandedTitleMarginStart="32dp"
+            app:expandedTitleMarginEnd="32dp">
             <FFImageLoading.Views.ImageViewAsync
                 android:id="@+id/backdrop"
                 android:src="@drawable/logoRect"

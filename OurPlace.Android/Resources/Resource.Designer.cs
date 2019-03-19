@@ -5529,6 +5529,9 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f0d0003
 			public const int CardView_Light = 2131558403;
 			
+			// aapt resource value: 0x7f0d0189
+			public const int ExpandedAppBar = 2131558793;
+			
 			// aapt resource value: 0x7f0d0184
 			public const int OurPlace = 2131558788;
 			

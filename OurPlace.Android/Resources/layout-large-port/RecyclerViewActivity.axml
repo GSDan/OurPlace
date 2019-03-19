@@ -17,7 +17,8 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:contentScrim="@color/app_green"
+            app:expandedTitleTextAppearance="@style/ExpandedAppBar"
+			app:contentScrim="@color/app_green"
             app:expandedTitleMarginStart="48dp"
             app:expandedTitleMarginEnd="64dp">
             <FFImageLoading.Views.ImageViewAsync
