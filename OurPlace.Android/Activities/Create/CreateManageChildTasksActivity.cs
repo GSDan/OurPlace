@@ -103,7 +103,6 @@ namespace OurPlace.Android.Activities.Create
                     position--;
                     adapter.data.RemoveAt(position);
                     adapter.NotifyDataSetChanged();
-                    SaveProgress();
                 })
                 .Show();
         }
@@ -111,7 +110,7 @@ namespace OurPlace.Android.Activities.Create
         private void Adapter_EditItemClick(object sender, int position)
         {
             LearningTask thisTask = adapter.data[position - 1];
-            if (thisTask == null || thisTask.TaskType == null)
+            if (thisTask?.TaskType == null)
             {
                 return;
             }
@@ -125,7 +124,7 @@ namespace OurPlace.Android.Activities.Create
             StartActivityForResult(intent, EditTaskIntent);
         }
 
-        private void Adapter_FinishClick(object sender, int e)
+        private void ReturnWithData()
         {
             for (int i = 0; i < adapter.data.Count(); i++)
             {
@@ -143,56 +142,24 @@ namespace OurPlace.Android.Activities.Create
             myIntent.PutExtra("PARENT", parentInd);
             SetResult(global::Android.App.Result.Ok, myIntent);
             Finish();
-            return;
         }
 
-        public async Task SaveProgress()
+        public override void OnBackPressed()
         {
-            parentTask.ChildTasks = adapter.data;
+            ReturnWithData();
+        }
 
-            // Hide the prompt if the user has added a task
-            fabPrompt.Visibility =
-                (parentTask.ChildTasks != null && parentTask.ChildTasks.Any())
-                ? ViewStates.Gone : ViewStates.Visible;
-
-            List<LearningTask> lt = learningActivity.LearningTasks.ToList();
-            lt[parentInd] = parentTask;
-            learningActivity.LearningTasks = lt;
-
-            // Don't save changes to uploaded activities until we're ready to submit
-            if (editingSubmitted) return;
-
-            if (dbManager == null)
-            {
-                dbManager = await GetDatabaseManager();
-            }
-
-            // Add/update this new activity in the user's inprogress cache
-            string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;
-            List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
-                new List<LearningActivity>() :
-                JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
-
-            int existingInd = inProgress.FindIndex((la) => la.Id == learningActivity.Id);
-
-            if (existingInd == -1)
-            {
-                inProgress.Insert(0, learningActivity);
-            }
-            else
-            {
-                inProgress.RemoveAt(existingInd);
-                inProgress.Insert(0, learningActivity);
-            }
-
-            dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
-            dbManager.AddUser(dbManager.currentUser);
-            MainMyActivitiesFragment.ForceRefresh = true;
+        private void Adapter_FinishClick(object sender, int e)
+        {
+            ReturnWithData();
         }
 
         protected override void OnResume()
         {
-            var suppress = SaveProgress();
+            // Hide the prompt if the user has added a task
+            fabPrompt.Visibility =
+                ( adapter.data.Any())
+                    ? ViewStates.Gone : ViewStates.Visible;
             base.OnResume();
         }
 
@@ -205,25 +172,23 @@ namespace OurPlace.Android.Activities.Create
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
         {
-            if (resultCode == Result.Ok)
+            if (resultCode != Result.Ok) return;
+
+            if (requestCode == AddTaskIntent)
             {
-                if (requestCode == AddTaskIntent)
+                LearningTask newTask = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
+                adapter.data.Add(newTask);
+                adapter.NotifyDataSetChanged();
+            }
+            else if (requestCode == EditTaskIntent)
+            {
+                LearningTask returned = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
+                int foundIndex = adapter.data.FindIndex(t => t.Id == returned.Id);
+                if (foundIndex != -1)
                 {
-                    LearningTask newTask = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
-                    adapter.data.Add(newTask);
+                    adapter.data[foundIndex] = returned;
                     adapter.NotifyDataSetChanged();
                 }
-                else if (requestCode == EditTaskIntent)
-                {
-                    LearningTask returned = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
-                    int foundIndex = adapter.data.FindIndex(t => t.Id == returned.Id);
-                    if (foundIndex != -1)
-                    {
-                        adapter.data[foundIndex] = returned;
-                        adapter.NotifyDataSetChanged();
-                    }
-                }
-                var suppress = SaveProgress();
             }
         }
     }
