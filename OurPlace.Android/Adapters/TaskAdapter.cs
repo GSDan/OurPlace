@@ -662,6 +662,7 @@ namespace OurPlace.Android.Adapters
                 case TaskInfo:
                     itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Info, parent, false);
                     TaskViewHolderInfo ivh = new TaskViewHolderInfo(itemView, OnSpeakClick, OnClick);
+                    ivh.Button.Text = context.GetString(Resource.String.ExternalBtn);
                     return ivh;
                 case TaskDrawing:
                 case TaskPhoto:

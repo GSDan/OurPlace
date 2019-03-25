@@ -375,7 +375,7 @@ namespace OurPlace.API.Controllers.Site
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
             var result = await AuthenticationManager.AuthenticateAsync(DefaultAuthenticationTypes.ExternalCookie);
-            if (result == null || result.Identity == null)
+            if (result?.Identity == null)
             {
                 return RedirectToAction("Login");
             }
@@ -450,6 +450,7 @@ namespace OurPlace.API.Controllers.Site
                     FirstName = model.Given_name,
                     Surname = model.Family_name,
                     DateCreated = DateTime.UtcNow,
+                    AuthProvider = idClaim.Issuer,
                     Trusted = false,
                     LastConsent = DateTime.UtcNow
                 };
@@ -468,8 +469,7 @@ namespace OurPlace.API.Controllers.Site
                 else
                 {
                     // user already exists with that email
-                    appUser.Id = existingResult.Id;
-                    await UserManager.UpdateAsync(appUser);
+                    appUser = existingResult;
                 }
 
                 // Add this oauth login to the user account
@@ -486,6 +486,9 @@ namespace OurPlace.API.Controllers.Site
 
                 AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(appUser.UserName);
                 await SignInManager.SignInAsync(appUser, true, true);
+
+                Request.GetOwinContext().Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
+
                 return RedirectToLocal(returnUrl);
             }
         }
