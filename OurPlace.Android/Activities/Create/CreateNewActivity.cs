@@ -229,9 +229,16 @@ namespace OurPlace.Android.Activities.Create
         {
             if (newActivity == null)
             {
+                ApplicationUser currentUser = (await Common.LocalData.Storage.GetDatabaseManager()).currentUser;
+
                 newActivity = new LearningActivity
                 {
-                    Author = (await Common.LocalData.Storage.GetDatabaseManager()).currentUser,
+                    Author = new ApplicationUser()
+                    {
+                        Id = currentUser.Id,
+                        FirstName = currentUser.FirstName,
+                        Surname = currentUser.Surname
+                    },
                     Id = new Random().Next() // Temp ID, used locally only
                 };
             }

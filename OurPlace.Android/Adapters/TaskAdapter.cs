@@ -148,7 +148,7 @@ namespace OurPlace.Android.Adapters
         {
             TextEntered?.Invoke(obj, position);
             Items[position].IsCompleted = true;
-            CheckForChildren(position);
+            //CheckForChildren(position);
         }
 
         private void OnMediaClick(int taskIndex, int pathIndex)
@@ -241,7 +241,6 @@ namespace OurPlace.Android.Adapters
                     hiddenChildren[parent.Id].Add(childProgress);
                     Items.Remove(childProgress);
                 }
-                NotifyDataSetChanged();
             }
             else if (hasChildren && Items[position].IsCompleted && hiddenChildren.ContainsKey(Items[position].Id))
             {
@@ -256,8 +255,9 @@ namespace OurPlace.Android.Adapters
                     }
                 }
                 hiddenChildren.Remove(Items[position].Id);
-                NotifyDataSetChanged();
             }
+
+           context.RunOnUiThread(NotifyDataSetChanged);
         }
 
         /// <summary>
@@ -580,7 +580,11 @@ namespace OurPlace.Android.Adapters
 
             bool hasChildren = Items[position].ChildTasks != null && Items[position].ChildTasks.Any();
 
-            if (hasChildren && !Items[position].IsCompleted)
+            if (Items[position].TaskType.IdName == "ENTER_TEXT")
+            {
+                vh.LockedChildrenTease.Visibility = ViewStates.Gone;
+            }
+            else if (hasChildren && !Items[position].IsCompleted)
             {
                 vh.LockedChildrenTease.Visibility = ViewStates.Visible;
                 int childCount = Items[position].ChildTasks.Count();
