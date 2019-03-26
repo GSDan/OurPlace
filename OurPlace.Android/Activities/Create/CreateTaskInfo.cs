@@ -125,7 +125,7 @@ namespace OurPlace.Android.Activities.Create
 
             if (selectedImage == null && originalPath == null)
             {
-                ImageService.Instance.LoadUrl(taskType.IconUrl).Into(imageView);
+                AndroidUtils.LoadTaskTypeIcon(taskType, imageView);
             }
         }
 

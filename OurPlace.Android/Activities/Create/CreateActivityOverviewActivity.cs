@@ -172,6 +172,7 @@ namespace OurPlace.Android.Activities.Create
                         localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
                         dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
                         dbManager.AddUser(dbManager.currentUser);
+                        MainMyActivitiesFragment.ForceRefresh = true;
                         Finish();
                     }
                 })

@@ -84,7 +84,7 @@ namespace OurPlace.Android.Activities.Create
             }
 
             taskTypeName.Text = taskType.DisplayName;
-            ImageService.Instance.LoadUrl(taskType.IconUrl).Into(image);
+            AndroidUtils.LoadTaskTypeIcon(taskType, image);
         }
 
         private void AddTaskBtn_Click(object sender, EventArgs e)

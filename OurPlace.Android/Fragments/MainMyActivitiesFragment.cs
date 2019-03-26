@@ -114,6 +114,7 @@ namespace OurPlace.Android.Fragments
             {
                 refreshingData = true;
                 refresher.Refreshing = true;
+                ForceRefresh = false;
 
                 DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
 
@@ -132,6 +133,7 @@ namespace OurPlace.Android.Fragments
                 if (!results.Success)
                 {
                     Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
+                    await LoadIntoFeed(null);
                     return;
                 }
 
@@ -157,7 +159,7 @@ namespace OurPlace.Android.Fragments
                     }
                 }
 
-                LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
+                await LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
 
                 refreshingData = false;
             }

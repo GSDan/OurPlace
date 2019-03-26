@@ -2516,26 +2516,26 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f020054
 			public const int avd_hide_password = 2130837588;
 			
-			// aapt resource value: 0x7f020099
-			public const int avd_hide_password_1 = 2130837657;
+			// aapt resource value: 0x7f0200a6
+			public const int avd_hide_password_1 = 2130837670;
 			
-			// aapt resource value: 0x7f02009a
-			public const int avd_hide_password_2 = 2130837658;
+			// aapt resource value: 0x7f0200a7
+			public const int avd_hide_password_2 = 2130837671;
 			
-			// aapt resource value: 0x7f02009b
-			public const int avd_hide_password_3 = 2130837659;
+			// aapt resource value: 0x7f0200a8
+			public const int avd_hide_password_3 = 2130837672;
 			
 			// aapt resource value: 0x7f020055
 			public const int avd_show_password = 2130837589;
 			
-			// aapt resource value: 0x7f02009c
-			public const int avd_show_password_1 = 2130837660;
+			// aapt resource value: 0x7f0200a9
+			public const int avd_show_password_1 = 2130837673;
 			
-			// aapt resource value: 0x7f02009d
-			public const int avd_show_password_2 = 2130837661;
+			// aapt resource value: 0x7f0200aa
+			public const int avd_show_password_2 = 2130837674;
 			
-			// aapt resource value: 0x7f02009e
-			public const int avd_show_password_3 = 2130837662;
+			// aapt resource value: 0x7f0200ab
+			public const int avd_show_password_3 = 2130837675;
 			
 			// aapt resource value: 0x7f020056
 			public const int banner = 2130837590;
@@ -2696,11 +2696,11 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7f02008a
 			public const int notification_icon_background = 2130837642;
 			
-			// aapt resource value: 0x7f020097
-			public const int notification_template_icon_bg = 2130837655;
+			// aapt resource value: 0x7f0200a4
+			public const int notification_template_icon_bg = 2130837668;
 			
-			// aapt resource value: 0x7f020098
-			public const int notification_template_icon_low_bg = 2130837656;
+			// aapt resource value: 0x7f0200a5
+			public const int notification_template_icon_low_bg = 2130837669;
 			
 			// aapt resource value: 0x7f02008b
 			public const int notification_tile_bg = 2130837643;
@@ -2733,10 +2733,49 @@ namespace OurPlace.Android
 			public const int TakePhotoButton = 2130837652;
 			
 			// aapt resource value: 0x7f020095
-			public const int tooltip_frame_dark = 2130837653;
+			public const int task_draw = 2130837653;
 			
 			// aapt resource value: 0x7f020096
-			public const int tooltip_frame_light = 2130837654;
+			public const int task_drawPhoto = 2130837654;
+			
+			// aapt resource value: 0x7f020097
+			public const int task_info = 2130837655;
+			
+			// aapt resource value: 0x7f020098
+			public const int task_listen = 2130837656;
+			
+			// aapt resource value: 0x7f020099
+			public const int task_locHunt = 2130837657;
+			
+			// aapt resource value: 0x7f02009a
+			public const int task_mapMark = 2130837658;
+			
+			// aapt resource value: 0x7f02009b
+			public const int task_multChoice = 2130837659;
+			
+			// aapt resource value: 0x7f02009c
+			public const int task_photo = 2130837660;
+			
+			// aapt resource value: 0x7f02009d
+			public const int task_photoMatch = 2130837661;
+			
+			// aapt resource value: 0x7f02009e
+			public const int task_recAudio = 2130837662;
+			
+			// aapt resource value: 0x7f02009f
+			public const int task_recVideo = 2130837663;
+			
+			// aapt resource value: 0x7f0200a0
+			public const int task_scan = 2130837664;
+			
+			// aapt resource value: 0x7f0200a1
+			public const int task_text = 2130837665;
+			
+			// aapt resource value: 0x7f0200a2
+			public const int tooltip_frame_dark = 2130837666;
+			
+			// aapt resource value: 0x7f0200a3
+			public const int tooltip_frame_light = 2130837667;
 			
 			static Drawable()
 			{

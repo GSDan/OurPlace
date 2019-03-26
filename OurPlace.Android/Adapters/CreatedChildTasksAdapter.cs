@@ -96,21 +96,6 @@ namespace OurPlace.Android.Adapters
             FinishClick?.Invoke(this, position);
         }
 
-        private static void LoadImage(TaskType taskType, ImageViewAsync view)
-        {
-            if (string.IsNullOrEmpty(taskType.IconUrl))
-            {
-                ImageService.Instance.LoadCompiledResource("OurPlace_logo")
-                    .Into(view);
-            }
-            else
-            {
-                ImageService.Instance.LoadUrl(taskType.IconUrl)
-                    .Transform(new CircleTransformation())
-                    .Into(view);
-            }
-        }
-
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
             if (position == 0)
@@ -121,7 +106,7 @@ namespace OurPlace.Android.Adapters
                 avh.Description.Text = string.Format(context.Resources.GetString(Resource.String.createTaskChildrenDesc),
                     parentTask.TaskType.DisplayName);
 
-                LoadImage(parentTask.TaskType, avh.TaskTypeIcon);
+                AndroidUtils.LoadTaskTypeIcon(data[position].TaskType, avh.TaskTypeIcon);
                 return;
             }
 
@@ -151,7 +136,7 @@ namespace OurPlace.Android.Adapters
             vh.ManageChildrenBtn.Visibility = ViewStates.Gone;
 
             vh.DeleteBtn.Text = context.Resources.GetString(Resource.String.RemoveBtn);
-            LoadImage(data[position]?.TaskType, vh.TaskTypeIcon);
+            AndroidUtils.LoadTaskTypeIcon(data[position].TaskType, vh.TaskTypeIcon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)

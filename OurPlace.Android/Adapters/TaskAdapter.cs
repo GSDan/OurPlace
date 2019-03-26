@@ -557,8 +557,7 @@ namespace OurPlace.Android.Adapters
              }
 
             // These apply to all task types:
-
-            ImageService.Instance.LoadUrl(Items[position].TaskType.IconUrl).Into(((TaskViewHolder)holder).TaskTypeIcon);
+            AndroidUtils.LoadTaskTypeIcon(Items[position].TaskType, ((TaskViewHolder)holder).TaskTypeIcon);
 
             if (!string.IsNullOrWhiteSpace(Items[position].ImageUrl))
             {

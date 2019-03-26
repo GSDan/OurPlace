@@ -35,6 +35,8 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Util;
+using FFImageLoading;
+using FFImageLoading.Views;
 using Java.Lang;
 using Java.Util;
 using OurPlace.Android.Activities;
@@ -48,6 +50,59 @@ namespace OurPlace.Android
 {
     public static class AndroidUtils
     {
+        public static void LoadTaskTypeIcon(TaskType type, ImageViewAsync imageView)
+        {
+            string imageRes = null;
+
+            switch (type.IdName)
+            {
+                    case "INFO":
+                        imageRes = "task_info";
+                        break;
+                    case "LISTEN_AUDIO":
+                        imageRes = "task_listen";
+                        break;
+                    case "TAKE_PHOTO":
+                        imageRes = "task_photo";
+                        break;
+                    case "MATCH_PHOTO":
+                        imageRes = "task_photoMatch";
+                        break;
+                    case "DRAW":
+                        imageRes = "task_draw";
+                        break;
+                    case "DRAW_PHOTO":
+                        imageRes = "task_drawPhoto";
+                        break;
+                    case "TAKE_VIDEO":
+                        imageRes = "task_recVideo";
+                        break;
+                    case "REC_AUDIO":
+                        imageRes = "task_recAudio";
+                        break;
+                    case "MAP_MARK":
+                        imageRes = "task_mapMark";
+                        break;
+                    case "LOC_HUNT":
+                        imageRes = "task_locHunt";
+                        break;
+                    case "SCAN_QR":
+                        imageRes = "task_scan";
+                        break;
+                    case "MULT_CHOICE":
+                        imageRes = "task_multChoice";
+                        break;
+                    case "ENTER_TEXT":
+                        imageRes = "task_text";
+                        break;
+                    default:
+                        imageRes = "OurPlace_logo";
+                        break;
+            }
+
+            ImageService.Instance.LoadCompiledResource(imageRes).Into(imageView);
+        }
+
         public static async Task<bool> PrepActivityFiles(Context context, LearningActivity act)
         {
             ProgressDialog loadingDialog = new ProgressDialog(context);
