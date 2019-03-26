@@ -94,23 +94,31 @@ namespace OurPlace.Android
 
         public static async Task ReturnToSignIn(Activity activity)
         {
-            DatabaseManager dbManager = await GetDatabaseManager();
-
-            if (dbManager != null)
+            try
             {
-                dbManager.DeleteLearnerCacheAndProgress();
-                dbManager.CleanDatabase();
-            }
+                DatabaseManager dbManager = await GetDatabaseManager();
 
-            if (activity == null)
+                if (dbManager != null)
+                {
+                    dbManager.DeleteLearnerCacheAndProgress();
+                    dbManager.CleanDatabase();
+                }
+
+                if (activity == null)
+                {
+                    return;
+                }
+
+                Context context = activity.ApplicationContext;
+                Intent intent = new Intent(context, typeof(LoginActivity));
+                activity.StartActivity(intent);
+                activity.Finish();
+            }
+            catch (System.Exception e)
             {
-                return;
+                Console.WriteLine(e);
+                throw;
             }
-
-            Context context = activity.ApplicationContext;
-            Intent intent = new Intent(context, typeof(LoginActivity));
-            context.StartActivity(intent);
-            activity.Finish();
         }
 
         public static void LocationToEXIF(string filePath, global::Android.Locations.Location loc)
