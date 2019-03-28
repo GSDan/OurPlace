@@ -19,17 +19,21 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
                 <FFImageLoading.Views.ImageViewAsync
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:src="@mipmap/ic_launcher"
                     android:id="@+id/taskTypeIcon"
                     android:scaleType="centerCrop"
+					android:layout_marginLeft="6dp"
                     android:padding="8dp" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+					android:paddingLeft="8dp"
+					android:paddingRight="16dp"
+					android:paddingTop="16dp"
+					android:paddingBottom="16dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -38,7 +42,6 @@
                         android:text="Caption"
                         android:id="@+id/taskTitle"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginLeft="4dp"
                         android:textSize="18sp" />
                     <TextView
                         android:layout_width="match_parent"
@@ -48,7 +51,6 @@
                         android:text="Caption"
                         android:id="@+id/taskDesc"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginLeft="4dp"
                         android:textSize="16sp"
                         android:paddingBottom="10dp" />
                     <LinearLayout

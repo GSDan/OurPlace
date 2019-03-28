@@ -106,7 +106,7 @@ namespace OurPlace.Android.Adapters
                 avh.Description.Text = string.Format(context.Resources.GetString(Resource.String.createTaskChildrenDesc),
                     parentTask.TaskType.DisplayName);
 
-                AndroidUtils.LoadTaskTypeIcon(data[position].TaskType, avh.TaskTypeIcon);
+                AndroidUtils.LoadTaskTypeIcon(parentTask.TaskType, avh.TaskTypeIcon);
                 return;
             }
 

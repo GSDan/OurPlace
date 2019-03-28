@@ -34,8 +34,8 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
                 <FFImageLoading.Views.ImageViewAsync
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:src="@mipmap/ic_launcher"
                     android:id="@+id/taskTypeIcon"
                     android:scaleType="centerCrop"
