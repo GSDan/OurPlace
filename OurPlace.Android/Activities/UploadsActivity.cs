@@ -28,6 +28,7 @@ using Android.Support.V7.Widget;
 using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
+using OurPlace.Android.Fragments;
 using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
@@ -58,8 +59,15 @@ namespace OurPlace.Android.Activities.Create
             SetContentView(Resource.Layout.UploadsActivity);
 
             headerText = FindViewById<TextView>(Resource.Id.uploadsHeaderMessage);
+        }
 
-            var suppress = LoadQueue();
+        protected override async void OnStart()
+        {
+            base.OnStart();
+
+            await LoadQueue();
+
+            UploadAfterWarning(this, 0);
         }
 
         private async Task LoadQueue()
@@ -246,6 +254,7 @@ namespace OurPlace.Android.Activities.Create
             new global::Android.Support.V7.App.AlertDialog.Builder(this)
                 .SetTitle(Resource.String.uploadsUploadSuccessTitle)
                 .SetMessage(Resource.String.uploadsUploadSuccessMessage)
+                .SetCancelable(false)
                 .SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
                 {
                     if (adapter.Data.Count == 0)
@@ -261,6 +270,7 @@ namespace OurPlace.Android.Activities.Create
             Intent toMainIntent = new Intent(this, typeof(MainActivity));
             toMainIntent.AddFlags(ActivityFlags.ClearTop);
             toMainIntent.AddFlags(ActivityFlags.SingleTop);
+            MainMyActivitiesFragment.ForceRefresh = true;
             StartActivity(toMainIntent);
             Finish();
         }
