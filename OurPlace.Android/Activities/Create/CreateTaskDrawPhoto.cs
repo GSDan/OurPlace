@@ -31,14 +31,13 @@ using FFImageLoading;
 using FFImageLoading.Transformations;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -323,7 +322,7 @@ namespace OurPlace.Android.Activities.Create
                     newTask.JsonData = selectedImage.Path;
                 }
             }
-            else if(useParent)
+            else if (useParent)
             {
                 newTask.JsonData = "TASK::" + parentTask.Id;
                 if (outputFileUri != null && File.Exists(outputFileUri.Path))

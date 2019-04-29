@@ -29,12 +29,12 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using FFImageLoading.Views;
-using Newtonsoft.Json;
-using System;
-using System.Threading;
-using OurPlace.Common.Models;
-using System.Collections.Generic;
 using Microsoft.AppCenter.Analytics;
+using Newtonsoft.Json;
+using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace OurPlace.Android.Activities
 {
@@ -73,7 +73,7 @@ namespace OurPlace.Android.Activities
 
             timer = FindViewById<TextView>(Resource.Id.recTime);
             defaultCol = Color.Rgb(
-                Color.GetRedComponent(timer.CurrentTextColor), 
+                Color.GetRedComponent(timer.CurrentTextColor),
                 Color.GetGreenComponent(timer.CurrentTextColor),
                 Color.GetBlueComponent(timer.CurrentTextColor));
 
@@ -114,18 +114,20 @@ namespace OurPlace.Android.Activities
                 timer.SetTextColor(Color.Red);
             });
 
-                while (recording)
+            while (recording)
             {
                 TimeSpan diff = DateTime.UtcNow - startedAt;
 
-                RunOnUiThread(() => {
+                RunOnUiThread(() =>
+                {
                     timer.Text = diff.ToString(@"mm\:ss\:ff");
                 });
 
                 await System.Threading.Tasks.Task.Delay(15);
             }
 
-            RunOnUiThread(() => {
+            RunOnUiThread(() =>
+            {
                 timer.Text = "00:00:00";
                 timer.SetTextColor(defaultCol);
             });
@@ -135,7 +137,7 @@ namespace OurPlace.Android.Activities
         {
             recording = !recording;
 
-            if(recording)
+            if (recording)
             {
                 // Start recording
                 recorder.SetAudioSource(AudioSource.Mic);
@@ -171,7 +173,8 @@ namespace OurPlace.Android.Activities
             View dialogLayout = LayoutInflater.Inflate(Resource.Layout.DialogButton, null);
             playBtn = dialogLayout.FindViewById<Button>(Resource.Id.dialogBtn);
             playBtn.Text = Resources.GetString(Resource.String.ListenBtn);
-            playBtn.Click += (e, o) => {
+            playBtn.Click += (e, o) =>
+            {
 
                 if (player.IsPlaying)
                 {
@@ -193,7 +196,7 @@ namespace OurPlace.Android.Activities
             dialog.SetMessage("Do you want to use this recording, or try recording another clip?");
             dialog.SetView(dialogLayout);
             dialog.SetCancelable(false);
-            dialog.SetNegativeButton("Record another", (s, e) => 
+            dialog.SetNegativeButton("Record another", (s, e) =>
             {
                 player.Stop();
                 player.Reset();

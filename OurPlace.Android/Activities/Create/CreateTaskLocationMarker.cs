@@ -24,7 +24,6 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
-using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
@@ -98,12 +97,13 @@ namespace OurPlace.Android.Activities.Create
             {
                 errMess = Resource.String.createNewMapMarkerErrMinLessThanOne;
             }
-            else if(max < min && max != 0)
+            else if (max < min && max != 0)
             {
                 errMess = Resource.String.createNewMapMarkerErrMaxLessThanMin;
             }
 
-            if(errMess != -1){
+            if (errMess != -1)
+            {
                 new global::Android.Support.V7.App.AlertDialog.Builder(this)
                     .SetTitle(Resource.String.ErrorTitle)
                     .SetMessage(errMess)
@@ -119,7 +119,7 @@ namespace OurPlace.Android.Activities.Create
                 UserLocationOnly = userLocOnlyCheckbox.Checked
             };
 
-            if(newTask == null)
+            if (newTask == null)
             {
                 newTask = new LearningTask() { TaskType = taskType };
             }
@@ -127,7 +127,8 @@ namespace OurPlace.Android.Activities.Create
             newTask.Description = instructions.Text;
             newTask.JsonData = JsonConvert.SerializeObject(taskData);
 
-            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings {
+            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings
+            {
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });

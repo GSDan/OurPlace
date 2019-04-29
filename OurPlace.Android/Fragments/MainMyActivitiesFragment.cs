@@ -23,27 +23,27 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Runtime;
 using Android.Support.Design.Widget;
+using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Widget;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities;
 using OurPlace.Android.Activities.Create;
 using OurPlace.Android.Adapters;
+using OurPlace.Common;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
-using Android.Runtime;
-using Android.Support.V4.App;
-using OurPlace.Common;
-using Android.Text;
 using System.Linq;
-using OurPlace.Common.LocalData;
 using System.Threading.Tasks;
-using Microsoft.AppCenter.Analytics;
 
 namespace OurPlace.Android.Fragments
 {
@@ -163,7 +163,7 @@ namespace OurPlace.Android.Fragments
 
                 refreshingData = false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -214,7 +214,7 @@ namespace OurPlace.Android.Fragments
             adapter.Data = feed;
             adapter.NotifyDataSetChanged();
 
-            if(fabPrompt != null)
+            if (fabPrompt != null)
             {
                 // Hide the fab tutorial if the user has already created an activity
                 fabPrompt.Visibility = (adapter.Data.Count > 0) ? ViewStates.Gone : ViewStates.Visible;
@@ -275,7 +275,8 @@ namespace OurPlace.Android.Fragments
                     global::Android.Support.V7.App.AlertDialog dialog = new global::Android.Support.V7.App.AlertDialog.Builder(Activity)
                         .SetTitle(Resources.GetString(Resource.String.permissionFilesTitle))
                         .SetMessage(Resources.GetString(Resource.String.permissionFilesExplanation))
-                        .SetPositiveButton("Got it", (s, o) => {
+                        .SetPositiveButton("Got it", (s, o) =>
+                        {
                             RequestPermissions(new string[] { permission, writePerm }, PermReqId);
                         })
                         .Create();

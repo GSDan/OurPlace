@@ -88,7 +88,7 @@ namespace OurPlace.Android
 
                 canvas.DrawOval(new RectF(-r, -r, r, r), mPaint);
                 canvas.DrawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
-                
+
                 if (mTrackingCenter)
                 {
                     int c = mCenterPaint.Color;
@@ -200,7 +200,7 @@ namespace OurPlace.Android
             {
                 float x = e.GetX() - CENTER_X;
                 float y = e.GetY() - CENTER_Y;
-                bool inCenter = Math.Sqrt(x*x + y*y) <= CENTER_RADIUS;
+                bool inCenter = Math.Sqrt(x * x + y * y) <= CENTER_RADIUS;
 
                 switch (e.Action)
                 {

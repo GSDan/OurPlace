@@ -74,11 +74,11 @@ namespace OurPlace.Android.Activities
 
             string[] results = null;
 
-            if(thisTask.CompletionData?.JsonData != null)
+            if (thisTask.CompletionData?.JsonData != null)
             {
                 results = JsonConvert.DeserializeObject<string[]>(thisTask.CompletionData?.JsonData);
             }
-            
+
             taskType = thisTask.TaskType.IdName;
 
             Dictionary<string, string> properties = new Dictionary<string, string>
@@ -90,7 +90,7 @@ namespace OurPlace.Android.Activities
 
             if (new string[] { "TAKE_VIDEO", "REC_AUDIO", "LISTEN_AUDIO" }.Contains(taskType))
             {
-                if(taskType == "LISTEN_AUDIO" || taskType == "REC_AUDIO")
+                if (taskType == "LISTEN_AUDIO" || taskType == "REC_AUDIO")
                 {
                     ImageViewAsync imageView = FindViewById<ImageViewAsync>(Resource.Id.speakerImage);
                     imageView.Visibility = ViewStates.Visible;
@@ -98,7 +98,7 @@ namespace OurPlace.Android.Activities
 
                 global::Android.Net.Uri uri = null;
 
-                if(taskType == "LISTEN_AUDIO")
+                if (taskType == "LISTEN_AUDIO")
                 {
                     string localRes = Storage.GetCacheFilePath(
                         thisTask.JsonData,
@@ -122,9 +122,9 @@ namespace OurPlace.Android.Activities
 
                 mediaController = new AlwaysVisibleMediaController(this, Finish);
                 mediaController.SetAnchorView(videoView);
-                videoView.SetMediaController(mediaController); 
+                videoView.SetMediaController(mediaController);
             }
-            else if(new string[] { "DRAW", "DRAW_PHOTO", "TAKE_PHOTO", "MATCH_PHOTO" }.Contains(taskType))
+            else if (new string[] { "DRAW", "DRAW_PHOTO", "TAKE_PHOTO", "MATCH_PHOTO" }.Contains(taskType))
             {
                 ImageViewAsync imageView = FindViewById<ImageViewAsync>(Resource.Id.imageView);
                 imageView.Visibility = ViewStates.Visible;
@@ -177,7 +177,7 @@ namespace OurPlace.Android.Activities
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            if(taskType != "LISTEN_AUDIO")
+            if (taskType != "LISTEN_AUDIO")
             {
                 MenuInflater.Inflate(Resource.Menu.MediaViewerMenu, menu);
             }

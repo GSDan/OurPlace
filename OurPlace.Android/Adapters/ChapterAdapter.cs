@@ -20,12 +20,12 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
 
 namespace OurPlace.Android.Adapters
 {

@@ -25,15 +25,15 @@ using Android.OS;
 using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
+using OurPlace.Common;
+using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Android.Widget;
-using OurPlace.Common;
-using OurPlace.Common.LocalData;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create

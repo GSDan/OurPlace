@@ -79,11 +79,11 @@ namespace OurPlace.Android.Activities.Abstracts
                             Toast.MakeText(this, "Image load error", ToastLength.Short).Show();
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
                     }
-                    
+
                 })
                 .Into(headerImage);
         }

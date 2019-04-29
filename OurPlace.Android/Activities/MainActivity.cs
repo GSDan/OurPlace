@@ -21,6 +21,7 @@
 #endregion
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Gms.Maps;
 using Android.OS;
 using Android.Preferences;
@@ -41,7 +42,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.Content.PM;
 using ZXing.Mobile;
 
 namespace OurPlace.Android.Activities

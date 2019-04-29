@@ -53,8 +53,8 @@ namespace OurPlace.Android.Activities.Create
             SetContentView(Resource.Layout.CreateChooseLocationActivity);
 
             string chosenData = Intent.GetStringExtra("CHOSEN") ?? "";
-            previouslyChosen = !string.IsNullOrWhiteSpace(chosenData) ? 
-                JsonConvert.DeserializeObject<List<Place>>(chosenData) : 
+            previouslyChosen = !string.IsNullOrWhiteSpace(chosenData) ?
+                JsonConvert.DeserializeObject<List<Place>>(chosenData) :
                 new List<Place>();
 
             dialog = new ProgressDialog(this);
@@ -104,14 +104,14 @@ namespace OurPlace.Android.Activities.Create
 
             // Don't list places that have already been added
             List<GooglePlaceResult> final = new List<GooglePlaceResult>();
-            foreach(GooglePlaceResult res in resp.Data.results)
+            foreach (GooglePlaceResult res in resp.Data.results)
             {
-                if(previouslyChosen.All(p => p.GooglePlaceId != res.place_id))
+                if (previouslyChosen.All(p => p.GooglePlaceId != res.place_id))
                 {
                     final.Add(res);
                 }
             }
-            
+
             adapter = new PlacesAdapter(this, final);
             adapter.ItemClick += Adapter_ItemClick; ;
 

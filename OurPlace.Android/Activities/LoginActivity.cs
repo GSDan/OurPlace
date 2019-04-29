@@ -21,15 +21,15 @@
 #endregion
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.CustomTabs;
 using Android.Support.V7.App;
 using Android.Views;
-using OurPlace.Common;
-using System;
-using OurPlace.Common.Models;
 using Android.Widget;
-using Android.Graphics;
+using OurPlace.Common;
+using OurPlace.Common.Models;
+using System;
 using System.Linq;
 
 namespace OurPlace.Android.Activities
@@ -75,7 +75,8 @@ namespace OurPlace.Android.Activities
             View dialogLayout = LayoutInflater.Inflate(Resource.Layout.DialogButtonsX2, null);
             var termsButton = dialogLayout.FindViewById<Button>(Resource.Id.dialogBtn1);
             termsButton.Text = Resources.GetString(Resource.String.LoginOpenTerms);
-            termsButton.Click += (args, o) => {
+            termsButton.Click += (args, o) =>
+            {
 
                 Intent browserIntent =
                         new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(
@@ -85,7 +86,8 @@ namespace OurPlace.Android.Activities
 
             var privacyButton = dialogLayout.FindViewById<Button>(Resource.Id.dialogBtn2);
             privacyButton.Text = Resources.GetString(Resource.String.LoginOpenPrivacy);
-            privacyButton.Click += (args, o) => {
+            privacyButton.Click += (args, o) =>
+            {
 
                 Intent browserIntent =
                         new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(
@@ -146,7 +148,7 @@ namespace OurPlace.Android.Activities
             dialog.Show();
 
             const string fullUrl = "/api/Account/ExternalLogins?returnUrl=/callback&generateState=true";
-            ServerResponse< ExternalLogin[]> res = await ServerUtils.Get<ExternalLogin[]>(fullUrl, false);
+            ServerResponse<ExternalLogin[]> res = await ServerUtils.Get<ExternalLogin[]>(fullUrl, false);
 
             dialog.Dismiss();
 
@@ -180,7 +182,7 @@ namespace OurPlace.Android.Activities
                     .SetTitle(Resource.String.ErrorTitle)
                     .SetMessage(res?.Message)
                     .Show();
-            }            
+            }
         }
     }
 }

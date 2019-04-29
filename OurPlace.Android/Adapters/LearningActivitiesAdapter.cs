@@ -20,8 +20,6 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
@@ -30,6 +28,8 @@ using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using SectionedRecyclerview.Droid;
+using System;
+using System.Collections.Generic;
 using Object = Java.Lang.Object;
 
 namespace OurPlace.Android.Adapters
@@ -80,10 +80,10 @@ namespace OurPlace.Android.Adapters
             }
 
             int checkedItems = 0;
-            foreach(ActivityFeedSection section in Data)
+            foreach (ActivityFeedSection section in Data)
             {
                 checkedItems++; //include header
-                if(section.Activities.Count + checkedItems > position)
+                if (section.Activities.Count + checkedItems > position)
                 {
                     return section.Activities[position - checkedItems];
                 }
@@ -115,7 +115,7 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemCount(int sectionInd)
         {
-            if(Data != null && 
+            if (Data != null &&
                 Data.Count > sectionInd &&
                 Data[sectionInd].Activities != null)
             {

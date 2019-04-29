@@ -104,7 +104,7 @@ namespace OurPlace.Android.Listeners
         public void OnInit([GeneratedEnum] OperationResult status)
         {
             ready = true;
-            if(!string.IsNullOrWhiteSpace(currentSpeech))
+            if (!string.IsNullOrWhiteSpace(currentSpeech))
             {
                 Speak();
             }
@@ -112,7 +112,7 @@ namespace OurPlace.Android.Listeners
 
         public void Clean()
         {
-            if(speaker != null)
+            if (speaker != null)
             {
                 if (speaking)
                 {

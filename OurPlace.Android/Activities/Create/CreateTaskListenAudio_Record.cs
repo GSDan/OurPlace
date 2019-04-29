@@ -29,10 +29,8 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using FFImageLoading.Views;
-using Newtonsoft.Json;
 using System;
 using System.Threading;
-using OurPlace.Common.Models;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -109,14 +107,16 @@ namespace OurPlace.Android.Activities.Create
             {
                 TimeSpan diff = DateTime.UtcNow - startedAt;
 
-                RunOnUiThread(() => {
+                RunOnUiThread(() =>
+                {
                     timer.Text = diff.ToString(@"mm\:ss\:ff");
                 });
 
                 await System.Threading.Tasks.Task.Delay(15);
             }
 
-            RunOnUiThread(() => {
+            RunOnUiThread(() =>
+            {
                 timer.Text = "00:00:00";
                 timer.SetTextColor(defaultCol);
             });
@@ -162,7 +162,8 @@ namespace OurPlace.Android.Activities.Create
             View dialogLayout = LayoutInflater.Inflate(Resource.Layout.DialogButton, null);
             playBtn = dialogLayout.FindViewById<Button>(Resource.Id.dialogBtn);
             playBtn.Text = Resources.GetString(Resource.String.ListenBtn);
-            playBtn.Click += (e, o) => {
+            playBtn.Click += (e, o) =>
+            {
 
                 if (player.IsPlaying)
                 {

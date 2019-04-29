@@ -28,6 +28,7 @@ using Android.Support.V7.Widget;
 using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
+using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
@@ -35,7 +36,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {

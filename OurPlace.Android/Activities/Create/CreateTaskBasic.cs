@@ -24,7 +24,6 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Widget;
-using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
@@ -52,7 +51,7 @@ namespace OurPlace.Android.Activities.Create
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
             taskType = JsonConvert.DeserializeObject<TaskType>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            if((taskType != null && taskType.IdName == "SCAN_QR") || 
+            if ((taskType != null && taskType.IdName == "SCAN_QR") ||
                 (newTask != null && newTask.TaskType.IdName == "SCAN_QR"))
             {
                 SetContentView(Resource.Layout.CreateTaskScanQR);
@@ -101,7 +100,8 @@ namespace OurPlace.Android.Activities.Create
 
             newTask.Description = instructions.Text;
 
-            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings {
+            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings
+            {
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });

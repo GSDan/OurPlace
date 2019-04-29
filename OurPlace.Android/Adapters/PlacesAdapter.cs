@@ -20,13 +20,13 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
 
 namespace OurPlace.Android.Adapters
 {
@@ -65,7 +65,7 @@ namespace OurPlace.Android.Adapters
             vh.Title.Text = Data[position].name;
             vh.Description.Text = Data[position].vicinity;
 
-            if(Data[position].photos != null && Data[position].photos.Count > 0)
+            if (Data[position].photos != null && Data[position].photos.Count > 0)
             {
                 ImageService.Instance.LoadUrl(
                     $"https://maps.googleapis.com/maps/api/place/photo?photoreference={Data[position].photos[0].photo_reference}&sensor=false&maxheight={500}&maxwidth={500}&key={Context.Resources.GetString(Resource.String.MapsApiKey)}").Into(vh.TaskTypeIcon);

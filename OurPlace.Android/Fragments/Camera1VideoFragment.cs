@@ -175,7 +175,7 @@ namespace OurPlace.Android.Fragments
             {
                 mediaRecorder.Prepare();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 ReleaseMediaRecorder();
@@ -187,7 +187,7 @@ namespace OurPlace.Android.Fragments
 
         private void CaptureBtn_Click(object sender, EventArgs e)
         {
-            if(recording)
+            if (recording)
             {
                 mediaRecorder.Stop();
                 ReleaseMediaRecorder();
@@ -196,7 +196,7 @@ namespace OurPlace.Android.Fragments
             }
             else
             {
-                if(!PrepareMediaRecorder())
+                if (!PrepareMediaRecorder())
                 {
                     Toast.MakeText(Activity, Resource.String.errorCamera, ToastLength.Long).Show();
                     Activity.Finish();
@@ -208,7 +208,7 @@ namespace OurPlace.Android.Fragments
                         mediaRecorder.Start();
                         recording = true;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
                     }

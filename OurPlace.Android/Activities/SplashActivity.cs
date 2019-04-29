@@ -28,7 +28,7 @@ using Microsoft.AppCenter.Crashes;
 
 namespace OurPlace.Android.Activities
 {
-    [Activity(Label = "OurPlace", Theme= "@style/SplashTheme", MainLauncher = true)]
+    [Activity(Label = "OurPlace", Theme = "@style/SplashTheme", MainLauncher = true)]
     public class SplashActivity : Activity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -41,16 +41,16 @@ namespace OurPlace.Android.Activities
 
         private async void Initialise()
         {
-			if (await Common.LocalData.Storage.InitializeLogin())
-			{
-				Intent intent = new Intent(this, typeof(MainActivity));
-				StartActivity(intent);
-				Finish();
-			}
-			else
-			{
-				var suppressWarning = AndroidUtils.ReturnToSignIn(this);
-			}
+            if (await Common.LocalData.Storage.InitializeLogin())
+            {
+                Intent intent = new Intent(this, typeof(MainActivity));
+                StartActivity(intent);
+                Finish();
+            }
+            else
+            {
+                var suppressWarning = AndroidUtils.ReturnToSignIn(this);
+            }
         }
     }
 }

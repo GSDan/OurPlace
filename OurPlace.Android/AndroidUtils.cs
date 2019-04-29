@@ -19,11 +19,6 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -35,6 +30,7 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Util;
+using Android.Views;
 using FFImageLoading;
 using FFImageLoading.Views;
 using Java.Lang;
@@ -44,6 +40,11 @@ using OurPlace.Android.Activities.Create;
 using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android
@@ -56,48 +57,48 @@ namespace OurPlace.Android
 
             switch (type.IdName)
             {
-                    case "INFO":
-                        imageRes = "task_info";
-                        break;
-                    case "LISTEN_AUDIO":
-                        imageRes = "task_listen";
-                        break;
-                    case "TAKE_PHOTO":
-                        imageRes = "task_photo";
-                        break;
-                    case "MATCH_PHOTO":
-                        imageRes = "task_photoMatch";
-                        break;
-                    case "DRAW":
-                        imageRes = "task_draw";
-                        break;
-                    case "DRAW_PHOTO":
-                        imageRes = "task_drawPhoto";
-                        break;
-                    case "TAKE_VIDEO":
-                        imageRes = "task_recVideo";
-                        break;
-                    case "REC_AUDIO":
-                        imageRes = "task_recAudio";
-                        break;
-                    case "MAP_MARK":
-                        imageRes = "task_mapMark";
-                        break;
-                    case "LOC_HUNT":
-                        imageRes = "task_locHunt";
-                        break;
-                    case "SCAN_QR":
-                        imageRes = "task_scan";
-                        break;
-                    case "MULT_CHOICE":
-                        imageRes = "task_multChoice";
-                        break;
-                    case "ENTER_TEXT":
-                        imageRes = "task_text";
-                        break;
-                    default:
-                        imageRes = "OurPlace_logo";
-                        break;
+                case "INFO":
+                    imageRes = "task_info";
+                    break;
+                case "LISTEN_AUDIO":
+                    imageRes = "task_listen";
+                    break;
+                case "TAKE_PHOTO":
+                    imageRes = "task_photo";
+                    break;
+                case "MATCH_PHOTO":
+                    imageRes = "task_photoMatch";
+                    break;
+                case "DRAW":
+                    imageRes = "task_draw";
+                    break;
+                case "DRAW_PHOTO":
+                    imageRes = "task_drawPhoto";
+                    break;
+                case "TAKE_VIDEO":
+                    imageRes = "task_recVideo";
+                    break;
+                case "REC_AUDIO":
+                    imageRes = "task_recAudio";
+                    break;
+                case "MAP_MARK":
+                    imageRes = "task_mapMark";
+                    break;
+                case "LOC_HUNT":
+                    imageRes = "task_locHunt";
+                    break;
+                case "SCAN_QR":
+                    imageRes = "task_scan";
+                    break;
+                case "MULT_CHOICE":
+                    imageRes = "task_multChoice";
+                    break;
+                case "ENTER_TEXT":
+                    imageRes = "task_text";
+                    break;
+                default:
+                    imageRes = "OurPlace_logo";
+                    break;
             }
 
             ImageService.Instance.LoadCompiledResource(imageRes).Into(imageView);
@@ -145,6 +146,27 @@ namespace OurPlace.Android
 
             loadingDialog.Dismiss();
             return true;
+        }
+
+        public static void LoadActivityImageIntoView(ImageViewAsync targetImageView, string imageUrl, int activityId, int quality = 350)
+        {
+            string localRes = GetCacheFilePath(imageUrl, activityId, "jpg");
+
+            if (!File.Exists(localRes))
+            {
+                // Image hasn't been locally cached, try to download remote version
+                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(imageUrl))
+                    .DownSample(quality)
+                    .Into(targetImageView);
+            }
+            else
+            {
+                // Load the local file
+                ImageService.Instance.LoadFile(localRes).DownSample(500)
+                    .Into(targetImageView);
+            }
+
+            targetImageView.Visibility = ViewStates.Visible;
         }
 
         public static async Task ReturnToSignIn(Activity activity)

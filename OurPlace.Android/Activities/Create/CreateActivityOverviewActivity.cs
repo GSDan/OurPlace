@@ -33,12 +33,12 @@ using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
+using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OurPlace.Common;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
@@ -268,7 +268,7 @@ namespace OurPlace.Android.Activities.Create
             // Don't save changes to uploaded activities until we're ready to submit
             if (editingSubmitted) return;
 
-            if(dbManager == null)
+            if (dbManager == null)
             {
                 dbManager = await GetDatabaseManager();
             }
@@ -306,7 +306,7 @@ namespace OurPlace.Android.Activities.Create
         private void Fab_Click(object sender, EventArgs e)
         {
             Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
-            StartActivityForResult(intent, AddTaskIntent);            
+            StartActivityForResult(intent, AddTaskIntent);
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
@@ -316,47 +316,47 @@ namespace OurPlace.Android.Activities.Create
             switch (requestCode)
             {
                 case AddTaskIntent:
-                {
-                    LearningTask newTask = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
-                    adapter.Data.Add(newTask);
-                    adapter.NotifyDataSetChanged();
-                    break;
-                }
-                case ManageChildrenIntent:
-                {
-                    List<LearningTask> childTasks = JsonConvert.DeserializeObject<List<LearningTask>>(data.GetStringExtra("JSON"));
-                    int parentInd = data.GetIntExtra("PARENT", -1);
-                    if(parentInd >= 0)
                     {
-                        newActivity.LearningTasks.ToList()[parentInd].ChildTasks = childTasks;
-                        adapter.UpdateActivity(newActivity);
-                    }
-
-                    break;
-                }
-                case EditActivityIntent:
-                {
-                    LearningActivity returned = JsonConvert.DeserializeObject<LearningActivity>(data.GetStringExtra("JSON"));
-                    if(returned != null)
-                    {
-                        newActivity = returned;
-                        adapter.UpdateActivity(returned);
-                    }
-
-                    break;
-                }
-                case EditTaskIntent:
-                {
-                    LearningTask returned = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
-                    int foundIndex = adapter.Data.FindIndex((LearningTask t) => t.Id == returned.Id);
-                    if(foundIndex != -1)
-                    {
-                        adapter.Data[foundIndex] = returned;
+                        LearningTask newTask = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
+                        adapter.Data.Add(newTask);
                         adapter.NotifyDataSetChanged();
+                        break;
                     }
+                case ManageChildrenIntent:
+                    {
+                        List<LearningTask> childTasks = JsonConvert.DeserializeObject<List<LearningTask>>(data.GetStringExtra("JSON"));
+                        int parentInd = data.GetIntExtra("PARENT", -1);
+                        if (parentInd >= 0)
+                        {
+                            newActivity.LearningTasks.ToList()[parentInd].ChildTasks = childTasks;
+                            adapter.UpdateActivity(newActivity);
+                        }
 
-                    break;
-                }
+                        break;
+                    }
+                case EditActivityIntent:
+                    {
+                        LearningActivity returned = JsonConvert.DeserializeObject<LearningActivity>(data.GetStringExtra("JSON"));
+                        if (returned != null)
+                        {
+                            newActivity = returned;
+                            adapter.UpdateActivity(returned);
+                        }
+
+                        break;
+                    }
+                case EditTaskIntent:
+                    {
+                        LearningTask returned = JsonConvert.DeserializeObject<LearningTask>(data.GetStringExtra("JSON"));
+                        int foundIndex = adapter.Data.FindIndex((LearningTask t) => t.Id == returned.Id);
+                        if (foundIndex != -1)
+                        {
+                            adapter.Data[foundIndex] = returned;
+                            adapter.NotifyDataSetChanged();
+                        }
+
+                        break;
+                    }
             }
         }
 

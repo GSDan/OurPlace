@@ -153,8 +153,8 @@ namespace OurPlace.Android.Fragments
                     // Check if we've asked before:
                     ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Activity);
                     bool hasAsked = prefs.GetBoolean("has_asked_loc_perm", false);
-                    
-                    if(!hasAsked)
+
+                    if (!hasAsked)
                     {
                         // We've not asked before, show an explanation
                         ShowLocationPermExplanation(permission);
@@ -213,7 +213,8 @@ namespace OurPlace.Android.Fragments
 
                 if (googleApiClient != null && withLocation && googleApiClient.IsConnected)
                 {
-                    await Task.Run(() => {
+                    await Task.Run(() =>
+                    {
 
                         global::Android.Locations.Location lastKnown = LocationServices.FusedLocationApi.GetLastLocation(googleApiClient);
                         if (lastKnown == null) return;
@@ -252,7 +253,7 @@ namespace OurPlace.Android.Fragments
                         adapter.Data[0] = recent;
                         adapter.NotifyDataSetChanged();
                     }
-                    
+
                     Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
                     return;
                 }
@@ -270,7 +271,7 @@ namespace OurPlace.Android.Fragments
                 dbManager.AddUser(dbManager.currentUser);
 
                 // Check for recently opened activities
-                
+
                 if (recent != null)
                 {
                     results.Data.Insert(0, recent);
@@ -282,7 +283,7 @@ namespace OurPlace.Android.Fragments
                 viewLoaded = true;
                 loading = false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
@@ -294,7 +295,7 @@ namespace OurPlace.Android.Fragments
         /// <returns></returns>
         private async Task<ActivityFeedSection> LoadRecent()
         {
-            List<LearningActivity> recentlyOpened = (await((MainActivity)Activity).GetDbManager()).GetActivities();
+            List<LearningActivity> recentlyOpened = (await ((MainActivity)Activity).GetDbManager()).GetActivities();
             if (recentlyOpened != null && recentlyOpened.Count > 0)
             {
                 return new ActivityFeedSection

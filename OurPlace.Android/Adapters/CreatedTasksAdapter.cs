@@ -20,16 +20,15 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
 using Android.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using FFImageLoading;
 using FFImageLoading.Transformations;
-using FFImageLoading.Views;
 using OurPlace.Common;
 using OurPlace.Common.Models;
+using System;
+using System.Collections.Generic;
 
 namespace OurPlace.Android.Adapters
 {
@@ -167,7 +166,7 @@ namespace OurPlace.Android.Adapters
             vh.Title.Text = Data[position].TaskType.DisplayName;
             vh.Description.Text = Data[position].Description;
 
-            if (((List<LearningTask>) Data[position].ChildTasks).Count > 0)
+            if (((List<LearningTask>)Data[position].ChildTasks).Count > 0)
             {
                 vh.ManageChildrenBtn.Text = context.GetString(Resource.String.createTaskChildrenManage);
             }
@@ -185,19 +184,19 @@ namespace OurPlace.Android.Adapters
             switch (viewType)
             {
                 case 0:
-                {
-                    // The Activity details at the top of the list
-                    View activityView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Activity, parent, false);
-                    ActivityViewHolder avh = new ActivityViewHolder(activityView, null, OnEditActivityClick);
-                    return avh;
-                }
+                    {
+                        // The Activity details at the top of the list
+                        View activityView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Activity, parent, false);
+                        ActivityViewHolder avh = new ActivityViewHolder(activityView, null, OnEditActivityClick);
+                        return avh;
+                    }
                 case 2:
-                {
-                    // The finish button at the bottom of the list
-                    View finishView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
-                    ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
-                    return bvh;
-                }
+                    {
+                        // The finish button at the bottom of the list
+                        View finishView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Finish, parent, false);
+                        ButtonViewHolder bvh = new ButtonViewHolder(finishView, OnFinishClick);
+                        return bvh;
+                    }
             }
 
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.CreateTaskCard, parent, false);

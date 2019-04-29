@@ -19,108 +19,114 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Android.App;
 using Android.Content;
-using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using OurPlace.Android;
+using System;
 
 namespace ColorPicker
 {
-	public class ColorPickerDialog : AlertDialog,ColorPickerView.OnColorChangedListener
-	{
-		private ColorPickerView mColorPicker;
+    public class ColorPickerDialog : AlertDialog, ColorPickerView.OnColorChangedListener
+    {
+        private ColorPickerView mColorPicker;
 
-		private ColorPanelView mOldColor;
-		private ColorPanelView mNewColor;
-		 
-		private ColorPickerView.OnColorChangedListener mListener;
+        private ColorPanelView mOldColor;
+        private ColorPanelView mNewColor;
 
-		public ColorPickerDialog(Context context, int initialColor) : base(context,initialColor) {
-			mListener = null;
-			init(initialColor);
-		}
+        private ColorPickerView.OnColorChangedListener mListener;
 
-		public ColorPickerDialog(Context context, int initialColor, ColorPickerView.OnColorChangedListener listener) : base(context) {
-			mListener = listener;
-			init(initialColor);
-		}
+        public ColorPickerDialog(Context context, int initialColor) : base(context, initialColor)
+        {
+            mListener = null;
+            init(initialColor);
+        }
+
+        public ColorPickerDialog(Context context, int initialColor, ColorPickerView.OnColorChangedListener listener) : base(context)
+        {
+            mListener = listener;
+            init(initialColor);
+        }
 
 
-		private void init(int color) {
-			// To fight color branding.
-			Window.SetFormat(Android.Graphics.Format.Rgb888);
-			setUp(color);
-		}
+        private void init(int color)
+        {
+            // To fight color branding.
+            Window.SetFormat(Android.Graphics.Format.Rgb888);
+            setUp(color);
+        }
 
-		private void setUp(int color) {
-			Boolean isLandscapeLayout = false;
+        private void setUp(int color)
+        {
+            Boolean isLandscapeLayout = false;
 
-			LayoutInflater inflater = (LayoutInflater)Context.GetSystemService (Context.LayoutInflaterService);
+            LayoutInflater inflater = (LayoutInflater)Context.GetSystemService(Context.LayoutInflaterService);
 
-			View layout = inflater.Inflate(Resource.Layout.dialog_color_picker, null);
+            View layout = inflater.Inflate(Resource.Layout.dialog_color_picker, null);
 
-			SetContentView(layout);
+            SetContentView(layout);
 
-			SetTitle("Pick a Color");
-			// setIcon(android.R.drawable.ic_dialog_info);
+            SetTitle("Pick a Color");
+            // setIcon(android.R.drawable.ic_dialog_info);
 
-			LinearLayout landscapeLayout = (LinearLayout) layout.FindViewById(Resource.Id.dialog_color_picker_extra_layout_landscape);
+            LinearLayout landscapeLayout = (LinearLayout)layout.FindViewById(Resource.Id.dialog_color_picker_extra_layout_landscape);
 
-			if(landscapeLayout != null) {
-				isLandscapeLayout = true;
-			}
+            if (landscapeLayout != null)
+            {
+                isLandscapeLayout = true;
+            }
 
-			mColorPicker = (ColorPickerView) layout.FindViewById(Resource.Id.color_picker_view);
-			mOldColor = (ColorPanelView) layout.FindViewById(Resource.Id.color_panel_old);
-			mNewColor = (ColorPanelView) layout.FindViewById(Resource.Id.color_panel_new);
+            mColorPicker = (ColorPickerView)layout.FindViewById(Resource.Id.color_picker_view);
+            mOldColor = (ColorPanelView)layout.FindViewById(Resource.Id.color_panel_old);
+            mNewColor = (ColorPanelView)layout.FindViewById(Resource.Id.color_panel_new);
 
-			if(!isLandscapeLayout) {
-				((LinearLayout) mOldColor.Parent).SetPadding(
-					(int)Math.Round(mColorPicker.getDrawingOffset()), 
-					0, 
-					(int)Math.Round(mColorPicker.getDrawingOffset()), 
-					0);
+            if (!isLandscapeLayout)
+            {
+                ((LinearLayout)mOldColor.Parent).SetPadding(
+                    (int)Math.Round(mColorPicker.getDrawingOffset()),
+                    0,
+                    (int)Math.Round(mColorPicker.getDrawingOffset()),
+                    0);
 
-			}
-			else {
-				landscapeLayout.SetPadding(0, 0,(int) Math.Round(mColorPicker.getDrawingOffset()), 0);
-				string temp = null;
-				SetTitle(temp);
-			}
+            }
+            else
+            {
+                landscapeLayout.SetPadding(0, 0, (int)Math.Round(mColorPicker.getDrawingOffset()), 0);
+                string temp = null;
+                SetTitle(temp);
+            }
 
-			mColorPicker.setOnColorChangedListener(this);
+            mColorPicker.setOnColorChangedListener(this);
 
-			mOldColor.setColor(color);
-			mColorPicker.setColor(color, true);
+            mOldColor.setColor(color);
+            mColorPicker.setColor(color, true);
 
-		}
-		 
-		//TODO : change as per native lib for override
-		 
-		public void onColorChanged(int color) {
-			mNewColor.setColor(color);
+        }
 
-			if (mListener != null) {
-				mListener.onColorChanged(color);
+        //TODO : change as per native lib for override
 
-			}
+        public void onColorChanged(int color)
+        {
+            mNewColor.setColor(color);
 
-		}
+            if (mListener != null)
+            {
+                mListener.onColorChanged(color);
 
-		public void setAlphaSliderVisible(Boolean visible) {
-			mColorPicker.setAlphaSliderVisible(visible);
-		}
+            }
 
-		public int getColor() {
-			return mColorPicker.getColor();
-		}
-	}
+        }
+
+        public void setAlphaSliderVisible(Boolean visible)
+        {
+            mColorPicker.setAlphaSliderVisible(visible);
+        }
+
+        public int getColor()
+        {
+            return mColorPicker.getColor();
+        }
+    }
 }
 

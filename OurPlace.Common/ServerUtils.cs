@@ -160,6 +160,7 @@ namespace OurPlace.Common
                 case "MATCH_PHOTO":
                 case "DRAW":
                 case "DRAW_PHOTO":
+                case "INFO":
                     return "jpg";
                 case "TAKE_VIDEO":
                 case "REC_AUDIO":

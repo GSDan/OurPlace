@@ -31,14 +31,10 @@ using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
-using OurPlace.Android.Fragments;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -158,7 +154,7 @@ namespace OurPlace.Android.Activities.Create
         {
             // Hide the prompt if the user has added a task
             fabPrompt.Visibility =
-                ( adapter.data.Any())
+                (adapter.data.Any())
                     ? ViewStates.Gone : ViewStates.Visible;
             base.OnResume();
         }

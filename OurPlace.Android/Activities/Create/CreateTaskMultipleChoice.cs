@@ -26,7 +26,6 @@ using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
 using OurPlace.Common.Models;
@@ -78,7 +77,7 @@ namespace OurPlace.Android.Activities.Create
                 instructions.Text = newTask.Description;
                 List<string> existingEntries = JsonConvert.DeserializeObject<List<string>>(newTask.JsonData);
 
-                foreach(string entry in existingEntries)
+                foreach (string entry in existingEntries)
                 {
                     AddChoice(entry);
                 }
@@ -137,14 +136,14 @@ namespace OurPlace.Android.Activities.Create
             for (int i = 0; i < choicesRoot.ChildCount; i++)
             {
                 View child = choicesRoot.GetChildAt(i);
-                if(child.Id == topParent.Id)
+                if (child.Id == topParent.Id)
                 {
                     choicesRoot.RemoveViewAt(i);
                     break;
                 }
             }
 
-            if(choicesRoot.ChildCount <= 1)
+            if (choicesRoot.ChildCount <= 1)
             {
                 optionsHeader.Text = Resources.GetString(Resource.String.createNewMultChoiceNone);
             }
@@ -159,7 +158,7 @@ namespace OurPlace.Android.Activities.Create
                 errMess = Resource.String.createNewActivityTaskInstruct;
             }
 
-            if(entries.Count < 2)
+            if (entries.Count < 2)
             {
                 errMess = Resource.String.createNewMultChoiceTooFew;
             }
@@ -182,7 +181,8 @@ namespace OurPlace.Android.Activities.Create
             newTask.Description = instructions.Text;
             newTask.JsonData = JsonConvert.SerializeObject(entries);
 
-            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings {
+            string json = JsonConvert.SerializeObject(newTask, new JsonSerializerSettings
+            {
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 MaxDepth = 5
             });

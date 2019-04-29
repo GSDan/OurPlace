@@ -69,7 +69,7 @@ namespace OurPlace.Android.Activities
 
             bool needsPermission = PermissionsHandler.NeedsPermissionRequest(this);
 
-            if(needsPermission)
+            if (needsPermission)
             {
                 PermissionsHandler.RequestPermissionsAsync(this);
             }
@@ -111,7 +111,7 @@ namespace OurPlace.Android.Activities
             {
                 RunOnUiThread(() => Toast.MakeText(this, Resource.String.scanningActivity_success, ToastLength.Short).Show());
                 ReturnSuccess();
-            }            
+            }
         }
 
         protected override void OnPause()

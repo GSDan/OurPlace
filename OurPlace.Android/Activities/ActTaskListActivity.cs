@@ -102,7 +102,7 @@ namespace OurPlace.Android.Activities
 
             bool curatorControls = learningActivity.IsPublic && !learningActivity.Approved && dbManager.currentUser.Trusted;
 
-            adapter = new TaskAdapter(this, appTasks, learningActivity.Description, curatorControls, learningActivity.RequireUsername);
+            adapter = new TaskAdapter(this, learningActivity.Id, appTasks, learningActivity.Description, curatorControls, learningActivity.RequireUsername);
             adapter.ItemClick += OnItemClick;
             adapter.TextEntered += Adapter_TextEntered;
             adapter.ShowMedia += ShowMedia;
@@ -137,7 +137,7 @@ namespace OurPlace.Android.Activities
 
             TextView message = new TextView(this);
             message.SetText(Resource.String.actEnterUsername);
-            EditText nameInput = new EditText(this) {Text = enteredName};
+            EditText nameInput = new EditText(this) { Text = enteredName };
 
             LinearLayout dialogLayout = new LinearLayout(this)
             {
@@ -167,7 +167,7 @@ namespace OurPlace.Android.Activities
                     adapter.UpdateNames(enteredName);
                     dbManager.SaveActivityProgress(learningActivity, adapter.Items, enteredName);
 
-                    if(continueToFinish)
+                    if (continueToFinish)
                     {
                         PackageForUpload();
                     }
@@ -406,57 +406,58 @@ namespace OurPlace.Android.Activities
                 case "TAKE_VIDEO":
                 case "TAKE_PHOTO":
                 case "MATCH_PHOTO":
-                {
-                    lastReqIntent = new Intent(this, typeof(CameraActivity));
-                    lastReqIntent.PutExtra("JSON", json);
-                    lastReqIntent.PutExtra("ACTID", learningActivity.Id);
+                    {
+                        lastReqIntent = new Intent(this, typeof(CameraActivity));
+                        lastReqIntent.PutExtra("JSON", json);
+                        lastReqIntent.PutExtra("ACTID", learningActivity.Id);
 
-                    List<string> perms = new List<string>
+                        List<string> perms = new List<string>
                     {
                         global::Android.Manifest.Permission.Camera,
                         global::Android.Manifest.Permission.AccessFineLocation
                     };
-                    List<string> titles = new List<string>
+                        List<string> titles = new List<string>
                     {
                         base.Resources.GetString(Resource.String.permissionCameraTitle),
                         base.Resources.GetString(Resource.String.permissionLocationTitle)
                     };
-                    List<string> explanations = new List<string>
+                        List<string> explanations = new List<string>
                     {
                         base.Resources.GetString(Resource.String.permissionPhotoExplanation),
                         base.Resources.GetString(Resource.String.permissionLocationExplanation)
                     };
 
-                    // Video tasks also require the microphone
-                    if (taskType == "TAKE_VIDEO")
-                    {
-                        perms.Add(global::Android.Manifest.Permission.RecordAudio);
-                        titles.Add(base.Resources.GetString(Resource.String.permissionMicTitle));
-                        explanations.Add(base.Resources.GetString(Resource.String.permissionMicExplanation));
-                    }
+                        // Video tasks also require the microphone
+                        if (taskType == "TAKE_VIDEO")
+                        {
+                            perms.Add(global::Android.Manifest.Permission.RecordAudio);
+                            titles.Add(base.Resources.GetString(Resource.String.permissionMicTitle));
+                            explanations.Add(base.Resources.GetString(Resource.String.permissionMicExplanation));
+                        }
 
-                    AndroidUtils.CallWithPermission(perms.ToArray(), titles.ToArray(), explanations.ToArray(),
-                        lastReqIntent, adapter.Items[position].Id, PermReqId, this);
-                    break;
-                }
+                        AndroidUtils.CallWithPermission(perms.ToArray(), titles.ToArray(), explanations.ToArray(),
+                            lastReqIntent, adapter.Items[position].Id, PermReqId, this);
+                        break;
+                    }
 
                 case "DRAW":
                 case "DRAW_PHOTO":
-                {
-                    Intent drawActivity = new Intent(this, typeof(DrawingActivity));
-                    drawActivity.PutExtra("JSON", json);
-
-                    if (taskType == "DRAW_PHOTO" && adapter.Items[position].JsonData.StartsWith("TASK::", StringComparison.OrdinalIgnoreCase))
                     {
-                        int id = -1;
-                        int.TryParse(adapter.Items[position].JsonData.Substring(6), out id);
-                        string[] paths = JsonConvert.DeserializeObject<string[]>(adapter.GetTaskWithId(id).CompletionData.JsonData);
-                        drawActivity.PutExtra("PREVIOUS_PHOTO", paths[0]);
-                    }
+                        Intent drawActivity = new Intent(this, typeof(DrawingActivity));
+                        drawActivity.PutExtra("JSON", json);
 
-                    StartActivityForResult(drawActivity, adapter.Items[position].Id);
-                    break;
-                }
+                        if (taskType == "DRAW_PHOTO" && adapter.Items[position].JsonData.StartsWith("TASK::", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int id = -1;
+                            int.TryParse(adapter.Items[position].JsonData.Substring(6), out id);
+                            string[] paths = JsonConvert.DeserializeObject<string[]>(adapter.GetTaskWithId(id).CompletionData.JsonData);
+                            drawActivity.PutExtra("PREVIOUS_PHOTO", paths[0]);
+                            drawActivity.PutExtra("ACTIVITY_ID", learningActivity.Id);
+                        }
+
+                        StartActivityForResult(drawActivity, adapter.Items[position].Id);
+                        break;
+                    }
 
                 case "MAP_MARK":
                     lastReqIntent = new Intent(this, typeof(LocationMarkerActivity));
@@ -590,7 +591,7 @@ namespace OurPlace.Android.Activities
 
                 preppedTasks.Add(Storage.PrepForUpload(t));
             }
-         
+
             // Skip packaging the upload if there is no entered data
             bool anyData = false;
             foreach (AppTask t in preppedTasks)

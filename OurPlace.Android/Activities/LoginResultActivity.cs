@@ -19,12 +19,12 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
-using System;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Widget;
 using OurPlace.Common.Models;
+using System;
 using static OurPlace.Common.LocalData.Storage;
 
 namespace OurPlace.Android.Activities
@@ -96,7 +96,7 @@ namespace OurPlace.Android.Activities
                 updatedUser.AccessExpiresAt = tempUser.AccessExpiresAt;
                 updatedUser.RefreshToken = tempUser.RefreshToken;
                 updatedUser.RefreshExpiresAt = tempUser.RefreshExpiresAt;
-               
+
                 (await GetDatabaseManager()).AddUser(updatedUser);
                 Intent intent = new Intent(this, typeof(MainActivity));
                 intent.AddFlags(ActivityFlags.ClearTop);
@@ -110,7 +110,8 @@ namespace OurPlace.Android.Activities
                     .SetTitle(Resource.String.ErrorTitle)
                     .SetMessage(Resource.String.ErrorLogin)
                     .SetCancelable(false)
-                    .SetOnDismissListener(new OnDismissListener(() => {
+                    .SetOnDismissListener(new OnDismissListener(() =>
+                    {
                         Intent intent = new Intent(this, typeof(LoginActivity));
                         StartActivity(intent);
                         Finish();

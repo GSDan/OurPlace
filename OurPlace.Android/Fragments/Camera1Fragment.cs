@@ -25,7 +25,6 @@ using Android.Hardware;
 using Android.Media;
 using Android.OS;
 using Android.Runtime;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Java.Util;

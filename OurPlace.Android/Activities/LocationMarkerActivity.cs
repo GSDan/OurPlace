@@ -54,7 +54,7 @@ namespace OurPlace.Android.Activities
 
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
 
-            learningTask = JsonConvert.DeserializeObject<AppTask>(jsonData, 
+            learningTask = JsonConvert.DeserializeObject<AppTask>(jsonData,
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
             taskData = JsonConvert.DeserializeObject<MapMarkerTaskData>(learningTask.JsonData);
@@ -70,7 +70,8 @@ namespace OurPlace.Android.Activities
             progressDialog.SetMessage(Resources.GetString(Resource.String.mapLoadingMessage)); // Why Xamarin, why??
             progressDialog.SetCancelable(false);
             progressDialog.Indeterminate = true;
-            progressDialog.SetButton(Resources.GetString(Resource.String.dialog_cancel), (a, b) => {
+            progressDialog.SetButton(Resources.GetString(Resource.String.dialog_cancel), (a, b) =>
+            {
                 Finish();
             });
             progressDialog.Show();
@@ -139,25 +140,25 @@ namespace OurPlace.Android.Activities
 
         private void GoogleMap_MapClick(object sender, GoogleMap.MapClickEventArgs e)
         {
-            if(!taskData.UserLocationOnly)
+            if (!taskData.UserLocationOnly)
             {
-                if(CanPlaceMarkers())
+                if (CanPlaceMarkers())
                 {
                     Map_Location selected = new Map_Location(
                         e.Point.Latitude,
                         e.Point.Longitude,
                         GMap.CameraPosition.Zoom);
-                                        AddMarker(selected);
+                    AddMarker(selected);
                 }
                 else
                 {
                     string maxMessage = string.Format(Resources.GetString(Resource.String.ChosenMaxLocations),
-                        taskData.MaxNumMarkers, 
+                        taskData.MaxNumMarkers,
                         (taskData.MaxNumMarkers > 1) ? "s" : "");
                     Toast.MakeText(this, maxMessage, ToastLength.Long).Show();
                 }
             }
-            else if(CanPlaceMarkers())
+            else if (CanPlaceMarkers())
             {
                 Toast.MakeText(this, Resources.GetString(Resource.String.UserLocationOnly), ToastLength.Short).Show();
             }
@@ -191,7 +192,7 @@ namespace OurPlace.Android.Activities
                     UpdateText();
                     UpdateButton();
                 })
-                .SetNegativeButton("Cancel", (a,b) =>{ })
+                .SetNegativeButton("Cancel", (a, b) => { })
                 .Show();
         }
 
@@ -208,8 +209,8 @@ namespace OurPlace.Android.Activities
         private void MarkBtn_Click(object sender, System.EventArgs e)
         {
             Map_Location selected = new Map_Location(
-                GMap.MyLocation.Latitude, 
-                GMap.MyLocation.Longitude, 
+                GMap.MyLocation.Latitude,
+                GMap.MyLocation.Longitude,
                 GMap.CameraPosition.Zoom
                 );
             AddMarker(selected);

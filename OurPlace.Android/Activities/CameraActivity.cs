@@ -109,26 +109,7 @@ namespace OurPlace.Android.Activities
 
             ImageViewAsync targetImageView = view.FindViewById<ImageViewAsync>(Resource.Id.targetPhoto);
             string imageUrl = learningTask.JsonData;
-            string localRes = GetCacheFilePath(imageUrl,
-                activityId,
-                ServerUtils.GetFileExtension(learningTask.TaskType.IdName));
-
-            // Image hasn't been locally cached, try to download remote version
-            if (!File.Exists(localRes))
-            {
-                Toast.MakeText(this, Resource.String.PleaseWait, ToastLength.Long).Show();
-                ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(learningTask.JsonData))
-                    .DownSample(500)
-                    .Into(targetImageView);
-            }
-            else
-            {
-                // Load the local file
-                ImageService.Instance.LoadFile(localRes).DownSample(500)
-                    .Into(targetImageView);
-            }
-
-            targetImageView.Visibility = ViewStates.Visible;
+            AndroidUtils.LoadActivityImageIntoView(targetImageView, imageUrl, activityId, 500);
         }
 
         public void ReturnWithFile(string filePath)

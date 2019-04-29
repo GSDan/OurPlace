@@ -531,14 +531,14 @@ namespace OurPlace.Android.Fragments
             {
                 case (int)SurfaceOrientation.Rotation90:
                 case (int)SurfaceOrientation.Rotation270:
-                {
-                    bufferRect.Offset(centreX - bufferRect.CenterX(), centreY - bufferRect.CenterY());
-                    matrix.SetRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.Fill);
-                    float scale = Math.Max((float)viewHeight / mPreviewSize.Height, (float)viewWidth / mPreviewSize.Width);
-                    matrix.PostScale(scale, scale, centreX, centreY);
-                    matrix.PostRotate(90 * (rotation - 2), centreX, centreY);
-                    break;
-                }
+                    {
+                        bufferRect.Offset(centreX - bufferRect.CenterX(), centreY - bufferRect.CenterY());
+                        matrix.SetRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.Fill);
+                        float scale = Math.Max((float)viewHeight / mPreviewSize.Height, (float)viewWidth / mPreviewSize.Width);
+                        matrix.PostScale(scale, scale, centreX, centreY);
+                        matrix.PostRotate(90 * (rotation - 2), centreX, centreY);
+                        break;
+                    }
                 case (int)SurfaceOrientation.Rotation180:
                     matrix.PostRotate(180, centreX, centreY);
                     break;

@@ -165,11 +165,12 @@ namespace OurPlace.Android.Activities
 
             if (LearningTask.TaskType.IdName == "DRAW_PHOTO")
             {
-                if(string.IsNullOrWhiteSpace(PreviousImage))
+                //used for accessing cache folder
+                int activityId = Intent.GetIntExtra("ACTIVITY_ID", -1);
+
+                if (string.IsNullOrWhiteSpace(PreviousImage))
                 {
-                    ImageService.Instance.LoadUrl(Common.ServerUtils.GetUploadUrl(LearningTask.JsonData))
-                        .DownSample(500)
-                        .Into(bgImage);
+                    AndroidUtils.LoadActivityImageIntoView(bgImage, LearningTask.JsonData, activityId, 500);
                 }
                 else
                 {
@@ -181,7 +182,7 @@ namespace OurPlace.Android.Activities
             else
             {
                 bgImage.SetBackgroundColor(Color.White);
-            }                
+            }
 
             colorPickerView = FindViewById<ColorPickerView>(Resource.Id.color_picker_view);
             colorPickerView.setOnColorChangedListener(this);
@@ -265,7 +266,8 @@ namespace OurPlace.Android.Activities
                             ViewGroup.LayoutParams.MatchParent);
                     input.LayoutParameters = lp;
                     editalert.SetView(input);
-                    editalert.SetPositiveButton("OK", delegate{
+                    editalert.SetPositiveButton("OK", delegate
+                    {
 
                         string name = input.Text;
                         Bitmap bitmap = mv.DrawingCache;
@@ -274,7 +276,7 @@ namespace OurPlace.Android.Activities
                         Canvas c = new Canvas(image);
                         bgImage.Layout(bgImage.Left, bgImage.Top, bgImage.Right, bgImage.Bottom);
                         bgImage.Draw(c);
-                        
+
                         string sdCardPath = global::Android.OS.Environment.GetExternalStoragePublicDirectory(global::Android.OS.Environment.DirectoryDownloads).AbsolutePath;
                         string filePath = System.IO.Path.Combine(sdCardPath, name + ".png");
 

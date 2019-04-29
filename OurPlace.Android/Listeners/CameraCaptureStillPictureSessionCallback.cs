@@ -20,7 +20,6 @@
 */
 #endregion
 using Android.Hardware.Camera2;
-using OurPlace.Android.Activities;
 using OurPlace.Android.Fragments;
 
 namespace OurPlace.Android.Listeners

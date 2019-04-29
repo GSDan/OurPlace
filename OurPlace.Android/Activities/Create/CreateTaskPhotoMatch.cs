@@ -31,12 +31,11 @@ using FFImageLoading;
 using FFImageLoading.Transformations;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
-using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -102,7 +101,7 @@ namespace OurPlace.Android.Activities.Create
                     Java.IO.File cachedFile = new Java.IO.File(editCachePath);
                     selectedImage = global::Android.Net.Uri.FromFile(cachedFile);
                 }
-                
+
                 ShowImage();
             }
             else
@@ -210,7 +209,7 @@ namespace OurPlace.Android.Activities.Create
                 ImageService.Instance.LoadFile(selectedImage.Path)
                     .Transform(new CircleTransformation()).Into(chosenImageView);
             }
-            
+
             chosenLayout.Visibility = global::Android.Views.ViewStates.Visible;
         }
 

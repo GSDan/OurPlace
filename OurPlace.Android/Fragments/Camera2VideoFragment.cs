@@ -132,7 +132,7 @@ namespace OurPlace.Android.Fragments
             {
                 return (Size)Collections.Min(bigEnough, new CompareSizesByArea());
             }
-                
+
             Log.Error(FragTag, "Couldn't find any suitable preview size");
             return choices[0];
         }

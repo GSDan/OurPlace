@@ -20,10 +20,6 @@
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Graphics;
 using Android.Media;
@@ -34,6 +30,10 @@ using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Views;
 using SectionedRecyclerview.Droid;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OurPlace.Android.Adapters
 {
@@ -296,7 +296,7 @@ namespace OurPlace.Android.Adapters
 
     public class TaskViewHolderRecordVideo : TaskViewHolderResultList
     {
-        public TaskViewHolderRecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener) 
+        public TaskViewHolderRecordVideo(View itemView, Action<int> ttsAction, Action<int> btnListener, Action<int, int> thumbnailTapListener)
             : base(itemView, ttsAction, btnListener, thumbnailTapListener)
         {
         }
@@ -345,7 +345,7 @@ namespace OurPlace.Android.Adapters
                 return;
             }
 
-            for (int i = 0; i < files.Count(); i ++)
+            for (int i = 0; i < files.Count(); i++)
             {
                 Button openButton = new Button(context);
                 openButton.SetPadding(10, 10, 10, 10);

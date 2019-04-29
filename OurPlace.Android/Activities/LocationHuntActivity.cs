@@ -87,7 +87,7 @@ namespace OurPlace.Android.Activities
 
             Button openMapButton = FindViewById<Button>(Resource.Id.openMapButton);
             openMapButton.Click += OpenMapButton_Click;
-            openMapButton.Visibility = (target.MapAvailable == null || target.MapAvailable == true) 
+            openMapButton.Visibility = (target.MapAvailable == null || target.MapAvailable == true)
                 ? ViewStates.Visible : ViewStates.Gone;
 
             if (!AndroidUtils.IsGooglePlayServicesInstalled(this) || googleApiClient != null)
@@ -157,7 +157,7 @@ namespace OurPlace.Android.Activities
 
             Console.WriteLine("OnResume, connecting");
 
-            googleApiClient.Connect();            
+            googleApiClient.Connect();
         }
 
         protected override async void OnPause()
@@ -225,14 +225,14 @@ namespace OurPlace.Android.Activities
             distanceText.Text = $"Distance: {dist}";
             accuracyText.Text = $"Accuracy: {location.Accuracy:n0} metres";
 
-            if(animationThread == null)
+            if (animationThread == null)
             {
                 shouldAnimate = true;
                 animationThread = new Thread(AnimateImage);
                 animationThread.Start();
             }
 
-            if(distanceMetres < 10)
+            if (distanceMetres < 10)
             {
                 Arrived();
             }
@@ -249,7 +249,8 @@ namespace OurPlace.Android.Activities
             new global::Android.Support.V7.App.AlertDialog.Builder(this)
                 .SetTitle(base.Resources.GetString(Resource.String.locationHuntArrivedTitle))
                 .SetMessage(base.Resources.GetString(Resource.String.locationHuntArrivedMessage))
-                .SetPositiveButton("Got it!", (a, b) => {
+                .SetPositiveButton("Got it!", (a, b) =>
+                {
                     Intent myIntent = new Intent(this, typeof(ActTaskListActivity));
                     myIntent.PutExtra("TASK_ID", learningTask.Id);
                     myIntent.PutExtra("COMPLETE", true);

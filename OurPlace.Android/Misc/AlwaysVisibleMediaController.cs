@@ -43,7 +43,7 @@ namespace OurPlace.Android.Misc
             {
                 base.Show(0);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }

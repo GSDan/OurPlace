@@ -69,9 +69,10 @@ namespace OurPlace.Android
             {
                 SetMeasuredDimension(width, height);
             }
-            else {
+            else
+            {
 
-				SetMeasuredDimension(width, (int)(width * mRatioHeight / (float)mRatioWidth));
+                SetMeasuredDimension(width, (int)(width * mRatioHeight / (float)mRatioWidth));
 
                 //if (width < (float)height * mRatioWidth / (float)mRatioHeight)
                 //{

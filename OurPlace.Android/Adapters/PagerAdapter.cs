@@ -53,7 +53,7 @@ namespace OurPlace.Android.Adapters
 
         public override ICharSequence GetPageTitleFormatted(int position)
         {
-            switch(position)
+            switch (position)
             {
                 case 0:
                     return new String(context.Resources.GetString(Resource.String.MainLandingTabTitle));

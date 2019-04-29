@@ -30,12 +30,12 @@ using FFImageLoading;
 using FFImageLoading.Transformations;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using OurPlace.Common;
 
 namespace OurPlace.Android.Activities.Create
 {

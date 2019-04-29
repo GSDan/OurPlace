@@ -28,7 +28,6 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
-using FFImageLoading;
 using FFImageLoading.Views;
 using Newtonsoft.Json;
 using OurPlace.Common;

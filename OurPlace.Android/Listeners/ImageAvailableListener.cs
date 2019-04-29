@@ -20,14 +20,12 @@
 */
 #endregion
 
-using System;
-using System.Threading.Tasks;
-using Android.App;
 using Android.Media;
 using Java.IO;
 using Java.Nio;
 using OurPlace.Android.Activities;
 using OurPlace.Android.Fragments;
+using System.Threading.Tasks;
 
 namespace OurPlace.Android.Listeners
 {

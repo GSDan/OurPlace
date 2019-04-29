@@ -46,12 +46,12 @@ namespace OurPlace.Android.Adapters
             int swipeFlags = ItemTouchHelper.Start | ItemTouchHelper.End;
 
             // Only task cards should be movable
-            return (viewHolder.ItemViewType == 1)? MakeMovementFlags(dragFlags, swipeFlags) : 0;
+            return (viewHolder.ItemViewType == 1) ? MakeMovementFlags(dragFlags, swipeFlags) : 0;
         }
 
         public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
         {
-            if(viewHolder.ItemViewType != 1)
+            if (viewHolder.ItemViewType != 1)
             {
                 return false;
             }
