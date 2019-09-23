@@ -21,6 +21,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Spatial;
 
 namespace OurPlace.API.Models
 {
@@ -33,6 +34,8 @@ namespace OurPlace.API.Models
         public string ContactEmail { get; set; }
         public string GooglePlaceId { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public DbGeography Location { get; set; }
 
         public virtual PlaceLocality Locality { get; set; }
         public virtual ICollection<LearningActivity> Activities { get; set; }

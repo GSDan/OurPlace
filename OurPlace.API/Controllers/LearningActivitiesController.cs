@@ -23,10 +23,12 @@ using Microsoft.AspNet.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using OurPlace.API.Models;
+using OurPlace.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Spatial;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -36,7 +38,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
-using OurPlace.Common;
 using LearningTask = OurPlace.API.Models.LearningTask;
 
 namespace OurPlace.API.Controllers
@@ -157,10 +158,14 @@ namespace OurPlace.API.Controllers
             
             if(!lat.AlmostEquals(0, 0.0001) || !lon.AlmostEquals(0, 0.0001))
             {
-                IEnumerable<Place> places = LocationLogic.GetPlacesNear(db, lat, lon, 2500, 3);
+                DbGeography thisLoc = ServerUtils.CreatePoint(lat, lon);
+
+                IEnumerable<Place> places = db.Places.Where(pl => pl.Location.Distance(thisLoc) <= 2500).OrderBy(pl => pl.Location.Distance(thisLoc));
 
                 foreach(Place pl in places)
                 {
+                    double? distance = pl.Location.Distance(thisLoc);
+
                     // Get activities which are near the user's position, public and approved
                     List<Common.Models.LimitedLearningActivity> actsHere = GetAllWhere(a => 
                         !a.SoftDeleted && 
@@ -338,7 +343,7 @@ namespace OurPlace.API.Controllers
             existing.Places = places;
             existing.LearningTasks = tasks;
 
-            db.Entry(existing).State = EntityState.Modified;
+            db.Entry(existing).State = System.Data.Entity.EntityState.Modified;
 
             await db.SaveChangesAsync();
 
@@ -389,6 +394,7 @@ namespace OurPlace.API.Controllers
                             GooglePlaceId = result.result.place_id,
                             Latitude = new decimal(lat),
                             Longitude = new decimal(lon),
+                            Location = ServerUtils.CreatePoint(lat, lon),
                             Name = result.result.name,
                             CreatedAt = DateTime.UtcNow,
                             AddedBy = currentUser
@@ -612,5 +618,6 @@ namespace OurPlace.API.Controllers
         {
             return db.LearningActivities.Count(e => e.Id == id) > 0;
         }
+        
     }
 }

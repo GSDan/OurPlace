@@ -30,6 +30,7 @@ using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Spatial;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -69,6 +70,13 @@ namespace OurPlace.API
         {
             public CloudBlockBlob Blob { get; set; }
             public string Filename { get; set; }
+        }
+
+        public static DbGeography CreatePoint(double lat, double lon, int srid = 4326)
+        {
+            string wkt = String.Format("POINT({0} {1})", lon, lat);
+
+            return DbGeography.PointFromText(wkt, srid);
         }
 
         public static void ZipFilesToResponse(HttpResponseBase response, string filename, ICollection<DownloadStruct> files)

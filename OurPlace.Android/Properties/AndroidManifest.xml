@@ -18,8 +18,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see https://www.gnu.org/licenses.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.park.learn" android:installLocation="preferExternal" android:versionCode="47" android:versionName="3.0.5">
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="27" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.park.learn" android:installLocation="preferExternal" android:versionCode="51" android:versionName="3.0.9">
+	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -47,5 +47,6 @@
 		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
 		</provider>
+		<uses-library android:name="org.apache.http.legacy" android:required="false" />
 	</application>
 </manifest>

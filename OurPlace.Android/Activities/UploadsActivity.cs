@@ -126,6 +126,8 @@ namespace OurPlace.Android.Activities.Create
         /// </summary>
         private void UploadAfterWarning(object sender, int position)
         {
+            if(uploads.Count == 0 || position >= uploads.Count) return;
+
             files = JsonConvert.DeserializeObject<List<FileUpload>>(uploads[position].FilesJson);
             float totalFileSizeMb = 0;
 
