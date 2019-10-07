@@ -35,5 +35,6 @@ namespace OurPlace.Common.Models
         public string Title;
         public string Description;
         public List<LimitedLearningActivity> Activities;
+        public List<LimitedActivityCollection> Collections;
     }
 }

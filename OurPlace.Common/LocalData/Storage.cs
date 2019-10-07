@@ -348,7 +348,7 @@ namespace OurPlace.Common.LocalData
             databaseManager.AddUpload(uploadData);
 
             // Remove from cache when added to upload queue
-            string cacheJson = databaseManager.currentUser.LocalCreatedActivitiesJson;
+            string cacheJson = databaseManager.CurrentUser.LocalCreatedActivitiesJson;
             List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
                 new List<LearningActivity>() :
                 JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
@@ -359,8 +359,8 @@ namespace OurPlace.Common.LocalData
                 inProgress.RemoveAt(existingInd);
             }
 
-            databaseManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
-            databaseManager.AddUser(databaseManager.currentUser);
+            databaseManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
+            databaseManager.AddUser(databaseManager.CurrentUser);
 
             return uploadData;
         }

@@ -34,7 +34,7 @@ namespace OurPlace.Common.LocalData
 {
     public class DatabaseManager
     {
-        public ApplicationUser currentUser { get; set; }
+        public ApplicationUser CurrentUser { get; set; }
         private IEnumerable<TaskType> taskTypes;
         private readonly SQLiteConnection connection;
 
@@ -87,8 +87,8 @@ namespace OurPlace.Common.LocalData
 
         public ApplicationUser GetUser()
         {
-            currentUser = connection.Table<ApplicationUser>().FirstOrDefault();
-            return currentUser;
+            CurrentUser = connection.Table<ApplicationUser>().FirstOrDefault();
+            return CurrentUser;
         }
 
         public void CleanDatabase()
@@ -104,7 +104,7 @@ namespace OurPlace.Common.LocalData
                 Console.WriteLine(e.Message);
             }
 
-            currentUser = null;
+            CurrentUser = null;
         }
 
         public void CleanAllButUser()
@@ -127,14 +127,14 @@ namespace OurPlace.Common.LocalData
         public void DeleteUser()
         {
             connection.DeleteAll<ApplicationUser>();
-            currentUser = null;
+            CurrentUser = null;
         }
 
         public void AddUser(ApplicationUser data)
         {
             connection.DeleteAll<ApplicationUser>();
             connection.Insert(data);
-            currentUser = data;
+            CurrentUser = data;
         }
 
         public void AddTaskTypes(ICollection<TaskType> types)

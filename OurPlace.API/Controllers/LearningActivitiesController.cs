@@ -47,7 +47,118 @@ namespace OurPlace.API.Controllers
         private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private static Random rand = new Random();
 
-        private IEnumerable<Common.Models.LimitedLearningActivity> GetAllWhere(Func<LearningActivity, bool> predicate)
+        private IEnumerable<Common.Models.LimitedActivityCollection> GetAllCollectionsWhere(Func<ActivityCollection, bool> predicate)
+        {
+            return db.ActivityCollections.Where(predicate)
+                .Select(c => new Common.Models.ActivityCollection()
+                {
+                    Id = c.Id,
+                    CreatedAt = c.CreatedAt,
+                    Name = c.Name,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl,
+                    Approved = c.Approved,
+                    InviteCode = c.InviteCode,
+                    IsTrail = c.IsTrail,
+                    QRCodeUrl = c.QRCodeUrl,
+                    CollectionVersionNumber = c.CollectionVersionNumber,
+                    SoftDeleted = c.SoftDeleted,
+                    ActivityOrder = c.ActivityOrder,
+                    IsPublic = c.IsPublic,
+                    Location = new Common.Models.Place
+                    {
+                        Id = c.Location.Id,
+                        Name = c.Location.Name,
+                        GooglePlaceId = c.Location.GooglePlaceId,
+                        Latitude = c.Location.Latitude,
+                        Longitude = c.Location.Longitude
+                    },
+                    Application = new Common.Models.Application
+                    {
+                        Id = c.Application.Id,
+                        Name = c.Application.Name,
+                        Description = c.Application.Description,
+                        LogoUrl = c.Application.LogoUrl
+                    },
+                    Author = new Common.Models.LimitedApplicationUser
+                    {
+                        Id = c.Author.Id,
+                        FirstName = c.Author.FirstName,
+                        Surname = c.Author.Surname,
+                        ImageUrl = c.Author.ImageUrl
+                    },
+                    Activities = c.Activities.Select(a => new Common.Models.LimitedLearningActivity()
+                    {
+                       Id = a.Id,
+                       CreatedAt = a.CreatedAt,
+                       Name = a.Name,
+                       Description = a.Description,
+                       IsPublic = a.IsPublic,
+                       ImageUrl = a.ImageUrl,
+                       Approved = a.Approved,
+                       InviteCode = a.InviteCode,
+                       RequireUsername = a.RequireUsername,
+                       AppVersionNumber = a.AppVersionNumber,
+                       ActivityVersionNumber = a.ActivityVersionNumber,
+                       Application = new Common.Models.Application
+                       {
+                           Id = a.Application.Id,
+                           Name = a.Application.Name,
+                           Description = a.Application.Description,
+                           LogoUrl = a.Application.LogoUrl
+                       },
+                       Author = new Common.Models.LimitedApplicationUser
+                       {
+                           Id = a.Author.Id,
+                           FirstName = a.Author.FirstName,
+                           Surname = a.Author.Surname,
+                           ImageUrl = a.Author.ImageUrl
+                       },
+                       Places = a.Places.Select(p => new Common.Models.Place
+                       {
+                           Id = p.Id,
+                           Name = p.Name,
+                           GooglePlaceId = p.GooglePlaceId,
+                           Latitude = p.Latitude,
+                           Longitude = p.Longitude
+                       }),
+                       LearningTasks = a.LearningTasks.Where(t => !t.SoftDeleted).Select(t => new Common.Models.LearningTask
+                       {
+                           Id = t.Id,
+                           Description = t.Description,
+                           JsonData = t.JsonData,
+                           Order = t.Order,
+                           TaskType = new Common.Models.TaskType
+                           {
+                               Id = t.TaskType.Id,
+                               Description = t.TaskType.Description,
+                               IconUrl = t.TaskType.IconUrl,
+                               DisplayName = t.TaskType.DisplayName,
+                               ReqFileUpload = t.TaskType.ReqFileUpload,
+                               IdName = t.TaskType.IdName
+                           },
+                           ChildTasks = t.ChildTasks.Where(ct => !ct.SoftDeleted).Select(ct => new Common.Models.LearningTask
+                           {
+                               Id = ct.Id,
+                               Description = ct.Description,
+                               JsonData = ct.JsonData,
+                               Order = ct.Order,
+                               TaskType = new Common.Models.TaskType
+                               {
+                                   Id = ct.TaskType.Id,
+                                   Description = ct.TaskType.Description,
+                                   IconUrl = ct.TaskType.IconUrl,
+                                   DisplayName = ct.TaskType.DisplayName,
+                                   ReqFileUpload = ct.TaskType.ReqFileUpload,
+                                   IdName = ct.TaskType.IdName
+                               }
+                           }).OrderBy(ct => ct.Order)
+                       }).OrderBy(t => t.Order)
+                    })
+                }).ToList();
+        }
+
+        private IEnumerable<Common.Models.LimitedLearningActivity> GetAllActivitiesWhere(Func<LearningActivity, bool> predicate)
         {
             return db.LearningActivities.Where(predicate)
                .Select(a => new Common.Models.LimitedLearningActivity()
@@ -132,7 +243,7 @@ namespace OurPlace.API.Controllers
             var resp = Request.CreateResponse(HttpStatusCode.OK);
             resp.Content = new StringContent(
                 JsonConvert.SerializeObject(
-                    GetAllWhere(a => !a.SoftDeleted && ((a.IsPublic && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id)),
+                    GetAllActivitiesWhere(a => !a.SoftDeleted && ((a.IsPublic && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id)),
                     new JsonSerializerSettings() {
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                         MaxDepth = 5
@@ -164,24 +275,31 @@ namespace OurPlace.API.Controllers
 
                 foreach(Place pl in places)
                 {
-                    double? distance = pl.Location.Distance(thisLoc);
+                    // Get collections near the user's position, which have been approved and still
+                    // contain at least one activity
+                    List<Common.Models.LimitedActivityCollection> collectionsHere = GetAllCollectionsWhere(c =>
+                       !c.SoftDeleted &&
+                       c.Location.Id == pl.Id &&
+                        (c.Approved || thisUser.Trusted) &&
+                        c.Activities.Any(a => a.SoftDeleted == false) &&
+                        (isResearcher || c.IsPublic)).ToList();
 
                     // Get activities which are near the user's position, public and approved
-                    List<Common.Models.LimitedLearningActivity> actsHere = GetAllWhere(a => 
+                    List<Common.Models.LimitedLearningActivity> actsHere = GetAllActivitiesWhere(a => 
                         !a.SoftDeleted && 
-                        (a.Places.Any(l => l.Id == pl.Id) &&
+                        a.Places.Any(l => l.Id == pl.Id) &&
                          (a.Approved || thisUser.Trusted) &&
-                         (isResearcher || a.IsPublic)))
-                        .Take(12).ToList();
+                         (isResearcher || a.IsPublic)).ToList();
 
-                    if(actsHere.Count > 0)
+                    if(actsHere.Count > 0 || collectionsHere.Count > 0)
                     {
                         feed.Add(new Common.Models.LimitedActivityFeedSection
                         {
                             Title = $"Activities at {pl.Name}",
                             Description =
-                                $"It looks like you're near {pl.Name}! Here are some activities that have been made there.",
-                            Activities = actsHere
+                                $"Here are some things to do near {pl.Name}",
+                            Activities = actsHere,
+                            Collections = collectionsHere
                         });
                     }
                 }
@@ -192,7 +310,7 @@ namespace OurPlace.API.Controllers
                 Title = "Recently Uploaded",
                 Description = "Here are some of the latest activities that have been uploaded",
                 // Get the most recent activities which are public and approved, or made by the current user
-                Activities = GetAllWhere(a => !a.SoftDeleted && (((isResearcher || a.IsPublic) && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
+                Activities = GetAllActivitiesWhere(a => !a.SoftDeleted && (((isResearcher || a.IsPublic) && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
                     .OrderByDescending(a => a.CreatedAt).Take(16).ToList()
             });
 
@@ -224,7 +342,7 @@ namespace OurPlace.API.Controllers
             var resp = Request.CreateResponse(HttpStatusCode.OK);
             resp.Content = new StringContent(
                 JsonConvert.SerializeObject(
-                    GetAllWhere(a => !a.SoftDeleted && (a.Author.Id == creatorId && ((a.IsPublic && a.Approved) || creatorId == userId))),
+                    GetAllActivitiesWhere(a => !a.SoftDeleted && (a.Author.Id == creatorId && ((a.IsPublic && a.Approved) || creatorId == userId))),
                     new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
@@ -240,7 +358,7 @@ namespace OurPlace.API.Controllers
         [ResponseType(typeof(LearningActivity))]
         public async Task<HttpResponseMessage> GetLearningActivity(int id)
         {
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllWhere(a => a.Id == id).FirstOrDefault();
+            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == id).FirstOrDefault();
             if (limitedVersion == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Not found");
@@ -260,7 +378,7 @@ namespace OurPlace.API.Controllers
         {
             if (code == "SALTWELLSTATUE") code = "CHARLTONSTATUE";
 
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllWhere(a => a.InviteCode == code.ToUpper()).FirstOrDefault();
+            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.InviteCode == code.ToUpper()).FirstOrDefault();
             if (limitedVersion == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Not found");
@@ -552,7 +670,7 @@ namespace OurPlace.API.Controllers
 
             await db.SaveChangesAsync();
 
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllWhere(a => a.Id == finalAct.Id).FirstOrDefault();
+            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == finalAct.Id).FirstOrDefault();
 
             await MakeLog(new Dictionary<string, string>() { { "id", finalAct.Id.ToString() } });
 

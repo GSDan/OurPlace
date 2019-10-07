@@ -458,9 +458,18 @@
     <Compile Include="Migrations\201909231034370_Geography.Designer.cs">
       <DependentUpon>201909231034370_Geography.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910071237567_ActivityCollection.cs" />
+    <Compile Include="Migrations\201910071237567_ActivityCollection.Designer.cs">
+      <DependentUpon>201910071237567_ActivityCollection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910071338292_ActivityCollection_Update.cs" />
+    <Compile Include="Migrations\201910071338292_ActivityCollection_Update.Designer.cs">
+      <DependentUpon>201910071338292_ActivityCollection_Update.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ActivityCollection.cs" />
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\CompletedActivity.cs" />
     <Compile Include="Models\CompletedTask.cs" />
@@ -760,6 +769,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909231034370_Geography.resx">
       <DependentUpon>201909231034370_Geography.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910071237567_ActivityCollection.resx">
+      <DependentUpon>201910071237567_ActivityCollection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910071338292_ActivityCollection_Update.resx">
+      <DependentUpon>201910071338292_ActivityCollection_Update.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

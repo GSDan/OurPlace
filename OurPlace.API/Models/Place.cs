@@ -39,6 +39,7 @@ namespace OurPlace.API.Models
 
         public virtual PlaceLocality Locality { get; set; }
         public virtual ICollection<LearningActivity> Activities { get; set; }
+        public virtual ICollection<ActivityCollection> Collections { get; set; }
         public ApplicationUser AddedBy { get; set; }
     }
 }

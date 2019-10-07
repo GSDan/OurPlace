@@ -49,7 +49,7 @@ namespace OurPlace.Common
         private static RestClient restClient;
         private static HttpClient uploadClient;
 
-        private static string ServerErr = "SERVER_ERROR";
+        private static readonly string ServerErr = "SERVER_ERROR";
 
         /// <summary>
         /// Gets an access token to use as a bearer in request headers. 
@@ -62,31 +62,33 @@ namespace OurPlace.Common
         {
             DatabaseManager dbManager = await Storage.GetDatabaseManager(false);
 
-            if (dbManager.currentUser == null)
+            if (dbManager.CurrentUser == null)
             {
                 return null;
             }
 
             // return access token if one exists and is still valid
-            if (!string.IsNullOrWhiteSpace(dbManager.currentUser.AccessToken) &&
-                dbManager.currentUser.AccessExpiresAt > DateTime.UtcNow)
+            if (!string.IsNullOrWhiteSpace(dbManager.CurrentUser.AccessToken) &&
+                dbManager.CurrentUser.AccessExpiresAt > DateTime.UtcNow)
             {
-                return dbManager.currentUser.AccessToken;
+                return dbManager.CurrentUser.AccessToken;
             }
 
             // need to get new access token.
             // Check that we have a refresh token which exists and is valid
-            if (!string.IsNullOrWhiteSpace(dbManager.currentUser.RefreshToken) &&
-                dbManager.currentUser.RefreshExpiresAt > DateTime.UtcNow)
+            if (!string.IsNullOrWhiteSpace(dbManager.CurrentUser.RefreshToken) &&
+                dbManager.CurrentUser.RefreshExpiresAt > DateTime.UtcNow)
             {
                 // request new access token
                 try
                 {
                     using (var client = new HttpClient())
                     {
-                        Dictionary<string, string> args = new Dictionary<string, string>();
-                        args.Add("grant_type", "refresh_token");
-                        args.Add("refresh_token", dbManager.currentUser.RefreshToken);
+                        Dictionary<string, string> args = new Dictionary<string, string>
+                        {
+                            { "grant_type", "refresh_token" },
+                            { "refresh_token", dbManager.CurrentUser.RefreshToken }
+                        };
 
                         HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, ConfidentialData.api + "Token")
                         {
@@ -123,9 +125,9 @@ namespace OurPlace.Common
                             if (refResp != null && !string.IsNullOrWhiteSpace(refResp.Access_token))
                             {
                                 // success! Save the new access token and its expiry time
-                                dbManager.currentUser.AccessToken = refResp.Access_token;
-                                dbManager.currentUser.AccessExpiresAt = DateTime.UtcNow.AddSeconds(refResp.Expires_in);
-                                dbManager.AddUser(dbManager.currentUser);
+                                dbManager.CurrentUser.AccessToken = refResp.Access_token;
+                                dbManager.CurrentUser.AccessExpiresAt = DateTime.UtcNow.AddSeconds(refResp.Expires_in);
+                                dbManager.AddUser(dbManager.CurrentUser);
                                 return refResp.Access_token;
                             }
 
@@ -492,8 +494,10 @@ namespace OurPlace.Common
             {
                 if (uploadClient == null)
                 {
-                    uploadClient = new HttpClient();
-                    uploadClient.Timeout = TimeSpan.FromMinutes(30d);
+                    uploadClient = new HttpClient
+                    {
+                        Timeout = TimeSpan.FromMinutes(30d)
+                    };
                 }
 
                 string accessToken = await GetAccessToken();

@@ -66,6 +66,8 @@ namespace OurPlace.API.Models
 
         public DbSet<PlaceLocality> PlaceLocalities { get; set; }
 
+        public DbSet<ActivityCollection> ActivityCollections { get; set; }
+
         public DbSet<LearningActivity> LearningActivities { get; set; }
 
         public DbSet<LearningTask> LearningActivityTasks { get; set; }
