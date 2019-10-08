@@ -262,6 +262,9 @@ namespace OurPlace.Android.Fragments
                     LaunchWithStoragePermissions();
                     break;
                 case Resource.Id.fabCreateColl:
+                    Analytics.TrackEvent("MainMyActivitiesFragment_StartCreateCollection");
+                    requiresStorageIntent = new Intent(Activity, typeof(CreateCollectionActivity));
+                    LaunchWithStoragePermissions();
                     break;
             }
         }

@@ -148,6 +148,11 @@
   <string name="createFinishActivityTerms">I have read and accept the <a href="https://ourplace.app/terms">terms and conditions</a></string>
   <string name="createFinishActivityUploadBtn">Finish and Upload</string>
   <string name="createFinishActivityTermsErr">You must agree to the terms and conditions before proceeding.</string>
+  <string name="createCollectionFabPrompt">Add an Activity to this collection!</string>
+  <string name="createCollectionRemoveActivity">Remove</string>
+  <string name="createCollectionActivityLocation">This Activity is at: {0}</string>
+  <string name="createCollectionActivityNoLocation">This Activity doesn\'t have a location assigned to it.</string>
+  <string name="createCollectionViewActivityLocation">View Location</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>

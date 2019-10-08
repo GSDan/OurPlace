@@ -322,6 +322,7 @@
     <Compile Include="Activities\Abstracts\TTSActivity.cs" />
     <Compile Include="Activities\Create\CreateChooseLocation.cs" />
     <Compile Include="Activities\Create\CreateChooseTaskTypeActivity.cs" />
+    <Compile Include="Activities\Create\CreateCollectionActivity.cs" />
     <Compile Include="Activities\Create\CreateFinishActivity.cs" />
     <Compile Include="Activities\Create\CreateManageChildTasksActivity.cs" />
     <Compile Include="Activities\Create\CreateActivityOverviewActivity.cs" />
@@ -351,6 +352,7 @@
     <Compile Include="Activities\ScanningActivity.cs" />
     <Compile Include="Activities\SplashActivity.cs" />
     <Compile Include="Activities\UploadsActivity.cs" />
+    <Compile Include="Adapters\ActivityCollectionAdapter.cs" />
     <Compile Include="Adapters\ChapterAdapter.cs" />
     <Compile Include="Adapters\ChildItemDecoration.cs" />
     <Compile Include="Adapters\CreatedChildTasksAdapter.cs" />
@@ -1233,6 +1235,16 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_image_album_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Layout\CreateCollectionActivity.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Layout\ActivityCollectionCard.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
