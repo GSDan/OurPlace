@@ -30,4 +30,5 @@
   <color name="app_darkpurple">#AF4680</color>
   <color name="app_gray">#738182</color>
   <color name="app_red">#e03131</color>
+  <color name="app_graysemitrans">#80738182</color>
 </resources>

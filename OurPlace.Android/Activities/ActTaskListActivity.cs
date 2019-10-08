@@ -100,7 +100,7 @@ namespace OurPlace.Android.Activities
                 appTasks = learningActivity.LearningTasks.Select(t => new AppTask(t)).ToList();
             }
 
-            bool curatorControls = learningActivity.IsPublic && !learningActivity.Approved && dbManager.currentUser.Trusted;
+            bool curatorControls = learningActivity.IsPublic && !learningActivity.Approved && dbManager.CurrentUser.Trusted;
 
             adapter = new TaskAdapter(this, learningActivity.Id, appTasks, learningActivity.Description, curatorControls, learningActivity.RequireUsername);
             adapter.ItemClick += OnItemClick;
@@ -610,7 +610,7 @@ namespace OurPlace.Android.Activities
 
 
             ApplicationUser creator = learningActivity.Author;
-            if (creator != null && creator.Id != dbManager.currentUser.Id)
+            if (creator != null && creator.Id != dbManager.CurrentUser.Id)
             {
                 string name = creator.FirstName[0] + ". " + creator.Surname;
 

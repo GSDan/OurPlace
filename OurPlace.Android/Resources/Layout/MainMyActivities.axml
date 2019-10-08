@@ -35,19 +35,21 @@
                     android:paddingBottom="64dp"
                     android:clipToPadding="false"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/createActivityFab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_add_white_36dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginBottom="22dp"
+                <com.dekoservidoni.omfm.OneMoreFabMenu
+					android:id="@+id/fabMenu"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_gravity="end|bottom"
-                    app:elevation="4dp" />
-                <TextView
+					app:content_options="@menu/create_fab_contents"
+					app:color_main_button="@color/app_darkgreen"
+					app:close_on_click="true"
+					app:elevation="4dp" 
+					app:color_secondary_buttons="@color/app_green"
+					app:expanded_background_color="@color/app_graysemitrans"/>
+				<TextView
                     android:id="@+id/fabPrompt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -56,6 +58,7 @@
                     android:textStyle="bold|italic"
                     android:layout_marginRight="15dp"
                     android:layout_marginBottom="35dp"
+					android:layout_marginLeft="7dp"
                     android:layout_toLeftOf="@+id/createActivityFab"
                     android:layout_alignParentBottom="true" />
             </RelativeLayout>

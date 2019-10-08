@@ -80,6 +80,8 @@
   <string name="permissionLocationActivitiesExplanation">Grant OurPlace permission to access your location to see what activities are available nearby!</string>
   <string name="permissionRefused">Please give permissions in order to continue!</string>
   <string name="createNewActivityPrompt">Tap to create your first activity!</string>
+  <string name="createNewActivityFabNewAct">New Activity</string>
+  <string name="createNewActivityFabNewColl">New Collection</string>
   <string name="createNewActivityTitleView">What\'s the title of your new activity?</string>
   <string name="createNewActivityImagePrompt">Tap to add an image</string>
   <string name="createNewActivityDescView">Enter a description of your activity</string>

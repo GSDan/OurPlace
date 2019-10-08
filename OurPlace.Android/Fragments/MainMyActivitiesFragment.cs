@@ -24,7 +24,6 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.Design.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
@@ -32,6 +31,7 @@ using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
+using Com.Dekoservidoni.Omfm;
 using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities;
@@ -47,7 +47,7 @@ using System.Threading.Tasks;
 
 namespace OurPlace.Android.Fragments
 {
-    public class MainMyActivitiesFragment : global::Android.Support.V4.App.Fragment
+    public class MainMyActivitiesFragment : global::Android.Support.V4.App.Fragment, OneMoreFabMenu.IOptionsClick
     {
         private LearningActivitiesAdapter adapter;
         private RecyclerView recyclerView;
@@ -120,7 +120,7 @@ namespace OurPlace.Android.Fragments
 
                 ServerResponse<List<LearningActivity>> results =
                     await ServerUtils.Get<List<LearningActivity>>(
-                        "/api/learningactivities/getfromuser/?creatorId=" + dbManager.currentUser.Id);
+                        "/api/learningactivities/getfromuser/?creatorId=" + dbManager.CurrentUser.Id);
                 refresher.Refreshing = false;
 
                 if (results == null)
@@ -138,14 +138,14 @@ namespace OurPlace.Android.Fragments
                 }
 
                 // Save this in the offline cache
-                dbManager.currentUser.RemoteCreatedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                dbManager.CurrentUser.RemoteCreatedActivitiesJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects,
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                         MaxDepth = 5
                     });
-                dbManager.AddUser(dbManager.currentUser);
+                dbManager.AddUser(dbManager.CurrentUser);
 
                 List<LearningActivity> recentlyOpened = dbManager.GetActivities();
                 foreach (LearningActivity cachedActivity in recentlyOpened)
@@ -240,8 +240,8 @@ namespace OurPlace.Android.Fragments
                 Resource.Color.app_lightergreen
             );
 
-            FloatingActionButton fab = view.FindViewById<FloatingActionButton>(Resource.Id.createActivityFab);
-            fab.Click += Fab_Click;
+            OneMoreFabMenu fab = view.FindViewById<OneMoreFabMenu>(Resource.Id.fabMenu);
+            fab.SetOptionsClick(this);
 
             recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetLayoutManager(layoutManager);
@@ -252,11 +252,18 @@ namespace OurPlace.Android.Fragments
             LoadRemoteData();
         }
 
-        private void Fab_Click(object sender, EventArgs e)
+        public void OnOptionClick(Java.Lang.Integer p0)
         {
-            Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
-            requiresStorageIntent = new Intent(Activity, typeof(CreateNewActivity));
-            LaunchWithStoragePermissions();
+            switch (Convert.ToInt32(p0))
+            {
+                case Resource.Id.fabCreateAct:
+                    Analytics.TrackEvent("MainMyActivitiesFragment_StartCreate");
+                    requiresStorageIntent = new Intent(Activity, typeof(CreateNewActivity));
+                    LaunchWithStoragePermissions();
+                    break;
+                case Resource.Id.fabCreateColl:
+                    break;
+            }
         }
 
         private void LaunchWithStoragePermissions()

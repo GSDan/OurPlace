@@ -229,7 +229,7 @@ namespace OurPlace.Android.Activities.Create
         {
             if (newActivity == null)
             {
-                ApplicationUser currentUser = (await Common.LocalData.Storage.GetDatabaseManager()).currentUser;
+                ApplicationUser currentUser = (await Common.LocalData.Storage.GetDatabaseManager()).CurrentUser;
 
                 newActivity = new LearningActivity
                 {

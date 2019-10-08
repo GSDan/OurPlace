@@ -168,10 +168,10 @@ namespace OurPlace.Android.Activities.Create
                             dbManager = await GetDatabaseManager();
                         }
 
-                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.currentUser.LocalCreatedActivitiesJson);
+                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.CurrentUser.LocalCreatedActivitiesJson);
                         localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
-                        dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
-                        dbManager.AddUser(dbManager.currentUser);
+                        dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                        dbManager.AddUser(dbManager.CurrentUser);
                         MainMyActivitiesFragment.ForceRefresh = true;
                         Finish();
                     }
@@ -274,7 +274,7 @@ namespace OurPlace.Android.Activities.Create
             }
 
             // Add/update this new activity in the user's inprogress cache
-            string cacheJson = dbManager.currentUser.LocalCreatedActivitiesJson;
+            string cacheJson = dbManager.CurrentUser.LocalCreatedActivitiesJson;
             List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
                 new List<LearningActivity>() :
                 JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
@@ -291,8 +291,8 @@ namespace OurPlace.Android.Activities.Create
                 inProgress.Insert(0, newActivity);
             }
 
-            dbManager.currentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
-            dbManager.AddUser(dbManager.currentUser);
+            dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
+            dbManager.AddUser(dbManager.CurrentUser);
             MainMyActivitiesFragment.ForceRefresh = true;
         }
 

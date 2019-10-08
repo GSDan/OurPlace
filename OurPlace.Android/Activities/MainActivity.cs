@@ -112,13 +112,13 @@ namespace OurPlace.Android.Activities
         {
             DatabaseManager manager = await GetDbManager();
 
-            if (manager.currentUser == null)
+            if (manager.CurrentUser == null)
             {
                 // Something bad has happened, log out
                 var suppress = AndroidUtils.ReturnToSignIn(this);
             }
 
-            return manager.currentUser;
+            return manager.CurrentUser;
         }
 
         public async Task<List<ActivityFeedSection>> GetCachedActivities(bool ownedOnly)
@@ -319,7 +319,7 @@ namespace OurPlace.Android.Activities
 
             Dictionary<string, string> properties = new Dictionary<string, string>
             {
-                { "UserId", (await GetDbManager()).currentUser.Id},
+                { "UserId", (await GetDbManager()).CurrentUser.Id},
                 { "ActivityId", activity.Id.ToString() }
             };
             Analytics.TrackEvent("MainActivity_LaunchActivity", properties);

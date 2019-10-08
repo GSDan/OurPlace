@@ -172,7 +172,7 @@ namespace OurPlace.Android.Adapters
             string truncatedDesc = Helpers.Truncate(thisAct.Description, 100);
             vh.Description.Text = truncatedDesc;
 
-            bool thisAuthor = thisAct.Author?.Id == dbManager.currentUser.Id;
+            bool thisAuthor = thisAct.Author?.Id == dbManager.CurrentUser.Id;
 
             if (thisAuthor && (thisAct.Approved || thisAct.IsPublic == false))
             {

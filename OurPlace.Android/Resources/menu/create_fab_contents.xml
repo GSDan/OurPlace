@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <!-- First button is the initial Fab of the menu -->
+  <!-- Don't need the title in this case, so let it empty -->
+  <item
+      android:id="@+id/main_option"
+      android:icon="@drawable/ic_add_white_36dp"
+      android:title=""/>
+
+  <!-- Options buttons of the Fab menu -->
+
+  <item
+      android:id="@+id/fabCreateAct"
+      android:icon="@drawable/ic_image_white_24dp"
+      android:title="@string/createNewActivityFabNewAct" />
+
+  <item
+      android:id="@+id/fabCreateColl"
+      android:icon="@drawable/ic_image_album_white_24dp"
+      android:title="@string/createNewActivityFabNewColl" />
+</menu>

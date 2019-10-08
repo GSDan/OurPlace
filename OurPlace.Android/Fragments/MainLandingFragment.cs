@@ -261,14 +261,14 @@ namespace OurPlace.Android.Fragments
                 // Save this in the offline cache
                 DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
 
-                dbManager.currentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                dbManager.CurrentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects,
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                         MaxDepth = 6
                     });
-                dbManager.AddUser(dbManager.currentUser);
+                dbManager.AddUser(dbManager.CurrentUser);
 
                 // Check for recently opened activities
 
