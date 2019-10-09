@@ -11,7 +11,7 @@ using FFImageLoading.Transformations;
 
 namespace OurPlace.Android.Adapters
 {
-    class ActivityCollectionAdapter : RecyclerView.Adapter
+    class ActivityCollectionAdapter : RecyclerView.Adapter, ItemTouchHelperAdapter
     {
         public event EventHandler<int> EditCollectionClick;
         public event EventHandler<int> FinishClick;
@@ -45,25 +45,14 @@ namespace OurPlace.Android.Adapters
             return collection.Activities[position].Id;
         }
 
-        public bool onItemMove(int fromPosition, int toPosition)
+        public override int GetItemViewType(int position)
         {
-            // Account for the header and finish cards
-            int dataFrom = fromPosition - 1;
-
-            if (dataFrom < 0 || dataFrom >= collection.Activities.Count)
+            if (position == 0)
             {
-                return false;
+                return 0;
             }
 
-            int dataTo = Math.Min(toPosition - 1, collection.Activities.Count - 1);
-            dataTo = Math.Max(dataTo, 0);
-
-            collection.Activities.Swap(dataFrom, dataTo);
-            NotifyItemMoved(fromPosition, toPosition);
-
-            SaveProgress?.Invoke();
-
-            return true;
+            return position > collection.Activities?.Count ? 2 : 1;
         }
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -173,6 +162,32 @@ namespace OurPlace.Android.Adapters
         private void OnFinishClick(int position)
         {
             FinishClick?.Invoke(this, position);
+        }
+
+        public bool onItemMove(int fromPosition, int toPosition)
+        {
+            // Account for the header and finish cards
+            int dataFrom = fromPosition - 1;
+
+            if (dataFrom < 0 || dataFrom >= collection.Activities.Count)
+            {
+                return false;
+            }
+
+            int dataTo = Math.Min(toPosition - 1, collection.Activities.Count - 1);
+            dataTo = Math.Max(dataTo, 0);
+
+            collection.Activities.Swap(dataFrom, dataTo);
+            NotifyItemMoved(fromPosition, toPosition);
+
+            SaveProgress?.Invoke();
+
+            return true;
+        }
+
+        public void onItemDismiss(int position)
+        {
+            throw new NotImplementedException();
         }
     }
 

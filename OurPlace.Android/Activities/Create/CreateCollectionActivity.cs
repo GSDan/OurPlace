@@ -13,6 +13,7 @@ using OurPlace.Android.Adapters;
 using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -218,7 +219,8 @@ namespace OurPlace.Android.Activities.Create
                         FirstName = currentUser.FirstName,
                         Surname = currentUser.Surname
                     },
-                    Id = new Random().Next() // Temp ID, used locally only
+                    Id = new Random().Next(),// Temp ID, used locally only
+                    Activities = new List<LimitedLearningActivity>()
                 };
             }
 
