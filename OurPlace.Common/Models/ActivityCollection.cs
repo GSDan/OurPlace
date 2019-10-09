@@ -25,7 +25,7 @@ namespace OurPlace.Common.Models
         public string InviteCode { get; set; }
         public bool SoftDeleted { get; set; }
 
-        public virtual IEnumerable<LimitedLearningActivity> Activities { get; set; }
+        public virtual List<LimitedLearningActivity> Activities { get; set; }
         public virtual Application Application { get; set; }
 
         public int CollectionVersionNumber { get; set; }

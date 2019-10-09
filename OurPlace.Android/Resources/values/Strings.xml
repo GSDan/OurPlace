@@ -153,6 +153,11 @@
   <string name="createCollectionActivityLocation">This Activity is at: {0}</string>
   <string name="createCollectionActivityNoLocation">This Activity doesn\'t have a location assigned to it.</string>
   <string name="createCollectionViewActivityLocation">View Location</string>
+  <string name="createCollectionNameHint">What\'s the title of your collection?</string>
+  <string name="createCollectionNameErr">Please enter a name for your collection!</string>
+  <string name="createCollectionDescriptionHint">Enter a description of your collection-what\'s it about? What ties the Activities together?</string>
+  <string name="createCollectionDescriptionErr">Please enter a description for your collection!</string>
+  <string name="createCollectionNoImageWarning">You haven\'t chosen a cover image for your collection - are you sure you want to continue?</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>
