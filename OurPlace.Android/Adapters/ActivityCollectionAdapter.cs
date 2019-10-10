@@ -19,14 +19,14 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> DeleteItemClick;
 
         private readonly Context context;
-        private ActivityCollection collection;
+        public ActivityCollection Collection { get; private set; }
 
         public Action SaveProgress;
 
         public ActivityCollectionAdapter(Context context, ActivityCollection thisCollection, Action save)
         {
             this.context = context;
-            collection = thisCollection;
+            Collection = thisCollection;
             SaveProgress = save;
         }
 
@@ -37,12 +37,12 @@ namespace OurPlace.Android.Adapters
                 return -2;
             }
 
-            if (position >= collection.Activities?.Count)
+            if (position >= Collection.Activities?.Count)
             {
                 return -1;
             }
 
-            return collection.Activities[position].Id;
+            return Collection.Activities[position].Id;
         }
 
         public override int GetItemViewType(int position)
@@ -52,7 +52,7 @@ namespace OurPlace.Android.Adapters
                 return 0;
             }
 
-            return position > collection.Activities?.Count ? 2 : 1;
+            return position > Collection.Activities?.Count ? 2 : 1;
         }
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -64,17 +64,32 @@ namespace OurPlace.Android.Adapters
                     return;
                 }
 
-                avh.Title.Text = collection.Name;
-                avh.Description.Text = collection.Description;
+                avh.Title.Text = Collection.Name;
+                avh.Description.Text = Collection.Description;
+
+                if (string.IsNullOrWhiteSpace(Collection.ImageUrl)) return;
+
+                if (Collection.ImageUrl.StartsWith("upload"))
+                {
+                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(Collection.ImageUrl))
+                        .Transform(new CircleTransformation())
+                        .Into(avh.TaskTypeIcon);
+                }
+                else
+                {
+                    ImageService.Instance.LoadFile(Collection.ImageUrl)
+                        .Transform(new CircleTransformation())
+                        .Into(avh.TaskTypeIcon);
+                }
 
                 return;
             }
 
-            if (position > collection.Activities?.Count)
+            if (position > Collection.Activities?.Count)
             {
                 // Allow the collection to be submitted if there's at least two activities
                 ButtonViewHolder bvh = holder as ButtonViewHolder;
-                bvh.Button.Enabled = collection.Activities.Count > 1;
+                bvh.Button.Enabled = Collection.Activities.Count > 1;
                 return;
             }
 
@@ -85,7 +100,7 @@ namespace OurPlace.Android.Adapters
                 return;
             }
 
-            LimitedLearningActivity thisActivity = collection.Activities[position];
+            LimitedLearningActivity thisActivity = Collection.Activities[position];
 
             vh.Title.Text = thisActivity.Name;
             vh.Description.Text = thisActivity.Description;
@@ -135,12 +150,12 @@ namespace OurPlace.Android.Adapters
         {
             get
             {
-                if (collection.Activities == null)
+                if (Collection.Activities == null)
                 {
                     return 2;
                 }
 
-                return collection.Activities.Count + 2;
+                return Collection.Activities.Count + 2;
             }
         }
 
@@ -169,20 +184,26 @@ namespace OurPlace.Android.Adapters
             // Account for the header and finish cards
             int dataFrom = fromPosition - 1;
 
-            if (dataFrom < 0 || dataFrom >= collection.Activities.Count)
+            if (dataFrom < 0 || dataFrom >= Collection.Activities.Count)
             {
                 return false;
             }
 
-            int dataTo = Math.Min(toPosition - 1, collection.Activities.Count - 1);
+            int dataTo = Math.Min(toPosition - 1, Collection.Activities.Count - 1);
             dataTo = Math.Max(dataTo, 0);
 
-            collection.Activities.Swap(dataFrom, dataTo);
+            Collection.Activities.Swap(dataFrom, dataTo);
             NotifyItemMoved(fromPosition, toPosition);
 
             SaveProgress?.Invoke();
 
             return true;
+        }
+
+        public void UpdateActivity(ActivityCollection newColl)
+        {
+            Collection = newColl;
+            NotifyItemChanged(0);
         }
 
         public void onItemDismiss(int position)

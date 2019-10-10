@@ -43,6 +43,10 @@ namespace OurPlace.Common.Models
         public string RemoteCreatedActivitiesJson { get; set; }
         public string LocalCreatedActivitiesJson { get; set; }
 
+        public string CachedCollectionsJson { get; set; }
+        public string RemoteCreatedCollectionsJson { get; set; }
+        public string LocalCreatedCollectionsJson { get; set; }
+
     }
 
     public class LimitedApplicationUser
