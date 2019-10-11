@@ -121,7 +121,7 @@ namespace OurPlace.Android.Activities
             return manager.CurrentUser;
         }
 
-        public async Task<List<ActivityFeedSection>> GetCachedActivities(bool ownedOnly)
+        public async Task<List<FeedSection>> GetCachedActivities(bool ownedOnly)
         {
             ApplicationUser currentUser = await GetCurrentUser();
 
@@ -131,9 +131,9 @@ namespace OurPlace.Android.Activities
 
             try
             {
-                if (string.IsNullOrWhiteSpace(jsonCache)) return new List<ActivityFeedSection>();
+                if (string.IsNullOrWhiteSpace(jsonCache)) return new List<FeedSection>();
 
-                return JsonConvert.DeserializeObject<List<ActivityFeedSection>>(jsonCache,
+                return JsonConvert.DeserializeObject<List<FeedSection>>(jsonCache,
                     new JsonSerializerSettings
                     {
                         //TypeNameHandling = TypeNameHandling.Objects,
@@ -152,7 +152,7 @@ namespace OurPlace.Android.Activities
                     (await GetDbManager()).AddUser(currentUser);
                 }
 
-                return new List<ActivityFeedSection>();
+                return new List<FeedSection>();
             }
         }
 

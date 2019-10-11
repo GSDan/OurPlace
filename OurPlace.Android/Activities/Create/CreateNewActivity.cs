@@ -233,7 +233,7 @@ namespace OurPlace.Android.Activities.Create
 
                 newActivity = new LearningActivity
                 {
-                    Author = new ApplicationUser()
+                    Author = new LimitedApplicationUser()
                     {
                         Id = currentUser.Id,
                         FirstName = currentUser.FirstName,

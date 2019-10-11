@@ -609,7 +609,7 @@ namespace OurPlace.Android.Activities
             }
 
 
-            ApplicationUser creator = learningActivity.Author;
+            LimitedApplicationUser creator = learningActivity.Author;
             if (creator != null && creator.Id != dbManager.CurrentUser.Id)
             {
                 string name = creator.FirstName[0] + ". " + creator.Surname;

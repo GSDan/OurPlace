@@ -46,7 +46,7 @@ namespace OurPlace.Android.Fragments
 {
     public class MainLandingFragment : Fragment, GoogleApiClient.IConnectionCallbacks, GoogleApiClient.IOnConnectionFailedListener
     {
-        private LearningActivitiesAdapter adapter;
+        private FeedItemsAdapter adapter;
         private RecyclerView recyclerView;
         private GridLayoutManager layoutManager;
         private SwipeRefreshLayout refresher;
@@ -62,10 +62,10 @@ namespace OurPlace.Android.Fragments
 
             // Load from cached data from the database if available, 
             // just in case we can't contact the server
-            List<ActivityFeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
+            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
 
             // Check for recently opened activities
-            ActivityFeedSection recents = await LoadRecent();
+            FeedSection recents = await LoadRecent();
             if (recents != null)
             {
                 cached.Insert(0, recents);
@@ -76,12 +76,12 @@ namespace OurPlace.Android.Fragments
 
             int cols = Math.Max(widthInDp / 300, 1);
 
-            adapter = new LearningActivitiesAdapter(cached, await ((MainActivity)Activity).GetDbManager());
+            adapter = new FeedItemsAdapter(cached, await ((MainActivity)Activity).GetDbManager());
             adapter.ItemClick += OnItemClick;
 
             if (savedInstanceState != null)
             {
-                adapter.Data = JsonConvert.DeserializeObject<List<ActivityFeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
+                adapter.Data = JsonConvert.DeserializeObject<List<FeedSection>>(savedInstanceState.GetString("MAIN_ADAPTER_DATA"));
                 adapter.NotifyDataSetChanged();
             }
 
@@ -225,8 +225,8 @@ namespace OurPlace.Android.Fragments
                     });
                 }
 
-                Common.ServerResponse<List<ActivityFeedSection>> results =
-                    await Common.ServerUtils.Get<List<ActivityFeedSection>>($"/api/learningactivities/GetFeed?lat={lat}&lon={lon}");
+                Common.ServerResponse<List<FeedSection>> results =
+                    await Common.ServerUtils.Get<List<FeedSection>>($"/api/learningactivities/GetFeed?lat={lat}&lon={lon}");
 
                 refresher.Refreshing = false;
 
@@ -237,7 +237,7 @@ namespace OurPlace.Android.Fragments
                     return;
                 }
 
-                ActivityFeedSection recent = await LoadRecent();
+                FeedSection recent = await LoadRecent();
 
                 if (!results.Success)
                 {
@@ -293,16 +293,17 @@ namespace OurPlace.Android.Fragments
         /// Load recently opened Activities
         /// </summary>
         /// <returns></returns>
-        private async Task<ActivityFeedSection> LoadRecent()
+        private async Task<FeedSection> LoadRecent()
         {
             List<LearningActivity> recentlyOpened = (await ((MainActivity)Activity).GetDbManager()).GetActivities();
+
             if (recentlyOpened != null && recentlyOpened.Count > 0)
             {
-                return new ActivityFeedSection
+                return new FeedSection
                 {
                     Title = Resources.GetString(Resource.String.feedRecentTitle),
                     Description = Resources.GetString(Resource.String.feedRecentDesc),
-                    Activities = recentlyOpened
+                    Items = recentlyOpened
                 };
             }
             return null;
@@ -310,15 +311,20 @@ namespace OurPlace.Android.Fragments
 
         private void OnItemClick(object sender, int position)
         {
-            LearningActivity act = adapter.GetItem(position);
-            if (act != null)
+            FeedItem item = adapter.GetItem(position);
+
+            if(item == null)
+            {
+                Toast.MakeText(Activity, GetString(Resource.String.ErrorTitle), ToastLength.Short).Show();
+            }
+            else if (item is LearningActivity act)
             {
                 viewLoaded = false;
                 ((MainActivity)Activity).LaunchActivity(act);
             }
             else
             {
-                Toast.MakeText(Activity, "ERROR", ToastLength.Short).Show();
+                // TODO collection clicked
             }
         }
 

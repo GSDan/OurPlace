@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
+using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
 using Android.Views;
@@ -19,7 +20,7 @@ using System.Collections.Generic;
 namespace OurPlace.Android.Activities.Create
 {
     [Activity(Label = "Edit Collection", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity), LaunchMode = LaunchMode.SingleTask)]
-    public class CreateCollectionOverviewActivity : Activity
+    public class CreateCollectionOverviewActivity : AppCompatActivity
     {
         private ActivityCollection newCollection;
         private bool editingSubmitted;
@@ -68,6 +69,7 @@ namespace OurPlace.Android.Activities.Create
         {
             Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
             StartActivityForResult(intent, addActivityIntent);
+            intent.Dispose();
         }
 
         private void Adapter_OpenLocationClick(object sender, int e)
@@ -87,6 +89,7 @@ namespace OurPlace.Android.Activities.Create
             newCollection = adapter.Collection;
             intent.PutExtra("JSON", JsonConvert.SerializeObject(newCollection));
             StartActivityForResult(intent, editCollectionIntent);
+            intent.Dispose();
         }
 
         private void Adapter_DeleteItemClick(object sender, int e)

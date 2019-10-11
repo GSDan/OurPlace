@@ -32,12 +32,12 @@ namespace OurPlace.iOS.ViewSources
 {
     public class ActivityViewSource : UICollectionViewSource
     {
-        public List<ActivityFeedSection> Rows { get; set; }
+        public List<FeedSection> Rows { get; set; }
         public Single FontSize { get; set; }
 
         public ActivityViewSource() : base()
         {
-            Rows = new List<ActivityFeedSection>();
+            Rows = new List<FeedSection>();
         }
 
         public override nint NumberOfSections(UICollectionView collectionView)
@@ -51,16 +51,16 @@ namespace OurPlace.iOS.ViewSources
             if (Rows != null &&
                Rows.Count >= section &&
                Rows[(int)section] != null &&
-               Rows[(int)section].Activities != null)
+               Rows[(int)section].Items != null)
             {
-                return Rows[(int)section].Activities.Count;
+                return Rows[(int)section].Items.Count;
             }
             return 0;
         }
 
         public override UICollectionViewCell GetCell(UICollectionView collectionView, Foundation.NSIndexPath indexPath)
         {
-            LearningActivity row = Rows[indexPath.Section]?.Activities[indexPath.Row];
+            LearningActivity row = Rows[indexPath.Section]?.Items[indexPath.Row];
 
             if (row == null) return null;
 

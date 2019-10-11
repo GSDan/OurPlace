@@ -30,6 +30,7 @@ using OurPlace.Common.Models;
 using SectionedRecyclerview.Droid;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Object = Java.Lang.Object;
 
 namespace OurPlace.Android.Adapters
@@ -51,15 +52,15 @@ namespace OurPlace.Android.Adapters
         }
     }
 
-    public class LearningActivitiesAdapter : SectionedRecyclerViewAdapter
+    public class FeedItemsAdapter : SectionedRecyclerViewAdapter
     {
-        public List<ActivityFeedSection> Data;
+        public List<FeedSection> Data;
         public event EventHandler<int> ItemClick;
         private readonly DatabaseManager dbManager;
 
         private const int Header = -2;
 
-        public LearningActivitiesAdapter(List<ActivityFeedSection> data, DatabaseManager dbManager)
+        public FeedItemsAdapter(List<FeedSection> data, DatabaseManager dbManager)
         {
             Data = data;
             this.dbManager = dbManager;
@@ -72,7 +73,7 @@ namespace OurPlace.Android.Adapters
             ItemClick?.Invoke(this, position);
         }
 
-        public LearningActivity GetItem(int position)
+        public FeedItem GetItem(int position)
         {
             if (position < 0)
             {
@@ -80,14 +81,15 @@ namespace OurPlace.Android.Adapters
             }
 
             int checkedItems = 0;
-            foreach (ActivityFeedSection section in Data)
+            foreach (FeedSection section in Data)
             {
                 checkedItems++; //include header
-                if (section.Activities.Count + checkedItems > position)
+                int itemsInSection = section.Items.Count();
+                if (itemsInSection + checkedItems > position)
                 {
-                    return section.Activities[position - checkedItems];
+                    return section.Items.ElementAt(position - checkedItems);
                 }
-                checkedItems += section.Activities.Count;
+                checkedItems += itemsInSection;
             }
             return null;
         }
@@ -117,9 +119,9 @@ namespace OurPlace.Android.Adapters
         {
             if (Data != null &&
                 Data.Count > sectionInd &&
-                Data[sectionInd].Activities != null)
+                Data[sectionInd].Items != null)
             {
-                return Data[sectionInd].Activities.Count;
+                return Data[sectionInd].Items.Count();
             }
             return 0;
         }
@@ -145,19 +147,19 @@ namespace OurPlace.Android.Adapters
             LearningActivityViewHolder vh = holder as LearningActivityViewHolder;
             TaskParameter imTask;
 
-            LearningActivity thisAct = Data[sectionInd].Activities[relativePos];
+            FeedItem thisItem = Data[sectionInd].Items.ElementAt(relativePos);
 
-            if (string.IsNullOrWhiteSpace(thisAct.ImageUrl))
+            if (string.IsNullOrWhiteSpace(thisItem.ImageUrl))
             {
                 imTask = ImageService.Instance.LoadCompiledResource("logoRect");
             }
-            else if (thisAct.ImageUrl.StartsWith("/data", StringComparison.Ordinal))
+            else if (thisItem.ImageUrl.StartsWith("/data", StringComparison.Ordinal))
             {
-                imTask = ImageService.Instance.LoadFile(thisAct.ImageUrl);
+                imTask = ImageService.Instance.LoadFile(thisItem.ImageUrl);
             }
             else
             {
-                imTask = ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(thisAct.ImageUrl));
+                imTask = ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(thisItem.ImageUrl));
             }
 
             imTask.DownSampleInDip(width: 150);
@@ -167,14 +169,14 @@ namespace OurPlace.Android.Adapters
             }
 
             imTask.Into(vh.Image);
-            vh.Name.Text = thisAct.Name;
+            vh.Name.Text = thisItem.Name;
 
-            string truncatedDesc = Helpers.Truncate(thisAct.Description, 100);
+            string truncatedDesc = Helpers.Truncate(thisItem.Description, 100);
             vh.Description.Text = truncatedDesc;
 
-            bool thisAuthor = thisAct.Author?.Id == dbManager.CurrentUser.Id;
+            bool thisAuthor = thisItem.Author?.Id == dbManager.CurrentUser.Id;
 
-            if (thisAuthor && (thisAct.Approved || thisAct.IsPublic == false))
+            if (thisAuthor && (thisItem.Approved || thisItem.IsPublic == false))
             {
                 vh.StatusText.Visibility = ViewStates.Gone;
                 vh.TickIcon.Visibility = ViewStates.Visible;
@@ -190,6 +192,7 @@ namespace OurPlace.Android.Adapters
                 vh.StatusText.Visibility = ViewStates.Gone;
                 vh.TickIcon.Visibility = ViewStates.Gone;
             }
+            
         }
     }
 }

@@ -4,12 +4,11 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
+using Android.Support.V7.App;
 using Android.Widget;
 using FFImageLoading;
 using FFImageLoading.Transformations;
 using Newtonsoft.Json;
-using OurPlace.Android.Adapters;
 using OurPlace.Common;
 using OurPlace.Common.Models;
 using System;
@@ -21,7 +20,7 @@ using System.Threading.Tasks;
 namespace OurPlace.Android.Activities.Create
 {
     [Activity(Label = "Create a New Collection", Theme = "@style/OurPlaceActionBar", ParentActivity = typeof(MainActivity))]
-    public class CreateCollectionActivity : Activity
+    public class CreateCollectionActivity : AppCompatActivity
     {
         private ActivityCollection newCollection;
         private EditText titleInput;
@@ -220,7 +219,7 @@ namespace OurPlace.Android.Activities.Create
                         Surname = currentUser.Surname
                     },
                     Id = new Random().Next(),// Temp ID, used locally only
-                    Activities = new List<LimitedLearningActivity>()
+                    Activities = new List<LearningActivity>()
                 };
             }
 

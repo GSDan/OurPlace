@@ -19,32 +19,20 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+using OurPlace.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace OurPlace.Common.Models
 {
-    public class LearningActivity : LimitedLearningActivity
+    public class LearningActivity : FeedItem
     {
-        public new ApplicationUser Author { get; set; }
-    }
-
-    public class LimitedLearningActivity : Model
-    {
-        public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
-        public bool IsPublic { get; set; }
-        public string Description { get; set; }
-        public string ImageUrl { get; set; }
-        public bool Approved { get; set; }
         public string InviteCode { get; set; }
         public bool RequireUsername { get; set; }
-
-        public LimitedApplicationUser Author { get; set; }
         public IEnumerable<LearningTask> LearningTasks { get; set; }
         public IEnumerable<Place> Places { get; set; }
         public Application Application { get; set; }
-
         public int AppVersionNumber { get; set; }
         public int ActivityVersionNumber { get; set; }
     }

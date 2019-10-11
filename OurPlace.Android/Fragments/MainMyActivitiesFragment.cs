@@ -44,12 +44,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OurPlace.Common.Interfaces;
 
 namespace OurPlace.Android.Fragments
 {
     public class MainMyActivitiesFragment : global::Android.Support.V4.App.Fragment, OneMoreFabMenu.IOptionsClick
     {
-        private LearningActivitiesAdapter adapter;
+        private FeedItemsAdapter adapter;
         private RecyclerView recyclerView;
         private GridLayoutManager layoutManager;
         private TextView fabPrompt;
@@ -60,7 +61,7 @@ namespace OurPlace.Android.Fragments
         private bool refreshingData = true;
         private bool viewLoaded;
         private Intent requiresStorageIntent;
-        public static bool ForceRefresh;
+        public static bool ForceRefresh { get; set; }
 
         public override async void OnCreate(Bundle savedInstanceState)
         {
@@ -68,13 +69,13 @@ namespace OurPlace.Android.Fragments
 
             // Load from cached data from the database if available, 
             // just in case we can't contact the server
-            List<ActivityFeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
+            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
 
             var metrics = Resources.DisplayMetrics;
             var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
             int cols = Math.Max(widthInDp / 300, 1);
 
-            adapter = new LearningActivitiesAdapter(cached, await ((MainActivity)Activity).GetDbManager());
+            adapter = new FeedItemsAdapter(cached, await ((MainActivity)Activity).GetDbManager());
             adapter.ItemClick += OnItemClick;
             layoutManager = new GridLayoutManager(Activity, cols);
             layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
@@ -171,7 +172,7 @@ namespace OurPlace.Android.Fragments
 
         private async Task LoadIntoFeed(List<LearningActivity> remoteData)
         {
-            List<ActivityFeedSection> feed = new List<ActivityFeedSection>();
+            List<FeedSection> feed = new List<FeedSection>();
 
             string unsubmittedActivitiesJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedActivitiesJson;
             unsubmittedActivities = null;
@@ -191,22 +192,22 @@ namespace OurPlace.Android.Fragments
             // Add a section to the feed if the user has activities which they didn't finish creating
             if (unsubmittedActivities != null && unsubmittedActivities.Count > 0)
             {
-                feed.Add(new ActivityFeedSection
+                feed.Add(new FeedSection
                 {
                     Title = Resources.GetString(Resource.String.createdLocalTitle),
                     Description = Resources.GetString(Resource.String.createdLocalDesc),
-                    Activities = unsubmittedActivities
+                    Items = unsubmittedActivities
                 });
             }
 
             // Add a section to the feed if the user has activities stored on the remote server
             if (remoteData != null && remoteData.Count > 0)
             {
-                feed.Add(new ActivityFeedSection
+                feed.Add(new FeedSection
                 {
                     Title = Resources.GetString(Resource.String.createdFeedTitle),
                     Description = Resources.GetString(Resource.String.createdFeedDesc),
-                    Activities = remoteData
+                    Items = remoteData
                 });
             }
 
@@ -323,7 +324,7 @@ namespace OurPlace.Android.Fragments
 
         private void OnItemClick(object sender, int position)
         {
-            LearningActivity chosen = adapter.GetItem(position);
+            FeedItem chosen = adapter.GetItem(position);
 
             if (chosen == null)
             {
@@ -331,23 +332,30 @@ namespace OurPlace.Android.Fragments
                 return;
             }
 
-            bool inProgress = unsubmittedActivities != null && unsubmittedActivities.Exists((la) => chosen.Id == la.Id);
+            if(chosen is LearningActivity chosenAct)
+            {
+                bool inProgress = unsubmittedActivities != null && unsubmittedActivities.Exists((la) => chosenAct.Id == la.Id);
 
-            if (inProgress)
-            {
-                EditActivity(chosen, true);
+                if (inProgress)
+                {
+                    EditActivity(chosenAct, true);
+                }
+                else
+                {
+                    new AlertDialog.Builder(Activity)
+                        .SetTitle(chosen.Name)
+                        .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditActivity(chosenAct, false); })
+                        .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
+                        .SetCancelable(true)
+                        .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosenAct.InviteCode)))
+                        .SetNegativeButton(Resource.String.createdActivityDialogOpen,
+                        (a, b) => { ((MainActivity)Activity).LaunchActivity(chosenAct); })
+                        .Show();
+                }
             }
-            else
+            else if(chosen is ActivityCollection chosenColl)
             {
-                new AlertDialog.Builder(Activity)
-                    .SetTitle(chosen.Name)
-                    .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditActivity(chosen, false); })
-                    .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
-                    .SetCancelable(true)
-                    .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosen.InviteCode)))
-                    .SetNegativeButton(Resource.String.createdActivityDialogOpen,
-                    (a, b) => { ((MainActivity)Activity).LaunchActivity(chosen); })
-                    .Show();
+                //TODO
             }
         }
 

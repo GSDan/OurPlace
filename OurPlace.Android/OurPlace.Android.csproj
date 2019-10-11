@@ -381,7 +381,7 @@
     <Compile Include="Adapters\UploadsAdapter.cs" />
     <Compile Include="Adapters\ViewHolders.cs" />
     <Compile Include="AndroidUtils.cs" />
-    <Compile Include="Adapters\LearningActivitiesAdapter.cs" />
+    <Compile Include="Adapters\FeedItemsAdapter.cs" />
     <Compile Include="Fragments\CustomScannerFragment.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Misc\AlwaysVisibleMediaController.cs" />
@@ -606,11 +606,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\ids.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\values\apiKeys.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-hdpi\ic_play_circle_filled_white_24dp.png" />
@@ -1272,6 +1267,9 @@
     <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\apiKeys.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

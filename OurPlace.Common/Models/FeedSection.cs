@@ -23,18 +23,10 @@ using System.Collections.Generic;
 
 namespace OurPlace.Common.Models
 {
-    public class ActivityFeedSection
+    public class FeedSection
     {
         public string Title;
         public string Description;
-        public List<LearningActivity> Activities;
-    }
-
-    public class LimitedActivityFeedSection
-    {
-        public string Title;
-        public string Description;
-        public List<LimitedLearningActivity> Activities;
-        public List<LimitedActivityCollection> Collections;
+        public IEnumerable<FeedItem> Items;
     }
 }

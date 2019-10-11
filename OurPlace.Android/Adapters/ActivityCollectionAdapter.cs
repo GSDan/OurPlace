@@ -100,7 +100,7 @@ namespace OurPlace.Android.Adapters
                 return;
             }
 
-            LimitedLearningActivity thisActivity = Collection.Activities[position];
+            LearningActivity thisActivity = Collection.Activities[position];
 
             vh.Title.Text = thisActivity.Name;
             vh.Description.Text = thisActivity.Description;
