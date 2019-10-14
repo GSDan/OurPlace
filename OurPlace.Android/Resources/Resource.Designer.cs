@@ -5424,31 +5424,37 @@ namespace OurPlace.Android
 			public const int createCollectionViewActivityLocation = 2131689601;
 			
 			// aapt resource value: 0x7F0F00C5
-			public const int createdActivityDialogDelete = 2131689669;
+			public const int createdActivitiesLocalDesc = 2131689669;
 			
 			// aapt resource value: 0x7F0F00C6
-			public const int createdActivityDialogMessage = 2131689670;
+			public const int createdActivitiesLocalTitle = 2131689670;
 			
 			// aapt resource value: 0x7F0F00C7
-			public const int createdActivityDialogOpen = 2131689671;
+			public const int createdActivityDialogDelete = 2131689671;
 			
 			// aapt resource value: 0x7F0F00C8
-			public const int createdActivityDialogTitle = 2131689672;
+			public const int createdActivityDialogMessage = 2131689672;
 			
 			// aapt resource value: 0x7F0F00C9
-			public const int createdActivityDialogUnfinishedMessage = 2131689673;
+			public const int createdActivityDialogOpen = 2131689673;
 			
 			// aapt resource value: 0x7F0F00CA
-			public const int createdFeedDesc = 2131689674;
+			public const int createdActivityDialogTitle = 2131689674;
 			
 			// aapt resource value: 0x7F0F00CB
-			public const int createdFeedTitle = 2131689675;
+			public const int createdActivityDialogUnfinishedMessage = 2131689675;
 			
 			// aapt resource value: 0x7F0F00CC
-			public const int createdLocalDesc = 2131689676;
+			public const int createdCollectionsLocalDesc = 2131689676;
 			
 			// aapt resource value: 0x7F0F00CD
-			public const int createdLocalTitle = 2131689677;
+			public const int createdCollectionsLocalTitle = 2131689677;
+			
+			// aapt resource value: 0x7F0F00CE
+			public const int createdFeedDesc = 2131689678;
+			
+			// aapt resource value: 0x7F0F00CF
+			public const int createdFeedTitle = 2131689679;
 			
 			// aapt resource value: 0x7F0F0082
 			public const int createFinishActivityHeader = 2131689602;
@@ -5654,38 +5660,38 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0007
 			public const int DeleteBtn = 2131689479;
 			
-			// aapt resource value: 0x7F0F00CE
-			public const int deleteMessage = 2131689678;
-			
-			// aapt resource value: 0x7F0F00CF
-			public const int deleteTitle = 2131689679;
-			
 			// aapt resource value: 0x7F0F00D0
-			public const int dialog_cancel = 2131689680;
+			public const int deleteMessage = 2131689680;
 			
 			// aapt resource value: 0x7F0F00D1
-			public const int dialog_ok = 2131689681;
+			public const int deleteTitle = 2131689681;
 			
 			// aapt resource value: 0x7F0F00D2
-			public const int editActivityBackWarning = 2131689682;
+			public const int dialog_cancel = 2131689682;
 			
 			// aapt resource value: 0x7F0F00D3
-			public const int editActivityBackWarningAccept = 2131689683;
+			public const int dialog_ok = 2131689683;
+			
+			// aapt resource value: 0x7F0F00D4
+			public const int editActivityBackWarning = 2131689684;
+			
+			// aapt resource value: 0x7F0F00D5
+			public const int editActivityBackWarningAccept = 2131689685;
 			
 			// aapt resource value: 0x7F0F0008
 			public const int EditBtn = 2131689480;
 			
-			// aapt resource value: 0x7F0F00D4
-			public const int editNameBtn = 2131689684;
-			
-			// aapt resource value: 0x7F0F00D5
-			public const int enteredName = 2131689685;
-			
 			// aapt resource value: 0x7F0F00D6
-			public const int errorCache = 2131689686;
+			public const int editNameBtn = 2131689686;
 			
 			// aapt resource value: 0x7F0F00D7
-			public const int errorCamera = 2131689687;
+			public const int enteredName = 2131689687;
+			
+			// aapt resource value: 0x7F0F00D8
+			public const int errorCache = 2131689688;
+			
+			// aapt resource value: 0x7F0F00D9
+			public const int errorCamera = 2131689689;
 			
 			// aapt resource value: 0x7F0F0009
 			public const int ErrorLogin = 2131689481;
@@ -5699,26 +5705,26 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F000C
 			public const int ExternalBtn = 2131689484;
 			
-			// aapt resource value: 0x7F0F00D8
-			public const int fab_transformation_scrim_behavior = 2131689688;
-			
-			// aapt resource value: 0x7F0F00D9
-			public const int fab_transformation_sheet_behavior = 2131689689;
-			
 			// aapt resource value: 0x7F0F00DA
-			public const int feedRecentAlertDelete = 2131689690;
+			public const int fab_transformation_scrim_behavior = 2131689690;
 			
 			// aapt resource value: 0x7F0F00DB
-			public const int feedRecentAlertMessage = 2131689691;
+			public const int fab_transformation_sheet_behavior = 2131689691;
 			
 			// aapt resource value: 0x7F0F00DC
-			public const int feedRecentAlertStart = 2131689692;
+			public const int feedRecentAlertDelete = 2131689692;
 			
 			// aapt resource value: 0x7F0F00DD
-			public const int feedRecentDesc = 2131689693;
+			public const int feedRecentAlertMessage = 2131689693;
 			
 			// aapt resource value: 0x7F0F00DE
-			public const int feedRecentTitle = 2131689694;
+			public const int feedRecentAlertStart = 2131689694;
+			
+			// aapt resource value: 0x7F0F00DF
+			public const int feedRecentDesc = 2131689695;
+			
+			// aapt resource value: 0x7F0F00E0
+			public const int feedRecentTitle = 2131689696;
 			
 			// aapt resource value: 0x7F0F000D
 			public const int FinishBtn = 2131689485;
@@ -5729,17 +5735,17 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F000F
 			public const int Hello = 2131689487;
 			
-			// aapt resource value: 0x7F0F00DF
-			public const int hide_bottom_view_on_scroll_behavior = 2131689695;
+			// aapt resource value: 0x7F0F00E1
+			public const int hide_bottom_view_on_scroll_behavior = 2131689697;
 			
 			// aapt resource value: 0x7F0F0010
 			public const int ListenBtn = 2131689488;
 			
-			// aapt resource value: 0x7F0F00E0
-			public const int locationHuntArrivedMessage = 2131689696;
+			// aapt resource value: 0x7F0F00E2
+			public const int locationHuntArrivedMessage = 2131689698;
 			
-			// aapt resource value: 0x7F0F00E1
-			public const int locationHuntArrivedTitle = 2131689697;
+			// aapt resource value: 0x7F0F00E3
+			public const int locationHuntArrivedTitle = 2131689699;
 			
 			// aapt resource value: 0x7F0F0011
 			public const int LoginAgreeTerms = 2131689489;
@@ -5747,23 +5753,23 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0012
 			public const int LoginInfoPrompt = 2131689490;
 			
-			// aapt resource value: 0x7F0F00E2
-			public const int loginInfo_howAnswer = 2131689698;
-			
-			// aapt resource value: 0x7F0F00E3
-			public const int loginInfo_howTitle = 2131689699;
-			
 			// aapt resource value: 0x7F0F00E4
-			public const int loginInfo_whatAnswer = 2131689700;
+			public const int loginInfo_howAnswer = 2131689700;
 			
 			// aapt resource value: 0x7F0F00E5
-			public const int loginInfo_whatTitle = 2131689701;
+			public const int loginInfo_howTitle = 2131689701;
 			
 			// aapt resource value: 0x7F0F00E6
-			public const int loginInfo_whyAnswer = 2131689702;
+			public const int loginInfo_whatAnswer = 2131689702;
 			
 			// aapt resource value: 0x7F0F00E7
-			public const int loginInfo_whyTitle = 2131689703;
+			public const int loginInfo_whatTitle = 2131689703;
+			
+			// aapt resource value: 0x7F0F00E8
+			public const int loginInfo_whyAnswer = 2131689704;
+			
+			// aapt resource value: 0x7F0F00E9
+			public const int loginInfo_whyTitle = 2131689705;
 			
 			// aapt resource value: 0x7F0F0013
 			public const int LoginOpenPrivacy = 2131689491;
@@ -5786,8 +5792,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0019
 			public const int MainMyActivitiesTabTitle = 2131689497;
 			
-			// aapt resource value: 0x7F0F00E8
-			public const int mapLoadingMessage = 2131689704;
+			// aapt resource value: 0x7F0F00EA
+			public const int mapLoadingMessage = 2131689706;
 			
 			// aapt resource value: 0x7F0F001A
 			public const int MapsApiKey = 2131689498;
@@ -5807,152 +5813,152 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F001F
 			public const int MenuUploads = 2131689503;
 			
-			// aapt resource value: 0x7F0F00E9
-			public const int mtrl_chip_close_icon_content_description = 2131689705;
-			
-			// aapt resource value: 0x7F0F00EA
-			public const int noAppErrMessage = 2131689706;
-			
 			// aapt resource value: 0x7F0F00EB
-			public const int noAppErrTitle = 2131689707;
+			public const int mtrl_chip_close_icon_content_description = 2131689707;
 			
 			// aapt resource value: 0x7F0F00EC
-			public const int openAudioBtn = 2131689708;
+			public const int noAppErrMessage = 2131689708;
 			
 			// aapt resource value: 0x7F0F00ED
-			public const int password_toggle_content_description = 2131689709;
+			public const int noAppErrTitle = 2131689709;
 			
 			// aapt resource value: 0x7F0F00EE
-			public const int path_password_eye = 2131689710;
+			public const int openAudioBtn = 2131689710;
 			
 			// aapt resource value: 0x7F0F00EF
-			public const int path_password_eye_mask_strike_through = 2131689711;
+			public const int password_toggle_content_description = 2131689711;
 			
 			// aapt resource value: 0x7F0F00F0
-			public const int path_password_eye_mask_visible = 2131689712;
+			public const int path_password_eye = 2131689712;
 			
 			// aapt resource value: 0x7F0F00F1
-			public const int path_password_strike_through = 2131689713;
+			public const int path_password_eye_mask_strike_through = 2131689713;
 			
 			// aapt resource value: 0x7F0F00F2
-			public const int permissionCameraTitle = 2131689714;
+			public const int path_password_eye_mask_visible = 2131689714;
 			
 			// aapt resource value: 0x7F0F00F3
-			public const int permissionFilesExplanation = 2131689715;
+			public const int path_password_strike_through = 2131689715;
 			
 			// aapt resource value: 0x7F0F00F4
-			public const int permissionFilesTitle = 2131689716;
+			public const int permissionCameraTitle = 2131689716;
 			
 			// aapt resource value: 0x7F0F00F5
-			public const int permissionLocationActivitiesExplanation = 2131689717;
+			public const int permissionFilesExplanation = 2131689717;
 			
 			// aapt resource value: 0x7F0F00F6
-			public const int permissionLocationActivitiesTitle = 2131689718;
+			public const int permissionFilesTitle = 2131689718;
 			
 			// aapt resource value: 0x7F0F00F7
-			public const int permissionLocationExplanation = 2131689719;
+			public const int permissionLocationActivitiesExplanation = 2131689719;
 			
 			// aapt resource value: 0x7F0F00F8
-			public const int permissionLocationTitle = 2131689720;
+			public const int permissionLocationActivitiesTitle = 2131689720;
 			
 			// aapt resource value: 0x7F0F00F9
-			public const int permissionMicExplanation = 2131689721;
+			public const int permissionLocationExplanation = 2131689721;
 			
 			// aapt resource value: 0x7F0F00FA
-			public const int permissionMicTitle = 2131689722;
+			public const int permissionLocationTitle = 2131689722;
 			
 			// aapt resource value: 0x7F0F00FB
-			public const int permissionPhotoExplanation = 2131689723;
+			public const int permissionMicExplanation = 2131689723;
 			
 			// aapt resource value: 0x7F0F00FC
-			public const int permissionRefused = 2131689724;
+			public const int permissionMicTitle = 2131689724;
 			
 			// aapt resource value: 0x7F0F00FD
-			public const int permissionVideoExplanation = 2131689725;
+			public const int permissionPhotoExplanation = 2131689725;
 			
 			// aapt resource value: 0x7F0F00FE
-			public const int place_autocomplete_clear_button = 2131689726;
+			public const int permissionRefused = 2131689726;
 			
 			// aapt resource value: 0x7F0F00FF
-			public const int place_autocomplete_search_hint = 2131689727;
+			public const int permissionVideoExplanation = 2131689727;
+			
+			// aapt resource value: 0x7F0F0100
+			public const int place_autocomplete_clear_button = 2131689728;
+			
+			// aapt resource value: 0x7F0F0101
+			public const int place_autocomplete_search_hint = 2131689729;
 			
 			// aapt resource value: 0x7F0F0020
 			public const int PleaseWait = 2131689504;
 			
-			// aapt resource value: 0x7F0F0100
-			public const int pref_accountLogout_summary = 2131689728;
-			
-			// aapt resource value: 0x7F0F0101
-			public const int pref_accountLogout_title = 2131689729;
-			
 			// aapt resource value: 0x7F0F0102
-			public const int pref_accountLogout_warning = 2131689730;
+			public const int pref_accountLogout_summary = 2131689730;
 			
 			// aapt resource value: 0x7F0F0103
-			public const int pref_account_cat_title = 2131689731;
+			public const int pref_accountLogout_title = 2131689731;
 			
 			// aapt resource value: 0x7F0F0104
-			public const int pref_cacheDelete_complete = 2131689732;
+			public const int pref_accountLogout_warning = 2131689732;
 			
 			// aapt resource value: 0x7F0F0105
-			public const int pref_cacheDelete_summary = 2131689733;
+			public const int pref_account_cat_title = 2131689733;
 			
 			// aapt resource value: 0x7F0F0106
-			public const int pref_cacheDelete_title = 2131689734;
+			public const int pref_cacheDelete_complete = 2131689734;
 			
 			// aapt resource value: 0x7F0F0107
-			public const int pref_cacheDelete_warning = 2131689735;
+			public const int pref_cacheDelete_summary = 2131689735;
 			
 			// aapt resource value: 0x7F0F0108
-			public const int pref_cacheNumber_summary = 2131689736;
+			public const int pref_cacheDelete_title = 2131689736;
 			
 			// aapt resource value: 0x7F0F0109
-			public const int pref_cacheNumber_title = 2131689737;
+			public const int pref_cacheDelete_warning = 2131689737;
 			
 			// aapt resource value: 0x7F0F010A
-			public const int pref_cache_cat_title = 2131689738;
+			public const int pref_cacheNumber_summary = 2131689738;
+			
+			// aapt resource value: 0x7F0F010B
+			public const int pref_cacheNumber_title = 2131689739;
+			
+			// aapt resource value: 0x7F0F010C
+			public const int pref_cache_cat_title = 2131689740;
 			
 			// aapt resource value: 0x7F0F0021
 			public const int RecBtn = 2131689505;
 			
-			// aapt resource value: 0x7F0F010B
-			public const int recordingLimit = 2131689739;
+			// aapt resource value: 0x7F0F010D
+			public const int recordingLimit = 2131689741;
 			
 			// aapt resource value: 0x7F0F0022
 			public const int RemoveBtn = 2131689506;
 			
-			// aapt resource value: 0x7F0F010C
-			public const int saveChanges = 2131689740;
-			
-			// aapt resource value: 0x7F0F010D
-			public const int scanningActivity_cancelled = 2131689741;
-			
 			// aapt resource value: 0x7F0F010E
-			public const int scanningActivity_success = 2131689742;
+			public const int saveChanges = 2131689742;
 			
 			// aapt resource value: 0x7F0F010F
-			public const int scanningActivity_title = 2131689743;
+			public const int scanningActivity_cancelled = 2131689743;
 			
 			// aapt resource value: 0x7F0F0110
-			public const int scanningActivity_wrong = 2131689744;
+			public const int scanningActivity_success = 2131689744;
 			
 			// aapt resource value: 0x7F0F0111
-			public const int searchAlertMessage = 2131689745;
+			public const int scanningActivity_title = 2131689745;
 			
 			// aapt resource value: 0x7F0F0112
-			public const int searchAlertTitle = 2131689746;
+			public const int scanningActivity_wrong = 2131689746;
 			
 			// aapt resource value: 0x7F0F0113
-			public const int searchFail = 2131689747;
+			public const int searchAlertMessage = 2131689747;
 			
 			// aapt resource value: 0x7F0F0114
-			public const int search_menu_title = 2131689748;
+			public const int searchAlertTitle = 2131689748;
 			
 			// aapt resource value: 0x7F0F0115
-			public const int shareCreatorMessage = 2131689749;
+			public const int searchFail = 2131689749;
 			
 			// aapt resource value: 0x7F0F0116
-			public const int shareCreatorTitle = 2131689750;
+			public const int search_menu_title = 2131689750;
+			
+			// aapt resource value: 0x7F0F0117
+			public const int shareCreatorMessage = 2131689751;
+			
+			// aapt resource value: 0x7F0F0118
+			public const int shareCreatorTitle = 2131689752;
 			
 			// aapt resource value: 0x7F0F0023
 			public const int StartBtn = 2131689507;
@@ -5960,8 +5966,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0024
 			public const int StartDrawBtn = 2131689508;
 			
-			// aapt resource value: 0x7F0F0117
-			public const int status_bar_notification_info_overflow = 2131689751;
+			// aapt resource value: 0x7F0F0119
+			public const int status_bar_notification_info_overflow = 2131689753;
 			
 			// aapt resource value: 0x7F0F0025
 			public const int StopBtn = 2131689509;
@@ -5975,59 +5981,59 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0028
 			public const int TaskBtnNotReady = 2131689512;
 			
-			// aapt resource value: 0x7F0F0118
-			public const int taskLockedParent = 2131689752;
+			// aapt resource value: 0x7F0F011A
+			public const int taskLockedParent = 2131689754;
 			
 			// aapt resource value: 0x7F0F0029
 			public const int TasksTitle = 2131689513;
 			
-			// aapt resource value: 0x7F0F0119
-			public const int taskUnlockedParent = 2131689753;
-			
-			// aapt resource value: 0x7F0F011A
-			public const int ttsError = 2131689754;
-			
 			// aapt resource value: 0x7F0F011B
-			public const int updateMessage = 2131689755;
+			public const int taskUnlockedParent = 2131689755;
 			
 			// aapt resource value: 0x7F0F011C
-			public const int updateTitle = 2131689756;
+			public const int ttsError = 2131689756;
 			
 			// aapt resource value: 0x7F0F011D
-			public const int uploadBtn = 2131689757;
+			public const int updateMessage = 2131689757;
 			
 			// aapt resource value: 0x7F0F011E
-			public const int uploadMissing = 2131689758;
+			public const int updateTitle = 2131689758;
 			
 			// aapt resource value: 0x7F0F011F
-			public const int uploadsNone = 2131689759;
+			public const int uploadBtn = 2131689759;
 			
 			// aapt resource value: 0x7F0F0120
-			public const int uploadsPrompt = 2131689760;
+			public const int uploadMissing = 2131689760;
 			
 			// aapt resource value: 0x7F0F0121
-			public const int uploadsSizeWarningMessage = 2131689761;
+			public const int uploadsNone = 2131689761;
 			
 			// aapt resource value: 0x7F0F0122
-			public const int uploadsSizeWarningTitle = 2131689762;
+			public const int uploadsPrompt = 2131689762;
 			
 			// aapt resource value: 0x7F0F0123
-			public const int uploadsSome = 2131689763;
-			
-			// aapt resource value: 0x7F0F0126
-			public const int uploadsUploadingActivity = 2131689766;
-			
-			// aapt resource value: 0x7F0F0127
-			public const int uploadsUploadingFiles = 2131689767;
-			
-			// aapt resource value: 0x7F0F0128
-			public const int uploadsUploadingItem = 2131689768;
+			public const int uploadsSizeWarningMessage = 2131689763;
 			
 			// aapt resource value: 0x7F0F0124
-			public const int uploadsUploadSuccessMessage = 2131689764;
+			public const int uploadsSizeWarningTitle = 2131689764;
 			
 			// aapt resource value: 0x7F0F0125
-			public const int uploadsUploadSuccessTitle = 2131689765;
+			public const int uploadsSome = 2131689765;
+			
+			// aapt resource value: 0x7F0F0128
+			public const int uploadsUploadingActivity = 2131689768;
+			
+			// aapt resource value: 0x7F0F0129
+			public const int uploadsUploadingFiles = 2131689769;
+			
+			// aapt resource value: 0x7F0F012A
+			public const int uploadsUploadingItem = 2131689770;
+			
+			// aapt resource value: 0x7F0F0126
+			public const int uploadsUploadSuccessMessage = 2131689766;
+			
+			// aapt resource value: 0x7F0F0127
+			public const int uploadsUploadSuccessTitle = 2131689767;
 			
 			// aapt resource value: 0x7F0F002A
 			public const int UserLocationOnly = 2131689514;

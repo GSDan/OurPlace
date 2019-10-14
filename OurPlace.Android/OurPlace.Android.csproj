@@ -384,6 +384,7 @@
     <Compile Include="Adapters\FeedItemsAdapter.cs" />
     <Compile Include="Fragments\CustomScannerFragment.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Misc\AlwaysVisibleMediaController.cs" />
     <Compile Include="Misc\AutoFitTextureView.cs" />
     <Compile Include="ColorPicker\AlphaPatternDrawable.cs" />

@@ -57,6 +57,7 @@ namespace OurPlace.Android.Fragments
         private SwipeRefreshLayout refresher;
         private const int PermReqId = 111;
         private List<LearningActivity> unsubmittedActivities;
+        private List<ActivityCollection> unsubmittedCollections;
         private TextView uploadsHint;
         private bool refreshingData = true;
         private bool viewLoaded;
@@ -174,6 +175,32 @@ namespace OurPlace.Android.Fragments
         {
             List<FeedSection> feed = new List<FeedSection>();
 
+            string unsubmittedCollectionsJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedCollectionsJson;
+            unsubmittedCollections = null;
+
+            if (!string.IsNullOrWhiteSpace(unsubmittedCollectionsJson))
+            {
+                unsubmittedCollections = JsonConvert.DeserializeObject<List<ActivityCollection>>(
+                    unsubmittedCollectionsJson,
+                    new JsonSerializerSettings
+                    {
+                        TypeNameHandling = TypeNameHandling.Objects,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 10
+                    });
+            }
+
+            // Add a section to the feed if the user has activities which they didn't finish creating
+            if (unsubmittedCollections != null && unsubmittedCollections.Count > 0)
+            {
+                feed.Add(new FeedSection
+                {
+                    Title = Resources.GetString(Resource.String.createdCollectionsLocalTitle),
+                    Description = Resources.GetString(Resource.String.createdCollectionsLocalDesc),
+                    Collections = unsubmittedCollections
+                });
+            }
+
             string unsubmittedActivitiesJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedActivitiesJson;
             unsubmittedActivities = null;
 
@@ -194,8 +221,8 @@ namespace OurPlace.Android.Fragments
             {
                 feed.Add(new FeedSection
                 {
-                    Title = Resources.GetString(Resource.String.createdLocalTitle),
-                    Description = Resources.GetString(Resource.String.createdLocalDesc),
+                    Title = Resources.GetString(Resource.String.createdActivitiesLocalTitle),
+                    Description = Resources.GetString(Resource.String.createdActivitiesLocalDesc),
                     Activities = unsubmittedActivities
                 });
             }

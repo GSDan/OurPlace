@@ -65,6 +65,13 @@ namespace OurPlace.Android.Activities.Create
             fab.Click += Fab_Click;
         }
 
+        protected override void OnResume()
+        {
+            SaveProgress();
+            adapter?.NotifyDataSetChanged();
+            base.OnResume();
+        }
+
         private void Fab_Click(object sender, EventArgs e)
         {
             Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
@@ -94,7 +101,8 @@ namespace OurPlace.Android.Activities.Create
 
         private void Adapter_DeleteItemClick(object sender, int e)
         {
-            throw new System.NotImplementedException();
+            //TODO
+            SaveProgress();
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)

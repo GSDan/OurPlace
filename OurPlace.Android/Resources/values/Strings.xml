@@ -178,8 +178,10 @@
   <string name="createdActivityDialogUnfinishedMessage">This activity is unfinished. What do you want to do with it?</string>
   <string name="createdFeedTitle">Your Created Activites</string>
   <string name="createdFeedDesc">The activities that you\'ve created and uploaded</string>
-  <string name="createdLocalTitle">In Progress</string>
-  <string name="createdLocalDesc">You started making these activities, but they haven\'t been uploaded yet!</string>
+  <string name="createdActivitiesLocalTitle">Activities In Progress</string>
+  <string name="createdActivitiesLocalDesc">You started making these activities, but they haven\'t been uploaded yet!</string>
+  <string name="createdCollectionsLocalTitle">Collections In Progress</string>
+  <string name="createdCollectionsLocalDesc">You started making these collections, but they haven\'t been uploaded yet!</string>
   <string name="approveActivityTitle">Curate this Activity</string>
   <string name="approveActivityMessage">If the content of this activity is appropriate, tap "Approve" so others can use it! Otherwise, tap "Delete" to remove it from the OurPlace server.</string>
   <string name="approveActivityBtnApprove">Approve</string>
