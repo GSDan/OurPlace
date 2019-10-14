@@ -19,6 +19,7 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+using System;
 using System.Collections.Generic;
 
 namespace OurPlace.Common.Models
@@ -27,6 +28,8 @@ namespace OurPlace.Common.Models
     {
         public string Title;
         public string Description;
-        public IEnumerable<FeedItem> Items;
+
+        public List<ActivityCollection> Collections;
+        public List<LearningActivity> Activities;
     }
 }

@@ -84,12 +84,19 @@ namespace OurPlace.Android.Adapters
             foreach (FeedSection section in Data)
             {
                 checkedItems++; //include header
-                int itemsInSection = section.Items.Count();
-                if (itemsInSection + checkedItems > position)
+                int collsInSection = section.Collections?.Count ?? 0;
+                if (collsInSection + checkedItems > position)
                 {
-                    return section.Items.ElementAt(position - checkedItems);
+                    return section.Collections[position - checkedItems];
                 }
-                checkedItems += itemsInSection;
+                checkedItems += collsInSection;
+
+                int actsInSection = section.Activities?.Count ?? 0;
+                if (actsInSection + checkedItems > position)
+                {
+                    return section.Activities.ElementAt(position - checkedItems);
+                }
+                checkedItems += actsInSection;
             }
             return null;
         }
@@ -119,9 +126,9 @@ namespace OurPlace.Android.Adapters
         {
             if (Data != null &&
                 Data.Count > sectionInd &&
-                Data[sectionInd].Items != null)
+                Data[sectionInd] != null)
             {
-                return Data[sectionInd].Items.Count();
+                return Data[sectionInd].Collections?.Count ?? 0 + Data[sectionInd].Activities?.Count ?? 0;
             }
             return 0;
         }
@@ -147,7 +154,20 @@ namespace OurPlace.Android.Adapters
             LearningActivityViewHolder vh = holder as LearningActivityViewHolder;
             TaskParameter imTask;
 
-            FeedItem thisItem = Data[sectionInd].Items.ElementAt(relativePos);
+            FeedItem thisItem; 
+            
+            if(Data[sectionInd].Collections?.Count > relativePos)
+            {
+                thisItem = Data[sectionInd].Collections.ElementAt(relativePos);
+            }
+            else if(Data[sectionInd].Activities?.Count > (relativePos - Data[sectionInd].Collections?.Count ?? 0))
+            {
+                thisItem = Data[sectionInd].Activities.ElementAt(relativePos - (Data[sectionInd].Collections?.Count ?? 0));
+            }
+            else
+            {
+                return;
+            }
 
             if (string.IsNullOrWhiteSpace(thisItem.ImageUrl))
             {

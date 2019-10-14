@@ -47,7 +47,7 @@ namespace OurPlace.API.Controllers
         private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private static Random rand = new Random();
 
-        private IEnumerable<Common.Models.LimitedActivityCollection> GetAllCollectionsWhere(Func<ActivityCollection, bool> predicate)
+        private IEnumerable<Common.Models.ActivityCollection> GetAllCollectionsWhere(Func<ActivityCollection, bool> predicate)
         {
             return db.ActivityCollections.Where(predicate)
                 .Select(c => new Common.Models.ActivityCollection()
@@ -87,7 +87,7 @@ namespace OurPlace.API.Controllers
                         Surname = c.Author.Surname,
                         ImageUrl = c.Author.ImageUrl
                     },
-                    Activities = c.Activities.Select(a => new Common.Models.LimitedLearningActivity()
+                    Activities = c.Activities.Select(a => new Common.Models.LearningActivity()
                     {
                        Id = a.Id,
                        CreatedAt = a.CreatedAt,
@@ -154,14 +154,14 @@ namespace OurPlace.API.Controllers
                                }
                            }).OrderBy(ct => ct.Order)
                        }).OrderBy(t => t.Order)
-                    })
+                    }).ToList()
                 }).ToList();
         }
 
-        private IEnumerable<Common.Models.LimitedLearningActivity> GetAllActivitiesWhere(Func<LearningActivity, bool> predicate)
+        private IEnumerable<Common.Models.LearningActivity> GetAllActivitiesWhere(Func<LearningActivity, bool> predicate)
         {
             return db.LearningActivities.Where(predicate)
-               .Select(a => new Common.Models.LimitedLearningActivity()
+               .Select(a => new Common.Models.LearningActivity()
                {
                    Id = a.Id,
                    CreatedAt = a.CreatedAt,
@@ -265,7 +265,7 @@ namespace OurPlace.API.Controllers
             // Researcher accounts privvy to all uploaded activities
             bool isResearcher = Common.ConfidentialData.TestEmails.Contains(thisUser.Email);
 
-            List<Common.Models.LimitedActivityFeedSection> feed = new List<Common.Models.LimitedActivityFeedSection>();
+            List<Common.Models.FeedSection> feed = new List<Common.Models.FeedSection>();
             
             if(!lat.AlmostEquals(0, 0.0001) || !lon.AlmostEquals(0, 0.0001))
             {
@@ -277,7 +277,7 @@ namespace OurPlace.API.Controllers
                 {
                     // Get collections near the user's position, which have been approved and still
                     // contain at least one activity
-                    List<Common.Models.LimitedActivityCollection> collectionsHere = GetAllCollectionsWhere(c =>
+                    List<Common.Models.ActivityCollection> collectionsHere = GetAllCollectionsWhere(c =>
                        !c.SoftDeleted &&
                        c.Location.Id == pl.Id &&
                         (c.Approved || thisUser.Trusted) &&
@@ -285,7 +285,7 @@ namespace OurPlace.API.Controllers
                         (isResearcher || c.IsPublic)).ToList();
 
                     // Get activities which are near the user's position, public and approved
-                    List<Common.Models.LimitedLearningActivity> actsHere = GetAllActivitiesWhere(a => 
+                    List<Common.Models.LearningActivity> actsHere = GetAllActivitiesWhere(a => 
                         !a.SoftDeleted && 
                         a.Places.Any(l => l.Id == pl.Id) &&
                          (a.Approved || thisUser.Trusted) &&
@@ -293,7 +293,7 @@ namespace OurPlace.API.Controllers
 
                     if(actsHere.Count > 0 || collectionsHere.Count > 0)
                     {
-                        feed.Add(new Common.Models.LimitedActivityFeedSection
+                        feed.Add(new Common.Models.FeedSection
                         {
                             Title = $"Activities at {pl.Name}",
                             Description =
@@ -305,7 +305,7 @@ namespace OurPlace.API.Controllers
                 }
             }
 
-            feed.Add(new Common.Models.LimitedActivityFeedSection
+            feed.Add(new Common.Models.FeedSection
             {
                 Title = "Recently Uploaded",
                 Description = "Here are some of the latest activities that have been uploaded",
@@ -358,7 +358,7 @@ namespace OurPlace.API.Controllers
         [ResponseType(typeof(LearningActivity))]
         public async Task<HttpResponseMessage> GetLearningActivity(int id)
         {
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == id).FirstOrDefault();
+            Common.Models.LearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == id).FirstOrDefault();
             if (limitedVersion == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Not found");
@@ -378,7 +378,7 @@ namespace OurPlace.API.Controllers
         {
             if (code == "SALTWELLSTATUE") code = "CHARLTONSTATUE";
 
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.InviteCode == code.ToUpper()).FirstOrDefault();
+            Common.Models.LearningActivity limitedVersion = GetAllActivitiesWhere(a => a.InviteCode == code.ToUpper()).FirstOrDefault();
             if (limitedVersion == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Not found");
@@ -670,7 +670,7 @@ namespace OurPlace.API.Controllers
 
             await db.SaveChangesAsync();
 
-            Common.Models.LimitedLearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == finalAct.Id).FirstOrDefault();
+            Common.Models.LearningActivity limitedVersion = GetAllActivitiesWhere(a => a.Id == finalAct.Id).FirstOrDefault();
 
             await MakeLog(new Dictionary<string, string>() { { "id", finalAct.Id.ToString() } });
 

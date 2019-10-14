@@ -196,7 +196,7 @@ namespace OurPlace.Android.Fragments
                 {
                     Title = Resources.GetString(Resource.String.createdLocalTitle),
                     Description = Resources.GetString(Resource.String.createdLocalDesc),
-                    Items = unsubmittedActivities
+                    Activities = unsubmittedActivities
                 });
             }
 
@@ -207,7 +207,7 @@ namespace OurPlace.Android.Fragments
                 {
                     Title = Resources.GetString(Resource.String.createdFeedTitle),
                     Description = Resources.GetString(Resource.String.createdFeedDesc),
-                    Items = remoteData
+                    Activities = remoteData
                 });
             }
 

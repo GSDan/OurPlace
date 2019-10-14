@@ -303,7 +303,7 @@ namespace OurPlace.Android.Fragments
                 {
                     Title = Resources.GetString(Resource.String.feedRecentTitle),
                     Description = Resources.GetString(Resource.String.feedRecentDesc),
-                    Items = recentlyOpened
+                    Activities = recentlyOpened
                 };
             }
             return null;
