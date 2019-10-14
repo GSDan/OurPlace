@@ -48,7 +48,6 @@ namespace OurPlace.Android.Activities.Create
     {
         private LearningActivity newActivity;
         private bool editingSubmitted;
-        private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private CreatedTasksAdapter adapter;
         private TextView fabPrompt;
@@ -75,7 +74,9 @@ namespace OurPlace.Android.Activities.Create
             adapter.DeleteItemClick += Adapter_DeleteItemClick;
             adapter.ManageChildrenItemClick += Adapter_ManageChildrenItemClick;
 
-            recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            fabPrompt = FindViewById<TextView>(Resource.Id.fabPrompt);
+
+            RecyclerView recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetAdapter(adapter);
 
             ItemTouchHelper.Callback callback = new DragHelper(adapter);
@@ -84,11 +85,12 @@ namespace OurPlace.Android.Activities.Create
 
             layoutManager = new LinearLayoutManager(this);
             recyclerView.SetLayoutManager(layoutManager);
-
-            fabPrompt = FindViewById<TextView>(Resource.Id.fabPrompt);
-
-            FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.createTaskFab);
-            fab.Click += Fab_Click;
+            
+                
+            using (FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.createTaskFab))
+            {
+                fab.Click += Fab_Click;
+            }
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -305,8 +307,10 @@ namespace OurPlace.Android.Activities.Create
 
         private void Fab_Click(object sender, EventArgs e)
         {
-            Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
-            StartActivityForResult(intent, AddTaskIntent);
+            using (Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity)))
+            {
+                StartActivityForResult(intent, AddTaskIntent);
+            }
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)

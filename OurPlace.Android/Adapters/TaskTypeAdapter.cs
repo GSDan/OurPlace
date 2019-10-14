@@ -33,13 +33,13 @@ namespace OurPlace.Android.Adapters
     public class TaskTypeAdapter : RecyclerView.Adapter
     {
         public event EventHandler<int> ItemClick;
-        public List<TaskType> Data;
-        public Context Context;
+        public List<TaskType> Data { get; private set; }
+        private readonly Context context;
 
         public TaskTypeAdapter(Context context, List<TaskType> data)
         {
             Data = data;
-            Context = context;
+            this.context = context;
 
             Data = Data.OrderBy(tt => tt.Order).ToList();
         }
@@ -78,7 +78,7 @@ namespace OurPlace.Android.Adapters
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard_Btn, parent, false);
             TaskViewHolderBtn vh = new TaskViewHolderBtn(itemView, null, OnClick)
             {
-                Button = { Text = Context.Resources.GetString(Resource.String.ChooseBtn) }
+                Button = { Text = context.Resources.GetString(Resource.String.ChooseBtn) }
             };
             return vh;
         }

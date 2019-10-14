@@ -21,7 +21,7 @@
 <resources>
   <string name="ApplicationName">OurPlace</string>
   <string name="MainLandingTabTitle">Highlights</string>
-  <string name="MainMyActivitiesTabTitle">My Activities</string>
+  <string name="MainMyActivitiesTabTitle">My Creations</string>
   <string name="MenuSettings">Settings</string>
   <string name="MenuScan">Scan QR</string>
   <string name="MenuSearch">Search</string>
@@ -150,14 +150,15 @@
   <string name="createFinishActivityTermsErr">You must agree to the terms and conditions before proceeding.</string>
   <string name="createCollectionFabPrompt">Add an Activity to this collection!</string>
   <string name="createCollectionRemoveActivity">Remove</string>
-  <string name="createCollectionActivityLocation">This Activity is at: {0}</string>
+  <string name="createCollectionActivityLocation">This activity is at {0}</string>
   <string name="createCollectionActivityNoLocation">This Activity doesn\'t have a location assigned to it.</string>
   <string name="createCollectionViewActivityLocation">View Location</string>
   <string name="createCollectionNameHint">What\'s the title of your collection?</string>
   <string name="createCollectionNameErr">Please enter a name for your collection!</string>
-  <string name="createCollectionDescriptionHint">Enter a description of your collection-what\'s it about? What ties the Activities together?</string>
+  <string name="createCollectionDescriptionHint">Enter a description of what your collection is about.</string>
   <string name="createCollectionDescriptionErr">Please enter a description for your collection!</string>
   <string name="createCollectionNoImageWarning">You haven\'t chosen a cover image for your collection - are you sure you want to continue?</string>
+  <string name="createCollectionAddActivityHeader">Choose an Activity to add to your collection:</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>

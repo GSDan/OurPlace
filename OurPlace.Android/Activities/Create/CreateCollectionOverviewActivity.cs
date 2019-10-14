@@ -16,6 +16,8 @@ using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -25,7 +27,6 @@ namespace OurPlace.Android.Activities.Create
         private ActivityCollection newCollection;
         private bool editingSubmitted;
         private ActivityCollectionAdapter adapter;
-        private RecyclerView recyclerView;
         private RecyclerView.LayoutManager layoutManager;
         private TextView fabPrompt;
         private DatabaseManager dbManager;
@@ -49,7 +50,9 @@ namespace OurPlace.Android.Activities.Create
             adapter.FinishClick += Adapter_FinishClick;
             adapter.OpenLocationClick += Adapter_OpenLocationClick;
 
-            recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            fabPrompt = FindViewById<TextView>(Resource.Id.fabPrompt);
+
+            RecyclerView recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
             recyclerView.SetAdapter(adapter);
 
             ItemTouchHelper.Callback callback = new DragHelper(adapter);
@@ -59,10 +62,10 @@ namespace OurPlace.Android.Activities.Create
             layoutManager = new LinearLayoutManager(this);
             recyclerView.SetLayoutManager(layoutManager);
 
-            fabPrompt = FindViewById<TextView>(Resource.Id.fabPrompt);
-
-            FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.addActivityFab);
-            fab.Click += Fab_Click;
+            using (FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.addActivityFab))
+            {
+                fab.Click += Fab_Click;
+            }
         }
 
         protected override void OnResume()
@@ -74,14 +77,32 @@ namespace OurPlace.Android.Activities.Create
 
         private void Fab_Click(object sender, EventArgs e)
         {
-            Intent intent = new Intent(this, typeof(CreateChooseTaskTypeActivity));
-            StartActivityForResult(intent, addActivityIntent);
-            intent.Dispose();
+            using (Intent intent = new Intent(this, typeof(CreateChooseActivityActivity)))
+            {
+                intent.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Collection.Activities));
+                StartActivityForResult(intent, addActivityIntent);
+            }
         }
 
-        private void Adapter_OpenLocationClick(object sender, int e)
+        private void Adapter_OpenLocationClick(object sender, int position)
         {
-            throw new System.NotImplementedException();
+            position--;
+            LearningActivity thisAct = adapter.Collection.Activities[position];
+            Place thisPlace = thisAct.Places?.FirstOrDefault();
+
+            if (thisPlace == null) return;
+
+            global::Android.Net.Uri mapsIntentUri = global::Android.Net.Uri.Parse(
+                    string.Format(CultureInfo.InvariantCulture,
+                    "geo:{0},{1}?q={0},{1}(Target+Location)",
+                    thisPlace.Latitude,
+                    thisPlace.Longitude));
+
+            using (Intent mapIntent = new Intent(Intent.ActionView, mapsIntentUri))
+            {
+                mapIntent.SetPackage("com.google.android.apps.maps");
+                StartActivity(mapIntent);
+            }
         }
 
         private void Adapter_FinishClick(object sender, int e)
@@ -99,15 +120,27 @@ namespace OurPlace.Android.Activities.Create
             intent.Dispose();
         }
 
-        private void Adapter_DeleteItemClick(object sender, int e)
+        private void Adapter_DeleteItemClick(object sender, int position)
         {
-            //TODO
-            SaveProgress();
+            using (var diag = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+            {
+                diag.SetTitle(Resource.String.deleteTitle)
+                .SetMessage(Resource.String.deleteMessage)
+                .SetNegativeButton(Resource.String.dialog_cancel, (a, e) => { })
+                .SetPositiveButton(Resource.String.DeleteBtn, (a, b) =>
+                {
+                    position--;
+                    adapter.Collection.Activities.RemoveAt(position);
+                    adapter.NotifyDataSetChanged();
+                    SaveProgress();
+                })
+                .Show();
+            }
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)
         {
-            if (resultCode != Result.Ok) return;
+            if (resultCode != Result.Ok || data == null) return;
 
             switch (requestCode)
             {
@@ -119,7 +152,13 @@ namespace OurPlace.Android.Activities.Create
                             newCollection = returned;
                             adapter.UpdateActivity(returned);
                         }
-
+                        break;
+                    }
+                case addActivityIntent:
+                    {
+                        LearningActivity added = JsonConvert.DeserializeObject<LearningActivity>(data.GetStringExtra("JSON"));
+                        adapter.Collection.Activities.Add(added);
+                        adapter.NotifyDataSetChanged();
                         break;
                     }
             }
@@ -131,7 +170,7 @@ namespace OurPlace.Android.Activities.Create
 
             // Hide the prompt if the user has added at least 2 activities
             fabPrompt.Visibility =
-                (newCollection.Activities != null && newCollection.Activities.Count >= 2)
+                (newCollection.Activities != null && newCollection.Activities.Count >= 1)
                     ? ViewStates.Gone : ViewStates.Visible;
 
             // Don't save changes to uploaded activities until we're ready to submit

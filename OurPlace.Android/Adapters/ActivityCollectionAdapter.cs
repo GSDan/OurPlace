@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using FFImageLoading;
 using FFImageLoading.Transformations;
+using System.Linq;
+using System.Globalization;
 
 namespace OurPlace.Android.Adapters
 {
@@ -104,6 +106,19 @@ namespace OurPlace.Android.Adapters
 
             vh.Title.Text = thisActivity.Name;
             vh.Description.Text = thisActivity.Description;
+
+            if(thisActivity.Places?.Any() ?? false)
+            {
+                vh.LocationButton.Visibility = ViewStates.Visible;
+                vh.LocationText.Text = string.Format(CultureInfo.CurrentCulture,
+                    context.GetString(Resource.String.createCollectionActivityLocation),
+                    thisActivity.Places.FirstOrDefault()?.Name);
+            }
+            else
+            {
+                vh.LocationButton.Visibility = ViewStates.Gone;
+                vh.LocationText.SetText(Resource.String.createCollectionActivityNoLocation);
+            }
 
             if (string.IsNullOrWhiteSpace(thisActivity.ImageUrl))
             {

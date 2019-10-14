@@ -335,6 +335,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\Abstracts\TTSActivity.cs" />
+    <Compile Include="Activities\Create\CreateChooseActivityActivity.cs" />
     <Compile Include="Activities\Create\CreateChooseLocation.cs" />
     <Compile Include="Activities\Create\CreateChooseTaskTypeActivity.cs" />
     <Compile Include="Activities\Create\CreateCollectionActivity.cs" />
@@ -368,6 +369,7 @@
     <Compile Include="Activities\ScanningActivity.cs" />
     <Compile Include="Activities\SplashActivity.cs" />
     <Compile Include="Activities\UploadsActivity.cs" />
+    <Compile Include="Adapters\ActivityAdapter.cs" />
     <Compile Include="Adapters\ActivityCollectionAdapter.cs" />
     <Compile Include="Adapters\ChapterAdapter.cs" />
     <Compile Include="Adapters\ChildItemDecoration.cs" />

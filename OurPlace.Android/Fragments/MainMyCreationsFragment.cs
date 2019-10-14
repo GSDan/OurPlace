@@ -161,7 +161,7 @@ namespace OurPlace.Android.Fragments
                     }
                 }
 
-                await LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList());
+                await LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList()).ConfigureAwait(false);
 
                 refreshingData = false;
             }
@@ -175,7 +175,7 @@ namespace OurPlace.Android.Fragments
         {
             List<FeedSection> feed = new List<FeedSection>();
 
-            string unsubmittedCollectionsJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedCollectionsJson;
+            string unsubmittedCollectionsJson = (await ((MainActivity)Activity).GetCurrentUser().ConfigureAwait(false)).LocalCreatedCollectionsJson;
             unsubmittedCollections = null;
 
             if (!string.IsNullOrWhiteSpace(unsubmittedCollectionsJson))
@@ -201,7 +201,7 @@ namespace OurPlace.Android.Fragments
                 });
             }
 
-            string unsubmittedActivitiesJson = (await ((MainActivity)Activity).GetCurrentUser()).LocalCreatedActivitiesJson;
+            string unsubmittedActivitiesJson = (await ((MainActivity)Activity).GetCurrentUser().ConfigureAwait(false)).LocalCreatedActivitiesJson;
             unsubmittedActivities = null;
 
             if (!string.IsNullOrWhiteSpace(unsubmittedActivitiesJson))
@@ -251,15 +251,15 @@ namespace OurPlace.Android.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View view = inflater.Inflate(Resource.Layout.MainMyActivities, container, false);
+            View view = inflater?.Inflate(Resource.Layout.MainMyActivities, container, false);
             return view;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            uploadsHint = view.FindViewById<TextView>(Resource.Id.uploadsHint);
-            fabPrompt = view.FindViewById<TextView>(Resource.Id.fabPrompt);
-            refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+            uploadsHint = view?.FindViewById<TextView>(Resource.Id.uploadsHint);
+            fabPrompt = view?.FindViewById<TextView>(Resource.Id.fabPrompt);
+            refresher = view?.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
             refresher.Refresh += (a, e) => { LoadRemoteData(); };
             refresher.SetColorSchemeResources(
                 Resource.Color.app_darkgreen,
