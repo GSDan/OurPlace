@@ -272,7 +272,7 @@ namespace OurPlace.Android.Activities.Create
             Intent toMainIntent = new Intent(this, typeof(MainActivity));
             toMainIntent.AddFlags(ActivityFlags.ClearTop);
             toMainIntent.AddFlags(ActivityFlags.SingleTop);
-            MainMyActivitiesFragment.ForceRefresh = true;
+            MainMyCreationsFragment.ForceRefresh = true;
             StartActivity(toMainIntent);
             Finish();
         }

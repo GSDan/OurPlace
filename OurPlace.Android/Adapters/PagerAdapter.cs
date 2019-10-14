@@ -45,7 +45,7 @@ namespace OurPlace.Android.Adapters
                 case 0:
                     return new MainLandingFragment();
                 case 1:
-                    return new MainMyActivitiesFragment();
+                    return new MainMyCreationsFragment();
                 default:
                     return null;
             }

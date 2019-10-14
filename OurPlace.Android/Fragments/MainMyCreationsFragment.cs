@@ -48,7 +48,7 @@ using OurPlace.Common.Interfaces;
 
 namespace OurPlace.Android.Fragments
 {
-    public class MainMyActivitiesFragment : global::Android.Support.V4.App.Fragment, OneMoreFabMenu.IOptionsClick
+    public class MainMyCreationsFragment : global::Android.Support.V4.App.Fragment, OneMoreFabMenu.IOptionsClick
     {
         private FeedItemsAdapter adapter;
         private RecyclerView recyclerView;
@@ -361,17 +361,17 @@ namespace OurPlace.Android.Fragments
 
             if(chosen is LearningActivity chosenAct)
             {
-                bool inProgress = unsubmittedActivities != null && unsubmittedActivities.Exists((la) => chosenAct.Id == la.Id);
+                bool inProgress = unsubmittedActivities?.Exists((la) => chosenAct.Id == la.Id) ?? false;
 
                 if (inProgress)
                 {
-                    EditActivity(chosenAct, true);
+                    EditCreation(chosenAct, true);
                 }
                 else
                 {
                     new AlertDialog.Builder(Activity)
                         .SetTitle(chosen.Name)
-                        .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditActivity(chosenAct, false); })
+                        .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditCreation(chosenAct, false); })
                         .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
                         .SetCancelable(true)
                         .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosenAct.InviteCode)))
@@ -382,13 +382,20 @@ namespace OurPlace.Android.Fragments
             }
             else if(chosen is ActivityCollection chosenColl)
             {
-                //TODO
+                bool inProgress = unsubmittedCollections?.Exists((coll) => chosenColl.Id == coll.Id) ?? false;
+
+                if(inProgress)
+                {
+                    EditCreation(chosenColl, true);
+                }
             }
         }
 
-        private void EditActivity(LearningActivity chosen, bool isLocalOnly)
+        private void EditCreation(FeedItem chosen, bool isLocalOnly)
         {
-            requiresStorageIntent = new Intent(Activity, typeof(CreateActivityOverviewActivity));
+            requiresStorageIntent = (chosen is LearningActivity)? 
+                new Intent(Activity, typeof(CreateActivityOverviewActivity)) :
+                new Intent(Activity, typeof(CreateCollectionOverviewActivity));
             string json = JsonConvert.SerializeObject(chosen, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
@@ -399,5 +406,6 @@ namespace OurPlace.Android.Fragments
             requiresStorageIntent.PutExtra("EDITING_SUBMITTED", !isLocalOnly);
             LaunchWithStoragePermissions();
         }
+
     }
 }

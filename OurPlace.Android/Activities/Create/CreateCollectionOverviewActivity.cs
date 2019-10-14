@@ -162,7 +162,7 @@ namespace OurPlace.Android.Activities.Create
 
             dbManager.CurrentUser.LocalCreatedCollectionsJson = JsonConvert.SerializeObject(inProgress);
             dbManager.AddUser(dbManager.CurrentUser);
-            MainMyActivitiesFragment.ForceRefresh = true;
+            MainMyCreationsFragment.ForceRefresh = true;
         }
     }
 }

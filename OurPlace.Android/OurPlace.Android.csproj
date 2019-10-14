@@ -398,7 +398,7 @@
     <Compile Include="Fragments\Camera2Fragment.cs" />
     <Compile Include="Fragments\Camera2VideoFragment.cs" />
     <Compile Include="Fragments\MainLandingFragment.cs" />
-    <Compile Include="Fragments\MainMyActivitiesFragment.cs" />
+    <Compile Include="Fragments\MainMyCreationsFragment.cs" />
     <Compile Include="Fragments\TouchableMapFragment.cs" />
     <Compile Include="Listeners\CallbackBroadcastReceiver.cs" />
     <Compile Include="Listeners\CameraCaptureListener.cs" />

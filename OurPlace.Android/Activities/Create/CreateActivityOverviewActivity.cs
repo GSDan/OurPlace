@@ -153,7 +153,7 @@ namespace OurPlace.Android.Activities.Create
                         if (resp.Success)
                         {
                             Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show();
-                            MainMyActivitiesFragment.ForceRefresh = true;
+                            MainMyCreationsFragment.ForceRefresh = true;
                             Finish();
                         }
                         else
@@ -172,7 +172,7 @@ namespace OurPlace.Android.Activities.Create
                         localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
                         dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
                         dbManager.AddUser(dbManager.CurrentUser);
-                        MainMyActivitiesFragment.ForceRefresh = true;
+                        MainMyCreationsFragment.ForceRefresh = true;
                         Finish();
                     }
                 })
@@ -293,7 +293,7 @@ namespace OurPlace.Android.Activities.Create
 
             dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
             dbManager.AddUser(dbManager.CurrentUser);
-            MainMyActivitiesFragment.ForceRefresh = true;
+            MainMyCreationsFragment.ForceRefresh = true;
         }
 
         protected override void OnResume()
