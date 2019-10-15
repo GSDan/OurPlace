@@ -5106,14 +5106,17 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0D0001
 			public const int CreateActivityOverviewMenu = 2131558401;
 			
+			// aapt resource value: 0x7F0D0002
+			public const int CreateCollectionAddActivityMenu = 2131558402;
+			
 			// aapt resource value: 0x7F0D0000
 			public const int create_fab_contents = 2131558400;
 			
-			// aapt resource value: 0x7F0D0002
-			public const int MainMenu = 2131558402;
-			
 			// aapt resource value: 0x7F0D0003
-			public const int MediaViewerMenu = 2131558403;
+			public const int MainMenu = 2131558403;
+			
+			// aapt resource value: 0x7F0D0004
+			public const int MediaViewerMenu = 2131558404;
 			
 			static Menu()
 			{
@@ -5406,298 +5409,301 @@ namespace OurPlace.Android
 			public const int createCollectionAddActivityHeader = 2131689594;
 			
 			// aapt resource value: 0x7F0F007B
-			public const int createCollectionDescriptionErr = 2131689595;
+			public const int createCollectionAddActivityHelp = 2131689595;
 			
 			// aapt resource value: 0x7F0F007C
-			public const int createCollectionDescriptionHint = 2131689596;
+			public const int createCollectionDescriptionErr = 2131689596;
 			
 			// aapt resource value: 0x7F0F007D
-			public const int createCollectionFabPrompt = 2131689597;
+			public const int createCollectionDescriptionHint = 2131689597;
 			
 			// aapt resource value: 0x7F0F007E
-			public const int createCollectionNameErr = 2131689598;
+			public const int createCollectionFabPrompt = 2131689598;
 			
 			// aapt resource value: 0x7F0F007F
-			public const int createCollectionNameHint = 2131689599;
+			public const int createCollectionNameErr = 2131689599;
 			
 			// aapt resource value: 0x7F0F0080
-			public const int createCollectionNoImageWarning = 2131689600;
+			public const int createCollectionNameHint = 2131689600;
 			
 			// aapt resource value: 0x7F0F0081
-			public const int createCollectionRemoveActivity = 2131689601;
+			public const int createCollectionNoImageWarning = 2131689601;
 			
 			// aapt resource value: 0x7F0F0082
-			public const int createCollectionViewActivityLocation = 2131689602;
-			
-			// aapt resource value: 0x7F0F00C6
-			public const int createdActivitiesLocalDesc = 2131689670;
-			
-			// aapt resource value: 0x7F0F00C7
-			public const int createdActivitiesLocalTitle = 2131689671;
-			
-			// aapt resource value: 0x7F0F00C8
-			public const int createdActivityDialogDelete = 2131689672;
-			
-			// aapt resource value: 0x7F0F00C9
-			public const int createdActivityDialogMessage = 2131689673;
-			
-			// aapt resource value: 0x7F0F00CA
-			public const int createdActivityDialogOpen = 2131689674;
-			
-			// aapt resource value: 0x7F0F00CB
-			public const int createdActivityDialogTitle = 2131689675;
-			
-			// aapt resource value: 0x7F0F00CC
-			public const int createdActivityDialogUnfinishedMessage = 2131689676;
-			
-			// aapt resource value: 0x7F0F00CD
-			public const int createdCollectionsLocalDesc = 2131689677;
-			
-			// aapt resource value: 0x7F0F00CE
-			public const int createdCollectionsLocalTitle = 2131689678;
-			
-			// aapt resource value: 0x7F0F00CF
-			public const int createdFeedDesc = 2131689679;
-			
-			// aapt resource value: 0x7F0F00D0
-			public const int createdFeedTitle = 2131689680;
+			public const int createCollectionRemoveActivity = 2131689602;
 			
 			// aapt resource value: 0x7F0F0083
-			public const int createFinishActivityHeader = 2131689603;
+			public const int createCollectionViewActivityLocation = 2131689603;
+			
+			// aapt resource value: 0x7F0F00C7
+			public const int createdActivitiesLocalDesc = 2131689671;
+			
+			// aapt resource value: 0x7F0F00C8
+			public const int createdActivitiesLocalTitle = 2131689672;
+			
+			// aapt resource value: 0x7F0F00C9
+			public const int createdActivityDialogDelete = 2131689673;
+			
+			// aapt resource value: 0x7F0F00CA
+			public const int createdActivityDialogMessage = 2131689674;
+			
+			// aapt resource value: 0x7F0F00CB
+			public const int createdActivityDialogOpen = 2131689675;
+			
+			// aapt resource value: 0x7F0F00CC
+			public const int createdActivityDialogTitle = 2131689676;
+			
+			// aapt resource value: 0x7F0F00CD
+			public const int createdActivityDialogUnfinishedMessage = 2131689677;
+			
+			// aapt resource value: 0x7F0F00CE
+			public const int createdCollectionsLocalDesc = 2131689678;
+			
+			// aapt resource value: 0x7F0F00CF
+			public const int createdCollectionsLocalTitle = 2131689679;
+			
+			// aapt resource value: 0x7F0F00D0
+			public const int createdFeedDesc = 2131689680;
+			
+			// aapt resource value: 0x7F0F00D1
+			public const int createdFeedTitle = 2131689681;
 			
 			// aapt resource value: 0x7F0F0084
-			public const int createFinishActivityPlaceBtn = 2131689604;
+			public const int createFinishActivityHeader = 2131689604;
 			
 			// aapt resource value: 0x7F0F0085
-			public const int createFinishActivityPlaceChoose = 2131689605;
+			public const int createFinishActivityPlaceBtn = 2131689605;
 			
 			// aapt resource value: 0x7F0F0086
-			public const int createFinishActivityPlaceChosenHeader = 2131689606;
+			public const int createFinishActivityPlaceChoose = 2131689606;
 			
 			// aapt resource value: 0x7F0F0087
-			public const int createFinishActivityPlaceExists = 2131689607;
+			public const int createFinishActivityPlaceChosenHeader = 2131689607;
 			
 			// aapt resource value: 0x7F0F0088
-			public const int createFinishActivityPlaceExplanation = 2131689608;
+			public const int createFinishActivityPlaceExists = 2131689608;
 			
 			// aapt resource value: 0x7F0F0089
-			public const int createFinishActivityPlaceHeader = 2131689609;
+			public const int createFinishActivityPlaceExplanation = 2131689609;
 			
 			// aapt resource value: 0x7F0F008A
-			public const int createFinishActivityPublicCheck = 2131689610;
+			public const int createFinishActivityPlaceHeader = 2131689610;
 			
 			// aapt resource value: 0x7F0F008B
-			public const int createFinishActivityPublicExplanation = 2131689611;
+			public const int createFinishActivityPublicCheck = 2131689611;
 			
 			// aapt resource value: 0x7F0F008C
-			public const int createFinishActivityReqNameCheck = 2131689612;
+			public const int createFinishActivityPublicExplanation = 2131689612;
 			
 			// aapt resource value: 0x7F0F008D
-			public const int createFinishActivityReqNameExplanation = 2131689613;
+			public const int createFinishActivityReqNameCheck = 2131689613;
 			
 			// aapt resource value: 0x7F0F008E
-			public const int createFinishActivityTerms = 2131689614;
+			public const int createFinishActivityReqNameExplanation = 2131689614;
 			
 			// aapt resource value: 0x7F0F008F
-			public const int createFinishActivityTermsErr = 2131689615;
+			public const int createFinishActivityTerms = 2131689615;
 			
 			// aapt resource value: 0x7F0F0090
-			public const int createFinishActivityUploadBtn = 2131689616;
+			public const int createFinishActivityTermsErr = 2131689616;
 			
 			// aapt resource value: 0x7F0F0091
-			public const int createNewActivityChildTasks = 2131689617;
+			public const int createFinishActivityUploadBtn = 2131689617;
 			
 			// aapt resource value: 0x7F0F0092
-			public const int createNewActivityChooseTaskType = 2131689618;
+			public const int createNewActivityChildTasks = 2131689618;
 			
 			// aapt resource value: 0x7F0F0093
-			public const int createNewActivityDescView = 2131689619;
+			public const int createNewActivityChooseTaskType = 2131689619;
 			
 			// aapt resource value: 0x7F0F0094
-			public const int createNewActivityErrNoDesc = 2131689620;
+			public const int createNewActivityDescView = 2131689620;
 			
 			// aapt resource value: 0x7F0F0095
-			public const int createNewActivityErrNoTitle = 2131689621;
+			public const int createNewActivityErrNoDesc = 2131689621;
 			
 			// aapt resource value: 0x7F0F0096
-			public const int createNewActivityFabNewAct = 2131689622;
+			public const int createNewActivityErrNoTitle = 2131689622;
 			
 			// aapt resource value: 0x7F0F0097
-			public const int createNewActivityFabNewColl = 2131689623;
+			public const int createNewActivityFabNewAct = 2131689623;
 			
 			// aapt resource value: 0x7F0F0098
-			public const int createNewActivityImagePrompt = 2131689624;
+			public const int createNewActivityFabNewColl = 2131689624;
 			
 			// aapt resource value: 0x7F0F0099
-			public const int createNewActivityPrompt = 2131689625;
+			public const int createNewActivityImagePrompt = 2131689625;
 			
 			// aapt resource value: 0x7F0F009A
-			public const int createNewActivityTask = 2131689626;
+			public const int createNewActivityPrompt = 2131689626;
 			
 			// aapt resource value: 0x7F0F009B
-			public const int createNewActivityTaskAddTask = 2131689627;
+			public const int createNewActivityTask = 2131689627;
 			
 			// aapt resource value: 0x7F0F009C
-			public const int createNewActivityTaskInstruct = 2131689628;
+			public const int createNewActivityTaskAddTask = 2131689628;
 			
 			// aapt resource value: 0x7F0F009D
-			public const int createNewActivityTitleView = 2131689629;
+			public const int createNewActivityTaskInstruct = 2131689629;
 			
 			// aapt resource value: 0x7F0F009E
-			public const int createNewActivityWarnNoImage = 2131689630;
+			public const int createNewActivityTitleView = 2131689630;
 			
 			// aapt resource value: 0x7F0F009F
-			public const int createNewDrawPhotoChooseParent = 2131689631;
+			public const int createNewActivityWarnNoImage = 2131689631;
 			
 			// aapt resource value: 0x7F0F00A0
-			public const int createNewDrawPhotoChoosePrompt = 2131689632;
+			public const int createNewDrawPhotoChooseParent = 2131689632;
 			
 			// aapt resource value: 0x7F0F00A1
-			public const int createNewDrawPhotoChooseSourceImage = 2131689633;
+			public const int createNewDrawPhotoChoosePrompt = 2131689633;
 			
 			// aapt resource value: 0x7F0F00A2
-			public const int createNewDrawPhotoChosenTask = 2131689634;
+			public const int createNewDrawPhotoChooseSourceImage = 2131689634;
 			
 			// aapt resource value: 0x7F0F00A3
-			public const int createNewDrawPhotoNothingSelected = 2131689635;
+			public const int createNewDrawPhotoChosenTask = 2131689635;
 			
 			// aapt resource value: 0x7F0F00A4
-			public const int createNewInfoAddImage = 2131689636;
+			public const int createNewDrawPhotoNothingSelected = 2131689636;
 			
 			// aapt resource value: 0x7F0F00A5
-			public const int createNewInfoNoImage = 2131689637;
+			public const int createNewInfoAddImage = 2131689637;
 			
 			// aapt resource value: 0x7F0F00A6
-			public const int createNewInfoPrompt = 2131689638;
+			public const int createNewInfoNoImage = 2131689638;
 			
 			// aapt resource value: 0x7F0F00A7
-			public const int createNewInfoUrlInvalid = 2131689639;
+			public const int createNewInfoPrompt = 2131689639;
 			
 			// aapt resource value: 0x7F0F00A8
-			public const int createNewInfoUrlPrompt = 2131689640;
+			public const int createNewInfoUrlInvalid = 2131689640;
 			
 			// aapt resource value: 0x7F0F00A9
-			public const int createNewListenAudioBtn = 2131689641;
+			public const int createNewInfoUrlPrompt = 2131689641;
 			
 			// aapt resource value: 0x7F0F00AA
-			public const int createNewListenChosen = 2131689642;
+			public const int createNewListenAudioBtn = 2131689642;
 			
 			// aapt resource value: 0x7F0F00AB
-			public const int createNewListenChosenPlaceholder = 2131689643;
+			public const int createNewListenChosen = 2131689643;
 			
 			// aapt resource value: 0x7F0F00AC
-			public const int createNewListenExisting = 2131689644;
+			public const int createNewListenChosenPlaceholder = 2131689644;
 			
 			// aapt resource value: 0x7F0F00AD
-			public const int createNewListenNew = 2131689645;
+			public const int createNewListenExisting = 2131689645;
 			
 			// aapt resource value: 0x7F0F00AE
-			public const int createNewListenNoFile = 2131689646;
+			public const int createNewListenNew = 2131689646;
 			
 			// aapt resource value: 0x7F0F00AF
-			public const int createNewListenPopUp = 2131689647;
+			public const int createNewListenNoFile = 2131689647;
 			
 			// aapt resource value: 0x7F0F00B0
-			public const int createNewLocationHuntChooseLocation = 2131689648;
+			public const int createNewListenPopUp = 2131689648;
 			
 			// aapt resource value: 0x7F0F00B1
-			public const int createNewLocationHuntMapCheckbox = 2131689649;
+			public const int createNewLocationHuntChooseLocation = 2131689649;
 			
 			// aapt resource value: 0x7F0F00B2
-			public const int createNewLocationHuntMapExplanation = 2131689650;
+			public const int createNewLocationHuntMapCheckbox = 2131689650;
 			
 			// aapt resource value: 0x7F0F00B3
-			public const int createNewMapMarkerErrMaxLessThanMin = 2131689651;
+			public const int createNewLocationHuntMapExplanation = 2131689651;
 			
 			// aapt resource value: 0x7F0F00B4
-			public const int createNewMapMarkerErrMinLessThanOne = 2131689652;
+			public const int createNewMapMarkerErrMaxLessThanMin = 2131689652;
 			
 			// aapt resource value: 0x7F0F00B5
-			public const int createNewMapMarkerExplanation = 2131689653;
+			public const int createNewMapMarkerErrMinLessThanOne = 2131689653;
 			
 			// aapt resource value: 0x7F0F00B6
-			public const int createNewMapMarkerMax = 2131689654;
+			public const int createNewMapMarkerExplanation = 2131689654;
 			
 			// aapt resource value: 0x7F0F00B7
-			public const int createNewMapMarkerMin = 2131689655;
+			public const int createNewMapMarkerMax = 2131689655;
 			
 			// aapt resource value: 0x7F0F00B8
-			public const int createNewMapMarkerUserLoc = 2131689656;
+			public const int createNewMapMarkerMin = 2131689656;
 			
 			// aapt resource value: 0x7F0F00B9
-			public const int createNewMultChoiceAdd = 2131689657;
+			public const int createNewMapMarkerUserLoc = 2131689657;
 			
 			// aapt resource value: 0x7F0F00BA
-			public const int createNewMultChoiceAdded = 2131689658;
+			public const int createNewMultChoiceAdd = 2131689658;
 			
 			// aapt resource value: 0x7F0F00BB
-			public const int createNewMultChoiceNone = 2131689659;
+			public const int createNewMultChoiceAdded = 2131689659;
 			
 			// aapt resource value: 0x7F0F00BC
-			public const int createNewMultChoicePrompt = 2131689660;
+			public const int createNewMultChoiceNone = 2131689660;
 			
 			// aapt resource value: 0x7F0F00BD
-			public const int createNewMultChoiceTooFew = 2131689661;
+			public const int createNewMultChoicePrompt = 2131689661;
 			
 			// aapt resource value: 0x7F0F00BE
-			public const int createNewPhotoMatchBtn = 2131689662;
+			public const int createNewMultChoiceTooFew = 2131689662;
 			
 			// aapt resource value: 0x7F0F00BF
-			public const int createNewPhotoMatchErr = 2131689663;
+			public const int createNewPhotoMatchBtn = 2131689663;
 			
 			// aapt resource value: 0x7F0F00C0
-			public const int createNewPhotoMatchPrompt = 2131689664;
+			public const int createNewPhotoMatchErr = 2131689664;
 			
 			// aapt resource value: 0x7F0F00C1
-			public const int createNewQrHint = 2131689665;
+			public const int createNewPhotoMatchPrompt = 2131689665;
 			
 			// aapt resource value: 0x7F0F00C2
-			public const int createTaskChildrenAdd = 2131689666;
+			public const int createNewQrHint = 2131689666;
 			
 			// aapt resource value: 0x7F0F00C3
-			public const int createTaskChildrenDesc = 2131689667;
+			public const int createTaskChildrenAdd = 2131689667;
 			
 			// aapt resource value: 0x7F0F00C4
-			public const int createTaskChildrenFinish = 2131689668;
+			public const int createTaskChildrenDesc = 2131689668;
 			
 			// aapt resource value: 0x7F0F00C5
-			public const int createTaskChildrenManage = 2131689669;
+			public const int createTaskChildrenFinish = 2131689669;
+			
+			// aapt resource value: 0x7F0F00C6
+			public const int createTaskChildrenManage = 2131689670;
 			
 			// aapt resource value: 0x7F0F0007
 			public const int DeleteBtn = 2131689479;
 			
-			// aapt resource value: 0x7F0F00D1
-			public const int deleteMessage = 2131689681;
-			
 			// aapt resource value: 0x7F0F00D2
-			public const int deleteTitle = 2131689682;
+			public const int deleteMessage = 2131689682;
 			
 			// aapt resource value: 0x7F0F00D3
-			public const int dialog_cancel = 2131689683;
+			public const int deleteTitle = 2131689683;
 			
 			// aapt resource value: 0x7F0F00D4
-			public const int dialog_ok = 2131689684;
+			public const int dialog_cancel = 2131689684;
 			
 			// aapt resource value: 0x7F0F00D5
-			public const int editActivityBackWarning = 2131689685;
+			public const int dialog_ok = 2131689685;
 			
 			// aapt resource value: 0x7F0F00D6
-			public const int editActivityBackWarningAccept = 2131689686;
+			public const int editActivityBackWarning = 2131689686;
+			
+			// aapt resource value: 0x7F0F00D7
+			public const int editActivityBackWarningAccept = 2131689687;
 			
 			// aapt resource value: 0x7F0F0008
 			public const int EditBtn = 2131689480;
 			
-			// aapt resource value: 0x7F0F00D7
-			public const int editNameBtn = 2131689687;
-			
 			// aapt resource value: 0x7F0F00D8
-			public const int enteredName = 2131689688;
+			public const int editNameBtn = 2131689688;
 			
 			// aapt resource value: 0x7F0F00D9
-			public const int errorCache = 2131689689;
+			public const int enteredName = 2131689689;
 			
 			// aapt resource value: 0x7F0F00DA
-			public const int errorCamera = 2131689690;
+			public const int errorCache = 2131689690;
+			
+			// aapt resource value: 0x7F0F00DB
+			public const int errorCamera = 2131689691;
 			
 			// aapt resource value: 0x7F0F0009
 			public const int ErrorLogin = 2131689481;
@@ -5711,26 +5717,26 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F000C
 			public const int ExternalBtn = 2131689484;
 			
-			// aapt resource value: 0x7F0F00DB
-			public const int fab_transformation_scrim_behavior = 2131689691;
-			
 			// aapt resource value: 0x7F0F00DC
-			public const int fab_transformation_sheet_behavior = 2131689692;
+			public const int fab_transformation_scrim_behavior = 2131689692;
 			
 			// aapt resource value: 0x7F0F00DD
-			public const int feedRecentAlertDelete = 2131689693;
+			public const int fab_transformation_sheet_behavior = 2131689693;
 			
 			// aapt resource value: 0x7F0F00DE
-			public const int feedRecentAlertMessage = 2131689694;
+			public const int feedRecentAlertDelete = 2131689694;
 			
 			// aapt resource value: 0x7F0F00DF
-			public const int feedRecentAlertStart = 2131689695;
+			public const int feedRecentAlertMessage = 2131689695;
 			
 			// aapt resource value: 0x7F0F00E0
-			public const int feedRecentDesc = 2131689696;
+			public const int feedRecentAlertStart = 2131689696;
 			
 			// aapt resource value: 0x7F0F00E1
-			public const int feedRecentTitle = 2131689697;
+			public const int feedRecentDesc = 2131689697;
+			
+			// aapt resource value: 0x7F0F00E2
+			public const int feedRecentTitle = 2131689698;
 			
 			// aapt resource value: 0x7F0F000D
 			public const int FinishBtn = 2131689485;
@@ -5741,17 +5747,17 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F000F
 			public const int Hello = 2131689487;
 			
-			// aapt resource value: 0x7F0F00E2
-			public const int hide_bottom_view_on_scroll_behavior = 2131689698;
+			// aapt resource value: 0x7F0F00E3
+			public const int hide_bottom_view_on_scroll_behavior = 2131689699;
 			
 			// aapt resource value: 0x7F0F0010
 			public const int ListenBtn = 2131689488;
 			
-			// aapt resource value: 0x7F0F00E3
-			public const int locationHuntArrivedMessage = 2131689699;
-			
 			// aapt resource value: 0x7F0F00E4
-			public const int locationHuntArrivedTitle = 2131689700;
+			public const int locationHuntArrivedMessage = 2131689700;
+			
+			// aapt resource value: 0x7F0F00E5
+			public const int locationHuntArrivedTitle = 2131689701;
 			
 			// aapt resource value: 0x7F0F0011
 			public const int LoginAgreeTerms = 2131689489;
@@ -5759,23 +5765,23 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0012
 			public const int LoginInfoPrompt = 2131689490;
 			
-			// aapt resource value: 0x7F0F00E5
-			public const int loginInfo_howAnswer = 2131689701;
-			
 			// aapt resource value: 0x7F0F00E6
-			public const int loginInfo_howTitle = 2131689702;
+			public const int loginInfo_howAnswer = 2131689702;
 			
 			// aapt resource value: 0x7F0F00E7
-			public const int loginInfo_whatAnswer = 2131689703;
+			public const int loginInfo_howTitle = 2131689703;
 			
 			// aapt resource value: 0x7F0F00E8
-			public const int loginInfo_whatTitle = 2131689704;
+			public const int loginInfo_whatAnswer = 2131689704;
 			
 			// aapt resource value: 0x7F0F00E9
-			public const int loginInfo_whyAnswer = 2131689705;
+			public const int loginInfo_whatTitle = 2131689705;
 			
 			// aapt resource value: 0x7F0F00EA
-			public const int loginInfo_whyTitle = 2131689706;
+			public const int loginInfo_whyAnswer = 2131689706;
+			
+			// aapt resource value: 0x7F0F00EB
+			public const int loginInfo_whyTitle = 2131689707;
 			
 			// aapt resource value: 0x7F0F0013
 			public const int LoginOpenPrivacy = 2131689491;
@@ -5798,8 +5804,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0019
 			public const int MainMyActivitiesTabTitle = 2131689497;
 			
-			// aapt resource value: 0x7F0F00EB
-			public const int mapLoadingMessage = 2131689707;
+			// aapt resource value: 0x7F0F00EC
+			public const int mapLoadingMessage = 2131689708;
 			
 			// aapt resource value: 0x7F0F001A
 			public const int MapsApiKey = 2131689498;
@@ -5819,152 +5825,152 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F001F
 			public const int MenuUploads = 2131689503;
 			
-			// aapt resource value: 0x7F0F00EC
-			public const int mtrl_chip_close_icon_content_description = 2131689708;
-			
 			// aapt resource value: 0x7F0F00ED
-			public const int noAppErrMessage = 2131689709;
+			public const int mtrl_chip_close_icon_content_description = 2131689709;
 			
 			// aapt resource value: 0x7F0F00EE
-			public const int noAppErrTitle = 2131689710;
+			public const int noAppErrMessage = 2131689710;
 			
 			// aapt resource value: 0x7F0F00EF
-			public const int openAudioBtn = 2131689711;
+			public const int noAppErrTitle = 2131689711;
 			
 			// aapt resource value: 0x7F0F00F0
-			public const int password_toggle_content_description = 2131689712;
+			public const int openAudioBtn = 2131689712;
 			
 			// aapt resource value: 0x7F0F00F1
-			public const int path_password_eye = 2131689713;
+			public const int password_toggle_content_description = 2131689713;
 			
 			// aapt resource value: 0x7F0F00F2
-			public const int path_password_eye_mask_strike_through = 2131689714;
+			public const int path_password_eye = 2131689714;
 			
 			// aapt resource value: 0x7F0F00F3
-			public const int path_password_eye_mask_visible = 2131689715;
+			public const int path_password_eye_mask_strike_through = 2131689715;
 			
 			// aapt resource value: 0x7F0F00F4
-			public const int path_password_strike_through = 2131689716;
+			public const int path_password_eye_mask_visible = 2131689716;
 			
 			// aapt resource value: 0x7F0F00F5
-			public const int permissionCameraTitle = 2131689717;
+			public const int path_password_strike_through = 2131689717;
 			
 			// aapt resource value: 0x7F0F00F6
-			public const int permissionFilesExplanation = 2131689718;
+			public const int permissionCameraTitle = 2131689718;
 			
 			// aapt resource value: 0x7F0F00F7
-			public const int permissionFilesTitle = 2131689719;
+			public const int permissionFilesExplanation = 2131689719;
 			
 			// aapt resource value: 0x7F0F00F8
-			public const int permissionLocationActivitiesExplanation = 2131689720;
+			public const int permissionFilesTitle = 2131689720;
 			
 			// aapt resource value: 0x7F0F00F9
-			public const int permissionLocationActivitiesTitle = 2131689721;
+			public const int permissionLocationActivitiesExplanation = 2131689721;
 			
 			// aapt resource value: 0x7F0F00FA
-			public const int permissionLocationExplanation = 2131689722;
+			public const int permissionLocationActivitiesTitle = 2131689722;
 			
 			// aapt resource value: 0x7F0F00FB
-			public const int permissionLocationTitle = 2131689723;
+			public const int permissionLocationExplanation = 2131689723;
 			
 			// aapt resource value: 0x7F0F00FC
-			public const int permissionMicExplanation = 2131689724;
+			public const int permissionLocationTitle = 2131689724;
 			
 			// aapt resource value: 0x7F0F00FD
-			public const int permissionMicTitle = 2131689725;
+			public const int permissionMicExplanation = 2131689725;
 			
 			// aapt resource value: 0x7F0F00FE
-			public const int permissionPhotoExplanation = 2131689726;
+			public const int permissionMicTitle = 2131689726;
 			
 			// aapt resource value: 0x7F0F00FF
-			public const int permissionRefused = 2131689727;
+			public const int permissionPhotoExplanation = 2131689727;
 			
 			// aapt resource value: 0x7F0F0100
-			public const int permissionVideoExplanation = 2131689728;
+			public const int permissionRefused = 2131689728;
 			
 			// aapt resource value: 0x7F0F0101
-			public const int place_autocomplete_clear_button = 2131689729;
+			public const int permissionVideoExplanation = 2131689729;
 			
 			// aapt resource value: 0x7F0F0102
-			public const int place_autocomplete_search_hint = 2131689730;
+			public const int place_autocomplete_clear_button = 2131689730;
+			
+			// aapt resource value: 0x7F0F0103
+			public const int place_autocomplete_search_hint = 2131689731;
 			
 			// aapt resource value: 0x7F0F0020
 			public const int PleaseWait = 2131689504;
 			
-			// aapt resource value: 0x7F0F0103
-			public const int pref_accountLogout_summary = 2131689731;
-			
 			// aapt resource value: 0x7F0F0104
-			public const int pref_accountLogout_title = 2131689732;
+			public const int pref_accountLogout_summary = 2131689732;
 			
 			// aapt resource value: 0x7F0F0105
-			public const int pref_accountLogout_warning = 2131689733;
+			public const int pref_accountLogout_title = 2131689733;
 			
 			// aapt resource value: 0x7F0F0106
-			public const int pref_account_cat_title = 2131689734;
+			public const int pref_accountLogout_warning = 2131689734;
 			
 			// aapt resource value: 0x7F0F0107
-			public const int pref_cacheDelete_complete = 2131689735;
+			public const int pref_account_cat_title = 2131689735;
 			
 			// aapt resource value: 0x7F0F0108
-			public const int pref_cacheDelete_summary = 2131689736;
+			public const int pref_cacheDelete_complete = 2131689736;
 			
 			// aapt resource value: 0x7F0F0109
-			public const int pref_cacheDelete_title = 2131689737;
+			public const int pref_cacheDelete_summary = 2131689737;
 			
 			// aapt resource value: 0x7F0F010A
-			public const int pref_cacheDelete_warning = 2131689738;
+			public const int pref_cacheDelete_title = 2131689738;
 			
 			// aapt resource value: 0x7F0F010B
-			public const int pref_cacheNumber_summary = 2131689739;
+			public const int pref_cacheDelete_warning = 2131689739;
 			
 			// aapt resource value: 0x7F0F010C
-			public const int pref_cacheNumber_title = 2131689740;
+			public const int pref_cacheNumber_summary = 2131689740;
 			
 			// aapt resource value: 0x7F0F010D
-			public const int pref_cache_cat_title = 2131689741;
+			public const int pref_cacheNumber_title = 2131689741;
+			
+			// aapt resource value: 0x7F0F010E
+			public const int pref_cache_cat_title = 2131689742;
 			
 			// aapt resource value: 0x7F0F0021
 			public const int RecBtn = 2131689505;
 			
-			// aapt resource value: 0x7F0F010E
-			public const int recordingLimit = 2131689742;
+			// aapt resource value: 0x7F0F010F
+			public const int recordingLimit = 2131689743;
 			
 			// aapt resource value: 0x7F0F0022
 			public const int RemoveBtn = 2131689506;
 			
-			// aapt resource value: 0x7F0F010F
-			public const int saveChanges = 2131689743;
-			
 			// aapt resource value: 0x7F0F0110
-			public const int scanningActivity_cancelled = 2131689744;
+			public const int saveChanges = 2131689744;
 			
 			// aapt resource value: 0x7F0F0111
-			public const int scanningActivity_success = 2131689745;
+			public const int scanningActivity_cancelled = 2131689745;
 			
 			// aapt resource value: 0x7F0F0112
-			public const int scanningActivity_title = 2131689746;
+			public const int scanningActivity_success = 2131689746;
 			
 			// aapt resource value: 0x7F0F0113
-			public const int scanningActivity_wrong = 2131689747;
+			public const int scanningActivity_title = 2131689747;
 			
 			// aapt resource value: 0x7F0F0114
-			public const int searchAlertMessage = 2131689748;
+			public const int scanningActivity_wrong = 2131689748;
 			
 			// aapt resource value: 0x7F0F0115
-			public const int searchAlertTitle = 2131689749;
+			public const int searchAlertMessage = 2131689749;
 			
 			// aapt resource value: 0x7F0F0116
-			public const int searchFail = 2131689750;
+			public const int searchAlertTitle = 2131689750;
 			
 			// aapt resource value: 0x7F0F0117
-			public const int search_menu_title = 2131689751;
+			public const int searchFail = 2131689751;
 			
 			// aapt resource value: 0x7F0F0118
-			public const int shareCreatorMessage = 2131689752;
+			public const int search_menu_title = 2131689752;
 			
 			// aapt resource value: 0x7F0F0119
-			public const int shareCreatorTitle = 2131689753;
+			public const int shareCreatorMessage = 2131689753;
+			
+			// aapt resource value: 0x7F0F011A
+			public const int shareCreatorTitle = 2131689754;
 			
 			// aapt resource value: 0x7F0F0023
 			public const int StartBtn = 2131689507;
@@ -5972,8 +5978,8 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0024
 			public const int StartDrawBtn = 2131689508;
 			
-			// aapt resource value: 0x7F0F011A
-			public const int status_bar_notification_info_overflow = 2131689754;
+			// aapt resource value: 0x7F0F011B
+			public const int status_bar_notification_info_overflow = 2131689755;
 			
 			// aapt resource value: 0x7F0F0025
 			public const int StopBtn = 2131689509;
@@ -5987,59 +5993,59 @@ namespace OurPlace.Android
 			// aapt resource value: 0x7F0F0028
 			public const int TaskBtnNotReady = 2131689512;
 			
-			// aapt resource value: 0x7F0F011B
-			public const int taskLockedParent = 2131689755;
+			// aapt resource value: 0x7F0F011C
+			public const int taskLockedParent = 2131689756;
 			
 			// aapt resource value: 0x7F0F0029
 			public const int TasksTitle = 2131689513;
 			
-			// aapt resource value: 0x7F0F011C
-			public const int taskUnlockedParent = 2131689756;
-			
 			// aapt resource value: 0x7F0F011D
-			public const int ttsError = 2131689757;
+			public const int taskUnlockedParent = 2131689757;
 			
 			// aapt resource value: 0x7F0F011E
-			public const int updateMessage = 2131689758;
+			public const int ttsError = 2131689758;
 			
 			// aapt resource value: 0x7F0F011F
-			public const int updateTitle = 2131689759;
+			public const int updateMessage = 2131689759;
 			
 			// aapt resource value: 0x7F0F0120
-			public const int uploadBtn = 2131689760;
+			public const int updateTitle = 2131689760;
 			
 			// aapt resource value: 0x7F0F0121
-			public const int uploadMissing = 2131689761;
+			public const int uploadBtn = 2131689761;
 			
 			// aapt resource value: 0x7F0F0122
-			public const int uploadsNone = 2131689762;
+			public const int uploadMissing = 2131689762;
 			
 			// aapt resource value: 0x7F0F0123
-			public const int uploadsPrompt = 2131689763;
+			public const int uploadsNone = 2131689763;
 			
 			// aapt resource value: 0x7F0F0124
-			public const int uploadsSizeWarningMessage = 2131689764;
+			public const int uploadsPrompt = 2131689764;
 			
 			// aapt resource value: 0x7F0F0125
-			public const int uploadsSizeWarningTitle = 2131689765;
+			public const int uploadsSizeWarningMessage = 2131689765;
 			
 			// aapt resource value: 0x7F0F0126
-			public const int uploadsSome = 2131689766;
-			
-			// aapt resource value: 0x7F0F0129
-			public const int uploadsUploadingActivity = 2131689769;
-			
-			// aapt resource value: 0x7F0F012A
-			public const int uploadsUploadingFiles = 2131689770;
-			
-			// aapt resource value: 0x7F0F012B
-			public const int uploadsUploadingItem = 2131689771;
+			public const int uploadsSizeWarningTitle = 2131689766;
 			
 			// aapt resource value: 0x7F0F0127
-			public const int uploadsUploadSuccessMessage = 2131689767;
+			public const int uploadsSome = 2131689767;
+			
+			// aapt resource value: 0x7F0F012A
+			public const int uploadsUploadingActivity = 2131689770;
+			
+			// aapt resource value: 0x7F0F012B
+			public const int uploadsUploadingFiles = 2131689771;
+			
+			// aapt resource value: 0x7F0F012C
+			public const int uploadsUploadingItem = 2131689772;
 			
 			// aapt resource value: 0x7F0F0128
-			public const int uploadsUploadSuccessTitle = 2131689768;
+			public const int uploadsUploadSuccessMessage = 2131689768;
+			
+			// aapt resource value: 0x7F0F0129
+			public const int uploadsUploadSuccessTitle = 2131689769;
 			
 			// aapt resource value: 0x7F0F002A
 			public const int UserLocationOnly = 2131689514;

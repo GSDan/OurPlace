@@ -159,6 +159,7 @@
   <string name="createCollectionDescriptionErr">Please enter a description for your collection!</string>
   <string name="createCollectionNoImageWarning">You haven\'t chosen a cover image for your collection - are you sure you want to continue?</string>
   <string name="createCollectionAddActivityHeader">Choose an Activity to add to your collection:</string>
+  <string name="createCollectionAddActivityHelp">Choose an Activity to add to your collection. The Activities listed are ones created by you. If you want to add someone else\'s Activity, enter its share code or scan its QR code using the buttons at the top of the screen.</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>
