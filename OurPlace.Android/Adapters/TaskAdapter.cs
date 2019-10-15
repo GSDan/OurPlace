@@ -631,7 +631,7 @@ namespace OurPlace.Android.Adapters
                 paths.RemoveAt(fileIndex);
                 Items[taskIndex].CompletionData.JsonData = JsonConvert.SerializeObject(paths);
 
-                if (paths.Count == 0)
+                if (!paths.Any())
                 {
                     Items[taskIndex].IsCompleted = false;
                     CheckForChildren(taskIndex);

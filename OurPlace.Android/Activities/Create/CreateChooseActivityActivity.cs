@@ -16,6 +16,7 @@ using Android.Views;
 using OurPlace.Common;
 using ZXing.Mobile;
 using Android.Util;
+using Android.Preferences;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -46,6 +47,23 @@ namespace OurPlace.Android.Activities.Create
             _ = GetUserActivities();
         }
 
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            // Check if we've shown help before:
+            ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(this);
+            bool hasAsked = prefs.GetBoolean("has_shown_collection_addhelp", false);
+
+            if (!hasAsked)
+            {
+                ISharedPreferencesEditor editor = prefs.Edit();
+                editor.PutBoolean("has_shown_collection_addhelp", true);
+                editor.Apply();
+                ShowHelp();
+            }
+        }
+
         private async Task GetUserActivities()
         {
             if (dbManager == null)
@@ -54,8 +72,23 @@ namespace OurPlace.Android.Activities.Create
             }
 
             activities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.CurrentUser.RemoteCreatedActivitiesJson) ?? new List<LearningActivity>();
-            activities.RemoveAll(act => previouslySelected.Any((rhs) => rhs.Id == act.Id)); //remove previously selected activities
+            int removed = activities.RemoveAll(act => previouslySelected.Any((rhs) => rhs.Id == act.Id)); //remove previously selected activities
             activities = activities.OrderByDescending(act => act.CreatedAt).ToList();
+            
+            if(!activities.Any())
+            {
+                using (TextView header = FindViewById<TextView>(Resource.Id.headerText))
+                {
+                    if(removed > 0)
+                    {
+                        header.SetText(Resource.String.createCollectionAddActivityHeaderNoneLeft);
+                    }
+                    else
+                    {
+                        header.SetText(Resource.String.createCollectionAddActivityHeaderNone);
+                    }                    
+                }
+            }
 
             SetupAdaptors();
 
@@ -154,7 +187,6 @@ namespace OurPlace.Android.Activities.Create
         {
             using (global::Android.Support.V7.App.AlertDialog.Builder alert = new global::Android.Support.V7.App.AlertDialog.Builder(this))
             {
-                alert.SetTitle(Resource.String.MenuHelp);
                 alert.SetMessage(Resource.String.createCollectionAddActivityHelp);
                 alert.SetPositiveButton(Resource.String.dialog_ok, (a, b) => { });
                 alert.Show();

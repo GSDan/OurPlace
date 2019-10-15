@@ -295,7 +295,7 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            if (taskTypes.Count == 0)
+            if (!taskTypes.Any())
             {
                 return;
             }

@@ -43,6 +43,7 @@ using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using static OurPlace.Common.LocalData.Storage;
@@ -304,12 +305,12 @@ namespace OurPlace.Android
 
             while (accountedFor < perms.Length)
             {
-                await Task.Delay(20);
+                await Task.Delay(20).ConfigureAwait(false);
             }
 
-            if (neededPerms.Count == 0)
+            if (!neededPerms.Any())
             {
-                activity.StartActivityForResult(toCall, intentId);
+                activity?.StartActivityForResult(toCall, intentId);
             }
             else
             {

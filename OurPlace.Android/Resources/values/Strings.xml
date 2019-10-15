@@ -148,6 +148,7 @@
   <string name="createFinishActivityTerms">I have read and accept the <a href="https://ourplace.app/terms">terms and conditions</a></string>
   <string name="createFinishActivityUploadBtn">Finish and Upload</string>
   <string name="createFinishActivityTermsErr">You must agree to the terms and conditions before proceeding.</string>
+  <string name="createCollectionHelp">Create a collection of related Activities that people can access all in one place. Perfect for making trails! Tap the \'+\' button to add an Activity. You can re-order Activities by holding and dragging them up or down the list.</string>
   <string name="createCollectionFabPrompt">Add an Activity to this collection!</string>
   <string name="createCollectionRemoveActivity">Remove</string>
   <string name="createCollectionActivityLocation">This activity is at {0}</string>
@@ -159,6 +160,8 @@
   <string name="createCollectionDescriptionErr">Please enter a description for your collection!</string>
   <string name="createCollectionNoImageWarning">You haven\'t chosen a cover image for your collection - are you sure you want to continue?</string>
   <string name="createCollectionAddActivityHeader">Choose an Activity to add to your collection:</string>
+  <string name="createCollectionAddActivityHeaderNone">You haven\'t made any Activities yet...</string>
+  <string name="createCollectionAddActivityHeaderNoneLeft">You\ve added all of your Activities!</string>
   <string name="createCollectionAddActivityHelp">Choose an Activity to add to your collection. The Activities listed are ones created by you. If you want to add someone else\'s Activity, enter its share code or scan its QR code using the buttons at the top of the screen.</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>

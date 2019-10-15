@@ -75,6 +75,29 @@ namespace OurPlace.Android.Activities.Create
             base.OnResume();
         }
 
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.HelpOnlyMenu, menu);
+            return base.OnPrepareOptionsMenu(menu);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item?.ItemId)
+            {
+                case Resource.Id.menuhelp:
+                    using (global::Android.Support.V7.App.AlertDialog.Builder alert = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                    {
+                        alert.SetMessage(Resource.String.createCollectionHelp);
+                        alert.SetPositiveButton(Resource.String.dialog_ok, (a, b) => { });
+                        alert.Show();
+                    }
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
+        }
+
         private void Fab_Click(object sender, EventArgs e)
         {
             using (Intent intent = new Intent(this, typeof(CreateChooseActivityActivity)))

@@ -126,7 +126,7 @@ namespace OurPlace.Android.Activities.Create
         /// </summary>
         private void UploadAfterWarning(object sender, int position)
         {
-            if(uploads.Count == 0 || position >= uploads.Count) return;
+            if(!uploads.Any() || position >= uploads.Count) return;
 
             files = JsonConvert.DeserializeObject<List<FileUpload>>(uploads[position].FilesJson);
             float totalFileSizeMb = 0;
@@ -259,7 +259,7 @@ namespace OurPlace.Android.Activities.Create
                 .SetCancelable(false)
                 .SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
                 {
-                    if (adapter.Data.Count == 0)
+                    if (!adapter.Data.Any())
                     {
                         OnBackPressed();
                     }

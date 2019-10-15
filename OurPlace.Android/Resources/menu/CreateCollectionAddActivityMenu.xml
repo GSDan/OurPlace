@@ -33,6 +33,6 @@ app:showAsAction="always"/>
   <item
   android:id="@+id/menuhelp"
   android:title="@string/MenuHelp"
-  android:icon="@drawable/ic_help_green_24dp"
-  app:showAsAction="never"/>
+  android:icon="@drawable/ic_help_white_24dp"
+  app:showAsAction="ifRoom"/>
 </menu>

@@ -60,7 +60,7 @@ namespace OurPlace.Android.Activities.Create
             taskTypes = (await GetDatabaseManager()).GetTaskTypes().ToList();
 
             // If the database is no good try to pull TaskTypes from the server
-            if (taskTypes == null || taskTypes.Count == 0)
+            if (taskTypes == null || !taskTypes.Any())
             {
                 ProgressDialog progDialog = new ProgressDialog(this);
                 progDialog.SetMessage(Resources.GetString(Resource.String.Connecting));
@@ -79,7 +79,7 @@ namespace OurPlace.Android.Activities.Create
                     return;
                 }
 
-                if (loadedTypes.Count == 0)
+                if (!loadedTypes.Any())
                 {
                     new global::Android.Support.V7.App.AlertDialog.Builder(this)
                         .SetTitle(Resource.String.ErrorTitle)
