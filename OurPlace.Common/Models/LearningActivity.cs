@@ -27,13 +27,9 @@ namespace OurPlace.Common.Models
 {
     public class LearningActivity : FeedItem
     {
-        public DateTime CreatedAt { get; set; }
-        public string InviteCode { get; set; }
         public bool RequireUsername { get; set; }
         public IEnumerable<LearningTask> LearningTasks { get; set; }
-        public IEnumerable<Place> Places { get; set; }
         public Application Application { get; set; }
-        public int AppVersionNumber { get; set; }
         public int ActivityVersionNumber { get; set; }
     }
 }

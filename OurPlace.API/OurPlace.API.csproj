@@ -327,6 +327,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ActivityCollectionsController.cs" />
     <Compile Include="Controllers\CallbackController.cs" />
     <Compile Include="Controllers\CompletedTasksController.cs" />
     <Compile Include="Controllers\EmailController.cs" />
@@ -465,6 +466,10 @@
     <Compile Include="Migrations\201910071338292_ActivityCollection_Update.cs" />
     <Compile Include="Migrations\201910071338292_ActivityCollection_Update.Designer.cs">
       <DependentUpon>201910071338292_ActivityCollection_Update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910161521555_collection_places.cs" />
+    <Compile Include="Migrations\201910161521555_collection_places.Designer.cs">
+      <DependentUpon>201910161521555_collection_places.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -775,6 +780,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910071338292_ActivityCollection_Update.resx">
       <DependentUpon>201910071338292_ActivityCollection_Update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910161521555_collection_places.resx">
+      <DependentUpon>201910161521555_collection_places.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

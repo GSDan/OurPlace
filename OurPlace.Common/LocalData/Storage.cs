@@ -178,7 +178,7 @@ namespace OurPlace.Common.LocalData
 
         public static void DeleteInProgress(LearningActivity act)
         {
-            List<FileUpload> files = GetFilesForCreatedActivity(act);
+            List<FileUpload> files = GetFilesForCreation(act);
 
             foreach (FileUpload file in files)
             {
@@ -322,68 +322,83 @@ namespace OurPlace.Common.LocalData
             return uploads;
         }
 
-        public static async Task<AppDataUpload> PrepCreatedActivityForUpload(LearningActivity created, bool updatingRemote)
+        public static async Task<AppDataUpload> PrepCreationForUpload(FeedItem created, bool updatingRemote)
         {
             created.AppVersionNumber = Helpers.AppVersionNumber;
 
             AppDataUpload uploadData = new AppDataUpload
             {
                 ItemId = created.Id,
-                UploadRoute = (updatingRemote) ? "api/learningactivities?id=" + created.Id : "api/learningactivities",
                 Name = created.Name,
                 CreatedAt = created.CreatedAt,
                 Description = created.Description,
                 ImageUrl = created.ImageUrl,
-                UploadType = (updatingRemote)? UploadType.UpdatedActivity : UploadType.NewActivity,
                 JsonData = JsonConvert.SerializeObject(created,
                     new JsonSerializerSettings
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                         MaxDepth = 5
                     }),
-                FilesJson = JsonConvert.SerializeObject(GetFilesForCreatedActivity(created))
+                FilesJson = JsonConvert.SerializeObject( GetFilesForCreation(created))
             };
 
             DatabaseManager databaseManager = await GetDatabaseManager();
-            databaseManager.AddUpload(uploadData);
-
+            
             // Remove from cache when added to upload queue
-            string cacheJson = databaseManager.CurrentUser.LocalCreatedActivitiesJson;
-            List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
-                new List<LearningActivity>() :
-                JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
-
-            int existingInd = inProgress.FindIndex((la) => la.Id == created.Id);
-            if (existingInd != -1)
+            if(created is LearningActivity createdActivity)
             {
-                inProgress.RemoveAt(existingInd);
+                uploadData.UploadType = (updatingRemote) ? UploadType.UpdatedActivity : UploadType.NewActivity;
+                uploadData.UploadRoute = (updatingRemote) ? "api/learningactivities?id=" + created.Id : "api/learningactivities";
+
+                string cacheJson = databaseManager.CurrentUser.LocalCreatedActivitiesJson;
+                List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
+                    new List<LearningActivity>() :
+                    JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
+
+                int existingInd = inProgress.FindIndex((la) => la.Id == created.Id);
+                if (existingInd != -1)
+                {
+                    inProgress.RemoveAt(existingInd);
+                }
+
+                databaseManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
+            }
+            else if(created is ActivityCollection createdCollection)
+            {
+                uploadData.UploadType = (updatingRemote) ? UploadType.UpdatedCollection : UploadType.NewCollection;
+                uploadData.UploadRoute = (updatingRemote) ? "api/activitycollections?id=" + created.Id : "api/activitycollections";
+
+                string cacheJson = databaseManager.CurrentUser.LocalCreatedCollectionsJson;
+                List<ActivityCollection> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
+                    new List<ActivityCollection>() :
+                    JsonConvert.DeserializeObject<List<ActivityCollection>>(cacheJson);
+
+                int existingInd = inProgress.FindIndex((la) => la.Id == created.Id);
+                if (existingInd != -1)
+                {
+                    inProgress.RemoveAt(existingInd);
+                }
+
+                databaseManager.CurrentUser.LocalCreatedCollectionsJson = JsonConvert.SerializeObject(inProgress);
             }
 
-            databaseManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
+            databaseManager.AddUpload(uploadData);
             databaseManager.AddUser(databaseManager.CurrentUser);
 
             return uploadData;
         }
 
-        private static List<FileUpload> GetFilesForCreatedActivity(LearningActivity created)
+        private static List<FileUpload> GetFilesForCreation(FeedItem created)
         {
             List<FileUpload> files = new List<FileUpload>();
 
-            if (created.LearningTasks != null)
+            if(created is LearningActivity createdActivity)
             {
-                foreach (LearningTask t in created.LearningTasks)
+                if (createdActivity.LearningTasks != null)
                 {
-                    string thisFile = GetPathIfFile(t);
-                    if (!string.IsNullOrWhiteSpace(thisFile))
+                    foreach (LearningTask t in createdActivity.LearningTasks)
                     {
-                        files.Add(new FileUpload
-                        {
-                            LocalFilePath = thisFile
-                        });
-                    }
-                    foreach (LearningTask c in t.ChildTasks)
-                    {
-                        thisFile = GetPathIfFile(c);
+                        string thisFile = GetPathIfFile(t);
                         if (!string.IsNullOrWhiteSpace(thisFile))
                         {
                             files.Add(new FileUpload
@@ -391,10 +406,21 @@ namespace OurPlace.Common.LocalData
                                 LocalFilePath = thisFile
                             });
                         }
+                        foreach (LearningTask c in t.ChildTasks)
+                        {
+                            thisFile = GetPathIfFile(c);
+                            if (!string.IsNullOrWhiteSpace(thisFile))
+                            {
+                                files.Add(new FileUpload
+                                {
+                                    LocalFilePath = thisFile
+                                });
+                            }
+                        }
                     }
                 }
             }
-
+            
             if (!string.IsNullOrWhiteSpace(created.ImageUrl) && !created.ImageUrl.StartsWith("upload"))
             {
                 files.Add(new FileUpload

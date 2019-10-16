@@ -44,9 +44,6 @@ namespace OurPlace.API.Controllers
 {
     public class LearningActivitiesController : ParkLearnAPIController
     {
-        private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private static Random rand = new Random();
-
         private IEnumerable<Common.Models.ActivityCollection> GetAllCollectionsWhere(Func<ActivityCollection, bool> predicate)
         {
             return db.ActivityCollections.Where(predicate)
@@ -65,14 +62,14 @@ namespace OurPlace.API.Controllers
                     SoftDeleted = c.SoftDeleted,
                     ActivityOrder = c.ActivityOrder,
                     IsPublic = c.IsPublic,
-                    Location = new Common.Models.Place
+                    Places = c.Places.Select(p => new Common.Models.Place
                     {
-                        Id = c.Location.Id,
-                        Name = c.Location.Name,
-                        GooglePlaceId = c.Location.GooglePlaceId,
-                        Latitude = c.Location.Latitude,
-                        Longitude = c.Location.Longitude
-                    },
+                        Id = p.Id,
+                        Name = p.Name,
+                        GooglePlaceId = p.GooglePlaceId,
+                        Latitude = p.Latitude,
+                        Longitude = p.Longitude
+                    }).ToList(),
                     Application = new Common.Models.Application
                     {
                         Id = c.Application.Id,
@@ -279,7 +276,7 @@ namespace OurPlace.API.Controllers
                     // contain at least one activity
                     List<Common.Models.ActivityCollection> collectionsHere = GetAllCollectionsWhere(c =>
                        !c.SoftDeleted &&
-                       c.Location.Id == pl.Id &&
+                       c.Places.Any(l => l.Id == pl.Id) &&
                         (c.Approved || thisUser.Trusted) &&
                         c.Activities.Any(a => a.SoftDeleted == false) &&
                         (isResearcher || c.IsPublic)).ToList();
@@ -446,7 +443,7 @@ namespace OurPlace.API.Controllers
                 return Unauthorized();
             }
                 
-            List<Place> places = await ProcessPlaces(learningActivity.Places, thisUser, existing.Places.ToList());
+            List<Place> places = await ProcessPlacesInNewContent(learningActivity.Places, thisUser, existing.Places.ToList());
             List<LearningTask> tasks = await ProcessTasks(learningActivity, thisUser, true);
 
             existing.AppVersionNumber = learningActivity.AppVersionNumber;
@@ -468,81 +465,7 @@ namespace OurPlace.API.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        private async Task<List<Place>> ProcessPlaces(ICollection<Place> places, ApplicationUser currentUser, List<Place> finalPlaces = null)
-        {
-            // Go through the activity's Places, adding them to the database if necessary
-            if (finalPlaces == null)
-            {
-                finalPlaces = new List<Place>();
-            }
-            else
-            {
-                // avoiding creating new, which seems to cause conflicts
-                finalPlaces.Clear();
-            }
-
-            if (places == null) return finalPlaces;
-
-            for (int i = 0; i < places.Count; i++)
-            {
-                Place thisPlace = places.ElementAt(i);
-                Place existing = await db.Places.Where(p => p.GooglePlaceId == thisPlace.GooglePlaceId).FirstOrDefaultAsync();
-                if (existing != null)
-                {
-                    finalPlaces.Add(existing);
-                }
-                else
-                {
-                    Common.Models.GMapsResult result;
-
-                    using (HttpClient client = new HttpClient())
-                    {
-                        string reqUrl = string.Format("https://maps.googleapis.com/maps/api/place/details/json?placeid={0}&key={1}",
-                            thisPlace.GooglePlaceId, Common.ConfidentialData.mapsk);
-                        var response = await client.GetStringAsync(reqUrl);
-                        result = JsonConvert.DeserializeObject<Common.Models.GMapsResult>(response);
-                    }
-                    if (result.status == "OK")
-                    {
-                        double lat = result.result.geometry.location.lat;
-                        double lon = result.result.geometry.location.lng;
-
-                        Place finalPlace = new Place
-                        {
-                            GooglePlaceId = result.result.place_id,
-                            Latitude = new decimal(lat),
-                            Longitude = new decimal(lon),
-                            Location = ServerUtils.CreatePoint(lat, lon),
-                            Name = result.result.name,
-                            CreatedAt = DateTime.UtcNow,
-                            AddedBy = currentUser
-                        };
-
-                        // Check for parent locality
-                        PlaceLocality locality = await LocationLogic.GetLocality(lat, lon);
-                        if (locality != null)
-                        {
-                            PlaceLocality existingLocality = await db.PlaceLocalities
-                                .Where(p => p.GooglePlaceId == locality.GooglePlaceId).FirstOrDefaultAsync();
-                            if (existingLocality == null)
-                            {
-                                finalPlace.Locality = db.PlaceLocalities.Add(locality);
-                                await db.SaveChangesAsync();
-                            }
-                            else
-                            {
-                                finalPlace.Locality = existingLocality;
-                            }
-                        }
-
-                        finalPlaces.Add(db.Places.Add(finalPlace));
-                    }
-
-                }
-            }
-
-            return finalPlaces;
-        }
+        
 
         private async Task<LearningTask> AddTaskIfNeeded(LearningTask thisTask, ApplicationUser currentUser, bool checkUpdated = false)
         {
@@ -636,7 +559,7 @@ namespace OurPlace.API.Controllers
 
             Application thisApp = db.Applications.AsEnumerable().FirstOrDefault();
 
-            learningActivity.Places = await ProcessPlaces(learningActivity.Places, thisUser);
+            learningActivity.Places = await ProcessPlacesInNewContent(learningActivity.Places, thisUser);
 
             learningActivity.LearningTasks = await ProcessTasks(learningActivity, thisUser);
             learningActivity.Author = thisUser;
@@ -679,22 +602,6 @@ namespace OurPlace.API.Controllers
             return resp;
         }
 
-        private async Task<string> GenerateQR(string codeName, string codeData)
-        {
-            string qrCodeUrl = "qrCodes/" + codeName + ".png";
-            Bitmap qrCode = ServerUtils.GenerateQRCode(codeData, true);
-            CloudBlobContainer appContainer = ServerUtils.GetCloudBlobContainer();
-            CloudBlockBlob blob = appContainer.GetBlockBlobReference(qrCodeUrl);
-            using (MemoryStream stream = new MemoryStream())
-            {
-                qrCode.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                blob.Properties.ContentType = "image/png";
-                stream.Seek(0, SeekOrigin.Begin);
-                await blob.UploadFromStreamAsync(stream);
-            }
-
-            return qrCodeUrl;
-        }
 
         // DELETE: api/LearningActivities/5
         [ResponseType(typeof(LearningActivity))]

@@ -7,7 +7,7 @@ namespace OurPlace.Common.Models
     public class ActivityCollection : FeedItem
     {
         public DateTime CreatedAt { get; set; }
-        public virtual Place Location { get; set; }
+        public virtual List<Place> Places { get; set; }
         public bool IsTrail { get; set; }
         public string ActivityOrder { get; set; }
         public string QRCodeUrl { get; set; }

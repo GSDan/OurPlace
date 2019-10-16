@@ -34,6 +34,7 @@ using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -72,7 +73,7 @@ namespace OurPlace.Android.Activities.Create
 
         private async Task LoadQueue()
         {
-            dbManager = await Storage.GetDatabaseManager();
+            dbManager = await Storage.GetDatabaseManager().ConfigureAwait(false);
 
             uploads = dbManager.GetUploadQueue().ToList();
 
@@ -150,9 +151,12 @@ namespace OurPlace.Android.Activities.Create
                 string unit = (totalFileSizeMb > 1000) ? "GB" : "MB";
                 float amount = (totalFileSizeMb > 1000) ? totalFileSizeMb / 1000 : totalFileSizeMb;
 
-                new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                    .SetTitle(Resource.String.uploadsSizeWarningTitle)
-                    .SetMessage(string.Format(base.Resources.GetString(Resource.String.uploadsSizeWarningMessage), amount.ToString("0.0"), unit))
+                using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                {
+                    builder.SetTitle(Resource.String.uploadsSizeWarningTitle)
+                    .SetMessage(string.Format(CultureInfo.InvariantCulture, 
+                        base.Resources.GetString(Resource.String.uploadsSizeWarningMessage), 
+                        amount.ToString("0.0", CultureInfo.InvariantCulture), unit))
                     .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
                     .SetCancelable(true)
                     .SetPositiveButton(Resource.String.Continue, (a, b) =>
@@ -160,6 +164,8 @@ namespace OurPlace.Android.Activities.Create
                         StartUploads(position);
                     })
                     .Show();
+                }
+                    
             }
             else
             {
@@ -193,16 +199,19 @@ namespace OurPlace.Android.Activities.Create
                             uploads[listPos].FilesJson = jsonData;
                             dbManager.UpdateUpload(uploads[listPos]);
                         },
-                    Storage.GetUploadsFolder());
+                    Storage.GetUploadsFolder()).ConfigureAwait(false);
 
                 if (!success)
                 {
                     uploadProgress.Dismiss();
-                    new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                        .SetTitle(Resource.String.ErrorTitle)
+                    using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                    {
+                        builder.SetTitle(Resource.String.ErrorTitle)
                         .SetMessage(Resource.String.ConnectionError)
                         .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { })
                         .Show();
+                    }
+                        
                     return;
                 }
             }
@@ -217,64 +226,81 @@ namespace OurPlace.Android.Activities.Create
 
             ServerResponse<string> resp = new ServerResponse<string>();
 
-            if (uploads[position].UploadType == UploadType.NewActivity ||
-                uploads[position].UploadType == UploadType.UpdatedActivity)
+            UploadType type = uploads[position].UploadType;
+
+            if (type == UploadType.NewActivity || type == UploadType.UpdatedActivity)
             {
-                resp = await ServerUtils.UploadActivity(uploads[position], uploads[position].UploadType == UploadType.UpdatedActivity);
+                resp = await ServerUtils.UploadActivity(uploads[position], type == UploadType.UpdatedActivity).ConfigureAwait(false);
+            }
+            else if (type == UploadType.NewCollection || type == UploadType.UpdatedCollection)
+            {
+                resp = await ServerUtils.UploadCollection(uploads[position], type == UploadType.UpdatedCollection).ConfigureAwait(false);
             }
             else
             {
                 // Uploading activity results
                 AppTask[] results = JsonConvert.DeserializeObject<AppTask[]>(uploads[position].JsonData) ?? new AppTask[0];
                 files = JsonConvert.DeserializeObject<List<FileUpload>>(uploads[position].FilesJson);
-                resp = await ServerUtils.UpdateAndPostResults(results, files, uploads[position].UploadRoute);
+                resp = await ServerUtils.UpdateAndPostResults(results, files, uploads[position].UploadRoute).ConfigureAwait(false);
             }
 
-            uploadProgress.Dismiss();
+            RunOnUiThread(() => uploadProgress.Dismiss());
 
             if (resp == null)
             {
                 var suppress = AndroidUtils.ReturnToSignIn(this);
-                Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show());
                 return;
             }
 
             if (!resp.Success)
             {
-                new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                    .SetTitle(Resource.String.ErrorTitle)
-                    .SetMessage(resp.Message)
-                    .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { })
-                    .Show();
+                RunOnUiThread(() =>
+                {
+                    using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                    {
+                        builder.SetTitle(Resource.String.ErrorTitle)
+                        .SetMessage(resp.Message)
+                        .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { })
+                        .Show();                        
+                    }  
+                });
                 return;
             }
 
             dbManager.DeleteUpload(uploads[position]);
-            adapter.Data.RemoveAt(position);
-            adapter.NotifyDataSetChanged();
 
-            new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                .SetTitle(Resource.String.uploadsUploadSuccessTitle)
-                .SetMessage(Resource.String.uploadsUploadSuccessMessage)
-                .SetCancelable(false)
-                .SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
+            RunOnUiThread(() =>
+            {
+                adapter.Data.RemoveAt(position);
+                adapter.NotifyDataSetChanged();
+
+                using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
                 {
-                    if (!adapter.Data.Any())
+                    builder.SetTitle(Resource.String.uploadsUploadSuccessTitle)
+                    .SetMessage(Resource.String.uploadsUploadSuccessMessage)
+                    .SetCancelable(false)
+                    .SetPositiveButton(Resource.String.dialog_ok, (a, b) =>
                     {
-                        OnBackPressed();
-                    }
-                })
-                .Show();
+                        if (!adapter.Data.Any())
+                        {
+                            OnBackPressed();
+                        }
+                    }).Show();
+                }
+            });
         }
 
         public override void OnBackPressed()
         {
-            Intent toMainIntent = new Intent(this, typeof(MainActivity));
-            toMainIntent.AddFlags(ActivityFlags.ClearTop);
-            toMainIntent.AddFlags(ActivityFlags.SingleTop);
-            MainMyCreationsFragment.ForceRefresh = true;
-            StartActivity(toMainIntent);
-            Finish();
+            using (Intent toMainIntent = new Intent(this, typeof(MainActivity)))
+            {
+                toMainIntent.AddFlags(ActivityFlags.ClearTop);
+                toMainIntent.AddFlags(ActivityFlags.SingleTop);
+                MainMyCreationsFragment.ForceRefresh = true;
+                StartActivity(toMainIntent);
+                Finish();
+            }
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] global::Android.App.Result resultCode, Intent data)

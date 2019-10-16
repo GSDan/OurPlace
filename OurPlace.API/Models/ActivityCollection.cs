@@ -9,7 +9,7 @@ namespace OurPlace.API.Models
         public DateTime CreatedAt { get; set; }
         public string Description { get; set; }
         public string ImageUrl { get; set; }
-        public virtual Place Location { get; set; }
+        public virtual ICollection<Place> Places { get; set; }
         public bool IsTrail { get; set; }
         public bool IsPublic { get; set; }
         public string ActivityOrder { get; set; }

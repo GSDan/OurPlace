@@ -27,12 +27,14 @@
             android:textSize="22sp"
             android:padding="8dp" />
         <TextView
+            android:id="@+id/publicBlurb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/createFinishActivityPublicExplanation"
             android:textSize="20sp"
             android:layout_marginBottom="20dp" />
         <TextView
+            android:id="@+id/addPlaceTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/createFinishActivityPlaceHeader"
@@ -41,12 +43,12 @@
             android:gravity="center"
             android:layout_marginBottom="6dp" />
         <TextView
+            android:id="@+id/addPlaceBlurb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/createFinishActivityPlaceExplanation"
             android:textSize="20sp"
-            android:layout_marginBottom="6dp"
-            android:id="@+id/textView2" />
+            android:layout_marginBottom="6dp" />
         <LinearLayout
             android:id="@+id/placesRoot"
             android:layout_width="match_parent"
@@ -82,6 +84,7 @@
             android:textSize="22sp"
             android:padding="8dp" />
         <TextView
+            android:id="@+id/reqNameBlurb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/createFinishActivityReqNameExplanation"

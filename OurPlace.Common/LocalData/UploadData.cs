@@ -24,7 +24,7 @@ using System;
 
 namespace OurPlace.Common.LocalData
 {
-    public enum UploadType { NewActivity, Result, UpdatedActivity }
+    public enum UploadType { NewActivity, Result, UpdatedActivity, NewCollection, UpdatedCollection }
 
     public class AppDataUpload
     {

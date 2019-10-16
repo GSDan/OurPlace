@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace OurPlace.Android.Activities.Create
 {
@@ -130,7 +131,21 @@ namespace OurPlace.Android.Activities.Create
 
         private void Adapter_FinishClick(object sender, int e)
         {
-            throw new System.NotImplementedException();
+            using (Intent intent = new Intent(this, typeof(CreateCollectionFinishActivity)))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                foreach (LearningActivity act in adapter.Collection.Activities)
+                {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}", (sb.Length > 0) ? "," : "", act.Id);
+                }
+
+                adapter.Collection.ActivityOrder = sb.ToString();
+
+                intent.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Collection));
+                intent.PutExtra("EDITING_SUBMITTED", editingSubmitted);
+                StartActivity(intent);
+            } 
         }
 
         private void Adapter_EditCollectionClick(object sender, int e)

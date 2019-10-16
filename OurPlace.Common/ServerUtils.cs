@@ -610,6 +610,22 @@ namespace OurPlace.Common
                 Post<string>(upload.UploadRoute, activity);
         }
 
+        public static Task<ServerResponse<string>> UploadCollection(AppDataUpload upload, bool updateExisting = false)
+        {
+            ActivityCollection collection = JsonConvert.DeserializeObject<ActivityCollection>(upload.JsonData);
+            List<FileUpload> files = JsonConvert.DeserializeObject<List<FileUpload>>(upload.FilesJson);
+
+            // update the collection's image url if it's had one uploaded
+            FileUpload f = files?.Where(fi => fi.LocalFilePath == collection.ImageUrl).FirstOrDefault();
+            if (f != null && !string.IsNullOrWhiteSpace(f.RemoteFilePath))
+            {
+                collection.ImageUrl = f.RemoteFilePath;
+            }
+
+            return updateExisting ? Put<string>(upload.UploadRoute, collection) :
+                Post<string>(upload.UploadRoute, collection);
+        }
+
         private static string GetNewTaskJsonData(LearningTask task, List<FileUpload> files)
         {
             if (task.TaskType.IdName == "MATCH_PHOTO" || task.TaskType.IdName == "LISTEN_AUDIO" ||

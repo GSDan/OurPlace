@@ -170,7 +170,7 @@ namespace OurPlace.Android.Activities.Create
             {
                 builder.SetTitle(Resource.String.searchAlertTitle);
                 int px = (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 16, Resources.DisplayMetrics);
-                message.SetText(Resource.String.searchAlertMessage);
+                message.SetText(Resource.String.createCollectionAddActivityEnterCode);
 
                 dialogLayout.AddView(message);
                 dialogLayout.AddView(codeInput);

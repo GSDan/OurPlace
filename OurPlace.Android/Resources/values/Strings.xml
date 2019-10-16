@@ -135,12 +135,12 @@
   <string name="createTaskChildrenDesc">These tasks will become available to the learner once they have completed your \'{0}\' task.</string>
   <string name="createTaskChildrenFinish">Save and Return</string>
   <string name="createFinishActivityHeader">Nearly Finished!</string>
-  <string name="createFinishActivityPublicCheck">I want this activity to be publicly accessible</string>
+  <string name="createFinishActivityPublicCheck">I want this {0} to be publicly accessible</string>
   <string name="createFinishActivityReqNameCheck">Require that users enter their name(s)</string>
-  <string name="createFinishActivityPublicExplanation">By making an activity public, you\'re allowing anyone else to be able to find and use it. <b>Untick this if you only want to share it privately.</b></string>
+  <string name="createFinishActivityPublicExplanation">By making your {0} public, you\'re allowing anyone else to be able to find and use it. <b>Untick this if you only want to share it privately.</b></string>
   <string name="createFinishActivityReqNameExplanation">This is useful if you expect several users to be sharing devices and/or accounts</string>   
-  <string name="createFinishActivityPlaceHeader">Is this activity specific to a location?</string>
-  <string name="createFinishActivityPlaceExplanation">If your activity relies on the user being in a specific place, add it here.</string>
+  <string name="createFinishActivityPlaceHeader">Is this {0} specific to a location?</string>
+  <string name="createFinishActivityPlaceExplanation">If you want people to find your {0} when they\'re near a particularly place, add it here.</string>
   <string name="createFinishActivityPlaceChosenHeader">Places:</string>
   <string name="createFinishActivityPlaceBtn">Add Place</string>
   <string name="createFinishActivityPlaceChoose">Choose a place to add to your activity:</string>
@@ -163,6 +163,7 @@
   <string name="createCollectionAddActivityHeaderNone">You haven\'t made any Activities yet...</string>
   <string name="createCollectionAddActivityHeaderNoneLeft">You\ve added all of your Activities!</string>
   <string name="createCollectionAddActivityHelp">Choose an Activity to add to your collection. The Activities listed are ones created by you. If you want to add someone else\'s Activity, enter its share code or scan its QR code using the buttons at the top of the screen.</string>
+  <string name="createCollectionAddActivityEnterCode">Enter an Activity\'s share code to add it to this collection:</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>

@@ -35,6 +35,7 @@ using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Place = OurPlace.Common.Models.Place;
 
@@ -68,7 +69,17 @@ namespace OurPlace.Android.Activities.Create
 
             choicesRoot = FindViewById<LinearLayout>(Resource.Id.placesRoot);
             activityPublic = FindViewById<CheckBox>(Resource.Id.checkboxPublic);
+            activityPublic.Text = string.Format(CultureInfo.InvariantCulture, activityPublic.Text, "Activity");
             reqUsername = FindViewById<CheckBox>(Resource.Id.checkboxReqName);
+
+            using (TextView publicBlurb = FindViewById<TextView>(Resource.Id.publicBlurb),
+                addPlaceTitle = FindViewById<TextView>(Resource.Id.addPlaceTitle),
+                addPlaceBlurb = FindViewById<TextView>(Resource.Id.addPlaceBlurb))
+            {
+                publicBlurb.Text = string.Format(CultureInfo.InvariantCulture, publicBlurb.Text, "Activity");
+                addPlaceTitle.Text = string.Format(CultureInfo.InvariantCulture, addPlaceTitle.Text, "Activity");
+                addPlaceBlurb.Text = string.Format(CultureInfo.InvariantCulture, addPlaceBlurb.Text, "Activity");
+            }
 
             chosenPlaces = new List<Place>();
 
@@ -91,16 +102,15 @@ namespace OurPlace.Android.Activities.Create
         {
             try
             {
-                //Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.ModeFullscreen).Build(this);
-
-                Intent intent = new PlacePicker.IntentBuilder().Build(this);
-                StartActivityForResult(intent, placePickerReq);
+                using(var builder = new PlacePicker.IntentBuilder())
+                {
+                    using (Intent intent = builder.Build(this))
+                    {
+                        StartActivityForResult(intent, placePickerReq);
+                    }
+                }
             }
-            catch (GooglePlayServicesRepairableException e)
-            {
-                Toast.MakeText(this, "Place err: " + e.Message, ToastLength.Long).Show();
-            }
-            catch (GooglePlayServicesNotAvailableException e)
+            catch (Exception e)
             {
                 Toast.MakeText(this, "Place err: " + e.Message, ToastLength.Long).Show();
             }
@@ -175,7 +185,7 @@ namespace OurPlace.Android.Activities.Create
 
         private void FinishClicked(object sender, EventArgs e)
         {
-            var suppress = SaveAndFinish();
+            _ = SaveAndFinish();
         }
 
         private async Task SaveAndFinish()
@@ -186,11 +196,13 @@ namespace OurPlace.Android.Activities.Create
 
             activity.ActivityVersionNumber = (editingSubmitted) ? activity.ActivityVersionNumber + 1 : 0;
 
-            var uploadData = await Storage.PrepCreatedActivityForUpload(activity, editingSubmitted);
+            var uploadData = await Storage.PrepCreationForUpload(activity, editingSubmitted);
 
-            Intent intent = new Intent(this, typeof(UploadsActivity));
-            StartActivity(intent);
-            Finish();
+            using (Intent intent = new Intent(this, typeof(UploadsActivity)))
+            {
+                StartActivity(intent);
+                Finish();
+            }
         }
     }
 }

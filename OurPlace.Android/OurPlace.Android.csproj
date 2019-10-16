@@ -339,6 +339,7 @@
     <Compile Include="Activities\Create\CreateChooseLocation.cs" />
     <Compile Include="Activities\Create\CreateChooseTaskTypeActivity.cs" />
     <Compile Include="Activities\Create\CreateCollectionActivity.cs" />
+    <Compile Include="Activities\Create\CreateCollectionFinishActivity.cs" />
     <Compile Include="Activities\Create\CreateCollectionOverviewActivity.cs" />
     <Compile Include="Activities\Create\CreateFinishActivity.cs" />
     <Compile Include="Activities\Create\CreateManageChildTasksActivity.cs" />
