@@ -292,7 +292,7 @@ namespace OurPlace.API.Controllers
                     {
                         feed.Add(new Common.Models.FeedSection
                         {
-                            Title = $"Activities at {pl.Name}",
+                            Title = $"Creations at {pl.Name}",
                             Description =
                                 $"Here are some things to do near {pl.Name}",
                             Activities = actsHere,
@@ -305,9 +305,11 @@ namespace OurPlace.API.Controllers
             feed.Add(new Common.Models.FeedSection
             {
                 Title = "Recently Uploaded",
-                Description = "Here are some of the latest activities that have been uploaded",
+                Description = "Here are some of the latest creations that have been uploaded",
                 // Get the most recent activities which are public and approved, or made by the current user
                 Activities = GetAllActivitiesWhere(a => !a.SoftDeleted && (((isResearcher || a.IsPublic) && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
+                    .OrderByDescending(a => a.CreatedAt).Take(16).ToList(),
+                Collections = GetAllCollectionsWhere(a => !a.SoftDeleted && (((isResearcher || a.IsPublic) && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id))
                     .OrderByDescending(a => a.CreatedAt).Take(16).ToList()
             });
 
@@ -327,7 +329,7 @@ namespace OurPlace.API.Controllers
         }
 
         // GET: api/LearningActivities
-        public async Task<HttpResponseMessage> GetFromUser(string creatorId)
+        public async Task<HttpResponseMessage> GetFromUser(string creatorId, bool includeCollections = false)
         {
             string userId = User?.Identity?.GetUserId();
             // Get activities created by the given creator. 
@@ -336,15 +338,38 @@ namespace OurPlace.API.Controllers
             if (string.IsNullOrWhiteSpace(userId))
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Please log in");
 
+            IEnumerable<Common.Models.LearningActivity> acts = GetAllActivitiesWhere(a =>
+            !a.SoftDeleted && (a.Author.Id == creatorId && ((a.IsPublic && a.Approved) || creatorId == userId)));
+
             var resp = Request.CreateResponse(HttpStatusCode.OK);
-            resp.Content = new StringContent(
-                JsonConvert.SerializeObject(
-                    GetAllActivitiesWhere(a => !a.SoftDeleted && (a.Author.Id == creatorId && ((a.IsPublic && a.Approved) || creatorId == userId))),
+
+            if(!includeCollections)
+            {
+                resp.Content = new StringContent(
+                JsonConvert.SerializeObject(acts,
                     new JsonSerializerSettings()
                     {
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                         MaxDepth = 5
                     }), Encoding.UTF8, "application/json");
+            }
+            else
+            {
+                var section = new Common.Models.FeedSection()
+                {
+                    Activities = acts.ToList(),
+                    Collections = GetAllCollectionsWhere(a =>
+                        !a.SoftDeleted && (a.Author.Id == creatorId && ((a.IsPublic && a.Approved) || creatorId == userId))).ToList()
+                };
+
+                resp.Content = new StringContent(
+                JsonConvert.SerializeObject(section,
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 5
+                    }), Encoding.UTF8, "application/json");
+            }
 
             await MakeLog(new Dictionary<string, string>() { { "creatorId", creatorId.ToString() }});
 

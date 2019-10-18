@@ -182,8 +182,8 @@
   <string name="createdActivityDialogDelete">Delete</string>
   <string name="createdActivityDialogOpen">Open</string>
   <string name="createdActivityDialogUnfinishedMessage">This activity is unfinished. What do you want to do with it?</string>
-  <string name="createdFeedTitle">Your Created Activites</string>
-  <string name="createdFeedDesc">The activities that you\'ve created and uploaded</string>
+  <string name="createdFeedTitle">Your Uploaded Creations</string>
+  <string name="createdFeedDesc">The activities and collections that you\'ve created and uploaded</string>
   <string name="createdActivitiesLocalTitle">Activities In Progress</string>
   <string name="createdActivitiesLocalDesc">You started making these activities, but they haven\'t been uploaded yet!</string>
   <string name="createdCollectionsLocalTitle">Collections In Progress</string>

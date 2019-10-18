@@ -45,6 +45,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OurPlace.Common.Interfaces;
+using System.Globalization;
 
 namespace OurPlace.Android.Fragments
 {
@@ -120,22 +121,25 @@ namespace OurPlace.Android.Fragments
 
                 DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
 
-                ServerResponse<List<LearningActivity>> results =
-                    await ServerUtils.Get<List<LearningActivity>>(
-                        "/api/learningactivities/getfromuser/?creatorId=" + dbManager.CurrentUser.Id);
-                refresher.Refreshing = false;
+                ServerResponse<FeedSection> results =
+                    await ServerUtils.Get<FeedSection>(
+                        string.Format(CultureInfo.InvariantCulture, 
+                        "/api/learningactivities/getfromuser/?creatorId={0}&includeCollections=true", dbManager.CurrentUser.Id))
+                    .ConfigureAwait(false);
+
+                Activity.RunOnUiThread(() => refresher.Refreshing = false);
 
                 if (results == null)
                 {
-                    var suppress = AndroidUtils.ReturnToSignIn(Activity);
-                    Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                    _ = AndroidUtils.ReturnToSignIn(Activity);
+                    Activity.RunOnUiThread(() => Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show());
                     return;
                 }
 
                 if (!results.Success)
                 {
-                    Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show();
-                    await LoadIntoFeed(null);
+                    Activity.RunOnUiThread(() => Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show());
+                    await LoadIntoFeed(null).ConfigureAwait(false);
                     return;
                 }
 
@@ -152,7 +156,7 @@ namespace OurPlace.Android.Fragments
                 List<LearningActivity> recentlyOpened = dbManager.GetActivities();
                 foreach (LearningActivity cachedActivity in recentlyOpened)
                 {
-                    LearningActivity refreshedVersion = results.Data.FirstOrDefault(act => act.Id == cachedActivity.Id);
+                    LearningActivity refreshedVersion = results.Data.Activities.FirstOrDefault(act => act.Id == cachedActivity.Id);
                     if (refreshedVersion != null &&
                         refreshedVersion.ActivityVersionNumber > cachedActivity.ActivityVersionNumber)
                     {
@@ -161,7 +165,7 @@ namespace OurPlace.Android.Fragments
                     }
                 }
 
-                await LoadIntoFeed(results.Data.OrderByDescending(act => act.CreatedAt).ToList()).ConfigureAwait(false);
+                await LoadIntoFeed(results.Data).ConfigureAwait(false);
 
                 refreshingData = false;
             }
@@ -171,7 +175,7 @@ namespace OurPlace.Android.Fragments
             }
         }
 
-        private async Task LoadIntoFeed(List<LearningActivity> remoteData)
+        private async Task LoadIntoFeed(FeedSection remoteData)
         {
             List<FeedSection> feed = new List<FeedSection>();
 
@@ -228,25 +232,30 @@ namespace OurPlace.Android.Fragments
             }
 
             // Add a section to the feed if the user has activities stored on the remote server
-            if (remoteData != null && remoteData.Count > 0)
+            if (remoteData != null && (remoteData.Activities?.Count > 0 || remoteData.Collections?.Count > 0))
             {
                 feed.Add(new FeedSection
                 {
                     Title = Resources.GetString(Resource.String.createdFeedTitle),
                     Description = Resources.GetString(Resource.String.createdFeedDesc),
-                    Activities = remoteData
-                });
+                    Activities = remoteData.Activities.OrderByDescending(act => act.CreatedAt).ToList(),
+                    Collections = remoteData.Collections.OrderByDescending(coll => coll.CreatedAt).ToList()
+                }) ;
             }
 
             // Set up the adapter if needed, adding the feed data
-            adapter.Data = feed;
-            adapter.NotifyDataSetChanged();
-
-            if (fabPrompt != null)
+            Activity.RunOnUiThread(() =>
             {
-                // Hide the fab tutorial if the user has already created an activity
-                fabPrompt.Visibility = (adapter.Data.Count > 0) ? ViewStates.Gone : ViewStates.Visible;
-            }
+                adapter.Data = feed;
+
+                adapter.NotifyDataSetChanged();
+
+                if (fabPrompt != null)
+                {
+                    // Hide the fab tutorial if the user has already created an activity
+                    fabPrompt.Visibility = (adapter.Data.Count > 0) ? ViewStates.Gone : ViewStates.Visible;
+                }
+            });
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

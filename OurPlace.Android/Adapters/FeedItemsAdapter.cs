@@ -58,6 +58,8 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> ItemClick;
         private readonly DatabaseManager dbManager;
 
+        private const int Activity = 1;
+        private const int Collection = 2;
         private const int Header = -2;
 
         public FeedItemsAdapter(List<FeedSection> data, DatabaseManager dbManager)
@@ -83,7 +85,6 @@ namespace OurPlace.Android.Adapters
             int checkedItems = 0;
             foreach (FeedSection section in Data)
             {
-                checkedItems++; //include header
                 int collsInSection = section.Collections?.Count ?? 0;
                 if (collsInSection + checkedItems > position)
                 {
@@ -111,7 +112,7 @@ namespace OurPlace.Android.Adapters
             }
             else
             {
-                View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.GridItem, parent, false);
+                View itemView = LayoutInflater.From(parent.Context).Inflate((viewType == Collection)? Resource.Layout.GridItemCollection : Resource.Layout.GridItem, parent, false);
                 LearningActivityViewHolder vh = new LearningActivityViewHolder(itemView, OnClick);
                 return vh;
             }
@@ -119,6 +120,11 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemViewType(int section, int relativePosition, int absolutePosition)
         {
+            FeedItem item = GetItem(absolutePosition);
+
+            if (item is LearningActivity) return Activity;
+            if (item is ActivityCollection) return Collection;
+
             return base.GetItemViewType(section, relativePosition, absolutePosition);
         }
 
@@ -128,7 +134,7 @@ namespace OurPlace.Android.Adapters
                 Data.Count > sectionInd &&
                 Data[sectionInd] != null)
             {
-                return Data[sectionInd].Collections?.Count ?? 0 + Data[sectionInd].Activities?.Count ?? 0;
+                return (Data[sectionInd].Collections?.Count ?? 0) + (Data[sectionInd].Activities?.Count ?? 0);
             }
             return 0;
         }
