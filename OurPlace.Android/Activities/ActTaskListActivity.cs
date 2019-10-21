@@ -66,11 +66,13 @@ namespace OurPlace.Android.Activities
 
             if (learningActivity == null)
             {
-                global::Android.Support.V7.App.AlertDialog.Builder alert = new global::Android.Support.V7.App.AlertDialog.Builder(this);
-                alert.SetTitle(Resource.String.ErrorTitle);
-                alert.SetMessage(Resource.String.ErrorTitle);
-                alert.SetOnDismissListener(new OnDismissListener(Finish));
-                alert.Show();
+                using (var alert = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                {
+                    alert.SetTitle(Resource.String.ErrorTitle)
+                    .SetMessage(Resource.String.ErrorTitle)
+                    .SetOnDismissListener(new OnDismissListener(Finish));
+                    alert.Show();
+                }
                 return;
             }
 
@@ -113,7 +115,6 @@ namespace OurPlace.Android.Activities
             SetContentView(Resource.Layout.RecyclerViewActivity);
             recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
             toolbar = FindViewById<global::Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
-            collapsingToolbar = FindViewById<CollapsingToolbarLayout>(Resource.Id.collapsing_toolbar);
             SetSupportActionBar(toolbar);
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
 
@@ -125,6 +126,27 @@ namespace OurPlace.Android.Activities
             {
                 adapter.UpdateNames(enteredName);
             }
+        }
+
+        public override Intent ParentActivityIntent => ReturnCorrectParent();
+
+        public override Intent SupportParentActivityIntent => ReturnCorrectParent();
+
+        private Intent ReturnCorrectParent()
+        {
+            Intent intent;
+
+            if (Intent.GetBooleanExtra("FROM_COLLECTION", false))
+            {
+                intent = new Intent(this, typeof(CollectionActivityListActivity));
+            }
+            else
+            {
+                intent = new Intent(this, typeof(MainActivity));
+            }
+
+            intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop);
+            return intent;
         }
 
         private void ShowNameEntry(bool continueToFinish = false)

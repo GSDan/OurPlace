@@ -75,7 +75,7 @@ namespace OurPlace.Android.Adapters
             ItemClick?.Invoke(this, position);
         }
 
-        public FeedItem GetItem(int position)
+        public FeedItem GetItem(int position, bool includeHeaders = false)
         {
             if (position < 0)
             {
@@ -85,6 +85,11 @@ namespace OurPlace.Android.Adapters
             int checkedItems = 0;
             foreach (FeedSection section in Data)
             {
+                if(includeHeaders)
+                {
+                    checkedItems++; // section header
+                }
+
                 int collsInSection = section.Collections?.Count ?? 0;
                 if (collsInSection + checkedItems > position)
                 {
@@ -95,7 +100,7 @@ namespace OurPlace.Android.Adapters
                 int actsInSection = section.Activities?.Count ?? 0;
                 if (actsInSection + checkedItems > position)
                 {
-                    return section.Activities.ElementAt(position - checkedItems);
+                    return section.Activities[position - checkedItems];
                 }
                 checkedItems += actsInSection;
             }
@@ -120,10 +125,26 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemViewType(int section, int relativePosition, int absolutePosition)
         {
-            FeedItem item = GetItem(absolutePosition);
+            FeedItem item = null;
 
-            if (item is LearningActivity) return Activity;
-            if (item is ActivityCollection) return Collection;
+            FeedSection thisSection = Data[section];
+
+            int collsInSection = thisSection.Collections?.Count ?? 0;
+            int actsInSection = thisSection.Activities?.Count ?? 0;
+            if (collsInSection > relativePosition)
+            {
+                item = thisSection.Collections[relativePosition];
+            }
+            else if ((actsInSection + collsInSection) > relativePosition)
+            {
+                item = thisSection.Activities[relativePosition - collsInSection];
+            }
+
+            if (item != null)
+            {
+                if (item is LearningActivity) return Activity;
+                if (item is ActivityCollection) return Collection;
+            }
 
             return base.GetItemViewType(section, relativePosition, absolutePosition);
         }

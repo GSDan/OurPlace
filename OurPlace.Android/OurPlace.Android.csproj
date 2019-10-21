@@ -335,6 +335,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\Abstracts\TTSActivity.cs" />
+    <Compile Include="Activities\CollectionActivityListActivity.cs" />
     <Compile Include="Activities\Create\CreateChooseActivityActivity.cs" />
     <Compile Include="Activities\Create\CreateChooseLocation.cs" />
     <Compile Include="Activities\Create\CreateChooseTaskTypeActivity.cs" />

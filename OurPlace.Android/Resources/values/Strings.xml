@@ -206,8 +206,8 @@
   <string name="actLoadStart">Preparing activity...</string>
   <string name="actLoadMessage">Downloading file {0}/{1}</string>
   <string name="uploadMissing">Error: file not found!</string>
-  <string name="feedRecentTitle">Your recent activities</string>
-  <string name="feedRecentDesc">You\'ve opened these activities recently</string>
+  <string name="feedRecentTitle">Recently Opened</string>
+  <string name="feedRecentDesc">You\'ve opened this content recently</string>
   <string name="feedRecentAlertMessage">Do you want to start this activity, or remove it from your recently used section?</string>
   <string name="feedRecentAlertDelete">Remove activity</string>
   <string name="feedRecentAlertStart">Start activity</string>

@@ -48,7 +48,7 @@ namespace OurPlace.Common.LocalData
                 connection.CreateTable<ApplicationUser>();
                 connection.CreateTable<FileUpload>();
                 connection.CreateTable<AppDataUpload>();
-                connection.CreateTable<ActivityCache>();
+                connection.CreateTable<ContentCache>();
             }
             catch (SQLiteException ex)
             {
@@ -115,7 +115,7 @@ namespace OurPlace.Common.LocalData
                 connection.DeleteAll<TaskType>();
                 connection.DeleteAll<FileUpload>();
                 connection.DeleteAll<AppDataUpload>();
-                connection.DeleteAll<ActivityCache>();
+                connection.DeleteAll<ContentCache>();
                 connection.DeleteAll<LearningActivity>(); // this last, as might not exist
             }
             catch (Exception e)
@@ -201,30 +201,30 @@ namespace OurPlace.Common.LocalData
         }
 
         // Cached activities
-        public void AddActivity(LearningActivity act, int maxCacheCount = 4)
+        public void AddContentCache(FeedItem content, int maxCacheCount = 4)
         {
-            bool exists = connection.Table<ActivityCache>().Where(a => a.ActivityId == act.Id).Any();
+            bool exists = connection.Table<ContentCache>().Where(a => a.ActivityId == content.Id).Any();
 
             // Limit to 4 recent activities, delete oldest
             if(!exists)
             {
-                int count = connection.Table<ActivityCache>().Count();
+                int count = connection.Table<ContentCache>().Count();
                 if(count >= maxCacheCount)
                 {
-                    List<ActivityCache> cached = connection.Table<ActivityCache>().OrderBy(a => a.AddedAt).ToList();
+                    List<ContentCache> cached = connection.Table<ContentCache>().OrderBy(a => a.AddedAt).ToList();
                     while (cached.Count >= maxCacheCount)
                     {
-                        LearningActivity thisAct = JsonConvert.DeserializeObject<LearningActivity>(cached.First().JsonData);
-                        DeleteCachedActivity(thisAct);
+                        FeedItem thisContent = JsonConvert.DeserializeObject<FeedItem>(cached.First().JsonData);
+                        DeleteCachedActivity(thisContent);
                         cached.RemoveAt(0);
                     }
                 }
             }
 
-            connection.InsertOrReplace(new ActivityCache
+            connection.InsertOrReplace(new ContentCache
             {
-                ActivityId = act.Id,
-                JsonData = JsonConvert.SerializeObject(act, new JsonSerializerSettings
+                ActivityId = content.Id,
+                JsonData = JsonConvert.SerializeObject(content, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Objects,
                     ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
@@ -249,8 +249,8 @@ namespace OurPlace.Common.LocalData
                 DeleteProgress(prog.ActivityId);
             }
 
-            List<ActivityCache> allCached = connection.Table<ActivityCache>().ToList();
-            foreach(ActivityCache cache in allCached)
+            List<ContentCache> allCached = connection.Table<ContentCache>().ToList();
+            foreach(ContentCache cache in allCached)
             {
                 DeleteCachedActivity(JsonConvert.DeserializeObject<LearningActivity>(cache.JsonData));
             }
@@ -258,20 +258,23 @@ namespace OurPlace.Common.LocalData
             ShouldRefreshFeed = true;
         }
 
-        public List<LearningActivity> GetActivities()
+        public List<FeedItem> GetCachedContent()
         {
-            List<ActivityCache> found = connection.Table<ActivityCache>()
+            List<ContentCache> found = connection.Table<ContentCache>()
                 .OrderByDescending(a => a.AddedAt).AsEnumerable().ToList();
 
-            List<LearningActivity> toRet = new List<LearningActivity>();
+            List<FeedItem> toRet = new List<FeedItem>();
 
             if(found != null)
             {
-                foreach(ActivityCache c in found)
+                foreach(ContentCache c in found)
                 {
                     try
                     {
-                        toRet.Add(JsonConvert.DeserializeObject<LearningActivity>(c.JsonData));
+                        toRet.Add(JsonConvert.DeserializeObject<FeedItem>(c.JsonData, new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto
+                        }));
                     }
                     catch(Exception e)
                     {
@@ -285,17 +288,17 @@ namespace OurPlace.Common.LocalData
 
         public LearningActivity GetActivity(int givenId)
         {
-            ActivityCache found =  connection.Table<ActivityCache>().Where(act => act.ActivityId == givenId).FirstOrDefault();
+            ContentCache found =  connection.Table<ContentCache>().Where(act => act.ActivityId == givenId).FirstOrDefault();
 
             if (found == null) return null;
 
             return JsonConvert.DeserializeObject<LearningActivity>(found.JsonData);
         }
 
-        public void DeleteCachedActivity(LearningActivity act)
+        public void DeleteCachedActivity(FeedItem content)
         {
-            DeleteActivityFileCache(act);
-            connection.Delete<ActivityCache>(act.Id);
+            DeleteActivityFileCache(content);
+            connection.Delete<ContentCache>(content.Id);
         }
     }
 }

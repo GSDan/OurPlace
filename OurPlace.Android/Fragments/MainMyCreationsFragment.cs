@@ -71,7 +71,7 @@ namespace OurPlace.Android.Fragments
 
             // Load from cached data from the database if available, 
             // just in case we can't contact the server
-            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
+            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedContent(false);
 
             var metrics = Resources.DisplayMetrics;
             var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
@@ -144,7 +144,7 @@ namespace OurPlace.Android.Fragments
                 }
 
                 // Save this in the offline cache
-                dbManager.CurrentUser.RemoteCreatedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                dbManager.CurrentUser.RemoteCreatedContentJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects,
@@ -153,12 +153,11 @@ namespace OurPlace.Android.Fragments
                     });
                 dbManager.AddUser(dbManager.CurrentUser);
 
-                List<LearningActivity> recentlyOpened = dbManager.GetActivities();
-                foreach (LearningActivity cachedActivity in recentlyOpened)
+                List<FeedItem> recentlyOpened = dbManager.GetCachedContent();
+                foreach (FeedItem cachedActivity in recentlyOpened)
                 {
-                    LearningActivity refreshedVersion = results.Data.Activities.FirstOrDefault(act => act.Id == cachedActivity.Id);
-                    if (refreshedVersion != null &&
-                        refreshedVersion.ActivityVersionNumber > cachedActivity.ActivityVersionNumber)
+                    FeedItem refreshedVersion = results.Data.Activities.FirstOrDefault(act => act.Id == cachedActivity.Id);
+                    if (refreshedVersion != null)
                     {
                         dbManager.DeleteCachedActivity(cachedActivity);
                         MainLandingFragment.ForceRefresh = true;

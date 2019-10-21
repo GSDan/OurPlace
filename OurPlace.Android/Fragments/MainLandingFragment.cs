@@ -62,7 +62,7 @@ namespace OurPlace.Android.Fragments
 
             // Load from cached data from the database if available, 
             // just in case we can't contact the server
-            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedActivities(false);
+            List<FeedSection> cached = await ((MainActivity)Activity).GetCachedContent(false);
 
             // Check for recently opened activities
             FeedSection recents = await LoadRecent();
@@ -261,7 +261,7 @@ namespace OurPlace.Android.Fragments
                 // Save this in the offline cache
                 DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
 
-                dbManager.CurrentUser.CachedActivitiesJson = JsonConvert.SerializeObject(results.Data,
+                dbManager.CurrentUser.CachedContentJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects,
@@ -295,23 +295,38 @@ namespace OurPlace.Android.Fragments
         /// <returns></returns>
         private async Task<FeedSection> LoadRecent()
         {
-            List<LearningActivity> recentlyOpened = (await ((MainActivity)Activity).GetDbManager()).GetActivities();
+            List<FeedItem> recentlyOpened = (await ((MainActivity)Activity).GetDbManager()).GetCachedContent();
 
             if (recentlyOpened != null && recentlyOpened.Count > 0)
             {
-                return new FeedSection
+                FeedSection cacheSection = new FeedSection
                 {
                     Title = Resources.GetString(Resource.String.feedRecentTitle),
                     Description = Resources.GetString(Resource.String.feedRecentDesc),
-                    Activities = recentlyOpened
+                    Activities = new List<LearningActivity>(),
+                    Collections = new List<ActivityCollection>()
                 };
+
+                foreach(FeedItem item in recentlyOpened)
+                {
+                    if(item is LearningActivity act)
+                    {
+                        cacheSection.Activities.Add(act);
+                    }
+                    else if(item is ActivityCollection coll)
+                    {
+                        cacheSection.Collections.Add(coll);
+                    }
+                }
+
+                return cacheSection;
             }
             return null;
         }
 
         private void OnItemClick(object sender, int position)
         {
-            FeedItem item = adapter.GetItem(position);
+            FeedItem item = adapter.GetItem(position - 1);
 
             if(item == null)
             {
@@ -322,9 +337,10 @@ namespace OurPlace.Android.Fragments
                 viewLoaded = false;
                 ((MainActivity)Activity).LaunchActivity(act);
             }
-            else
+            else if(item is ActivityCollection coll)
             {
-                // TODO collection clicked
+                viewLoaded = false;
+                ((MainActivity)Activity).LaunchCollection(coll);
             }
         }
 

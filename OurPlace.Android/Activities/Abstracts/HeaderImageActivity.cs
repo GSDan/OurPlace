@@ -33,60 +33,62 @@ namespace OurPlace.Android.Activities.Abstracts
 {
     public abstract class HeaderImageActivity : TTSActivity
     {
-        protected CollapsingToolbarLayout collapsingToolbar;
-
         protected void LoadHeaderImage(string imageUrl)
         {
-            ImageViewAsync headerImage = FindViewById<ImageViewAsync>(Resource.Id.backdrop);
-            if (string.IsNullOrWhiteSpace(imageUrl))
+            using (ImageViewAsync headerImage = FindViewById<ImageViewAsync>(Resource.Id.backdrop))
             {
-                ImageService.Instance.LoadCompiledResource("logoRect").Into(headerImage);
-                return;
-            }
-
-            ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(imageUrl))
-                .Success(() =>
+                if (string.IsNullOrWhiteSpace(imageUrl))
                 {
-                    try
+                    ImageService.Instance.LoadCompiledResource("logoRect").Into(headerImage);
+                    return;
+                }
+
+                using(var collapsingToolbar = FindViewById<CollapsingToolbarLayout>(Resource.Id.collapsing_toolbar))
+                {
+                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(imageUrl))
+                    .Success(() =>
                     {
-                        if ((BitmapDrawable)headerImage.Drawable != null)
+                        try
                         {
-                            Bitmap headerBitmap = ((BitmapDrawable)headerImage.Drawable).Bitmap;
-                            if (headerBitmap != null && !headerBitmap.IsRecycled)
+                            if ((BitmapDrawable)headerImage.Drawable != null)
                             {
-                                Palette palette = Palette.From(headerBitmap).Generate();
-
-                                if (palette.VibrantSwatch != null)
+                                Bitmap headerBitmap = ((BitmapDrawable)headerImage.Drawable).Bitmap;
+                                if (headerBitmap != null && !headerBitmap.IsRecycled)
                                 {
-                                    Color taskColor = new Color(palette.VibrantSwatch.Rgb);
-                                    Color statusColor = new Color(palette.VibrantSwatch.Rgb);
-                                    if (palette.DarkVibrantSwatch != null)
-                                    {
-                                        statusColor = new Color(palette.DarkVibrantSwatch.Rgb);
-                                    }
+                                    Palette palette = Palette.From(headerBitmap).Generate();
 
-                                    RunOnUiThread(() =>
+                                    if (palette.VibrantSwatch != null)
                                     {
-                                        Window.SetStatusBarColor(statusColor);
-                                        collapsingToolbar.SetContentScrimColor(taskColor);
-                                        collapsingToolbar.SetBackgroundColor(taskColor);
-                                    });
+                                        Color taskColor = new Color(palette.VibrantSwatch.Rgb);
+                                        Color statusColor = new Color(palette.VibrantSwatch.Rgb);
+                                        if (palette.DarkVibrantSwatch != null)
+                                        {
+                                            statusColor = new Color(palette.DarkVibrantSwatch.Rgb);
+                                        }
+
+                                        RunOnUiThread(() =>
+                                        {
+                                            Window.SetStatusBarColor(statusColor);
+                                            collapsingToolbar.SetContentScrimColor(taskColor);
+                                            collapsingToolbar.SetBackgroundColor(taskColor);
+                                        });
+                                    }
                                 }
                             }
+                            else
+                            {
+                                Toast.MakeText(this, "Image load error", ToastLength.Short).Show();
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            Toast.MakeText(this, "Image load error", ToastLength.Short).Show();
+                            Console.WriteLine(e.Message);
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
 
-                })
-                .Into(headerImage);
+                    })
+                    .Into(headerImage);
+                }
+            }
         }
-
     }
 }

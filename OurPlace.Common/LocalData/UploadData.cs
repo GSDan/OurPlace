@@ -47,7 +47,7 @@ namespace OurPlace.Common.LocalData
         public string RemoteFilePath { get; set; }
     }
 
-    public class ActivityCache
+    public class ContentCache
     {
         [PrimaryKey]
         public int ActivityId { get; set; }

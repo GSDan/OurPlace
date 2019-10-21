@@ -52,6 +52,38 @@ namespace OurPlace.Android
 {
     public static class AndroidUtils
     {
+        public static bool IsContentVersionCompatible(FeedItem content, Activity context)
+        {
+            if(content == null)
+            {
+                throw new System.Exception("Content is null");
+            }
+
+            if(context == null)
+            {
+                throw new System.Exception("Unable to access app context");
+            }
+
+            int thisVersion = context.PackageManager.GetPackageInfo(context.PackageName, 0).VersionCode;
+
+            if (content.AppVersionNumber > thisVersion)
+            {
+                context.RunOnUiThread(() => {
+                    using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(context))
+                    {
+                        builder.SetTitle(Resource.String.updateTitle)
+                        .SetMessage(Resource.String.updateMessage)
+                        .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { })
+                        .Show();
+                    }
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+
         public static void LoadTaskTypeIcon(TaskType type, ImageViewAsync imageView)
         {
             string imageRes = null;
@@ -105,48 +137,50 @@ namespace OurPlace.Android
             ImageService.Instance.LoadCompiledResource(imageRes).Into(imageView);
         }
 
-        public static async Task<bool> PrepActivityFiles(Context context, LearningActivity act)
+        public static async Task<bool> PrepActivityFiles(Activity context, LearningActivity act)
         {
-            ProgressDialog loadingDialog = new ProgressDialog(context);
-            loadingDialog.SetTitle(Resource.String.PleaseWait);
-            loadingDialog.SetMessage(context.Resources.GetString(Resource.String.actLoadStart));
-            loadingDialog.Indeterminate = true;
-            loadingDialog.SetCancelable(false);
-            loadingDialog.Show();
-
-            string baseMessage = context.Resources.GetString(Resource.String.actLoadMessage);
-
-            // Get all tasks in this activity which use uploaded files
-            List<TaskFileInfo> fileUrls = GetFileTasks(act);
-
-            using (WebClient webClient = new WebClient())
+            using (ProgressDialog loadingDialog = new ProgressDialog(context))
             {
-                // Loop over and pre-prepare listed files
-                for (int i = 0; i < fileUrls.Count; i++)
-                {
-                    loadingDialog.SetMessage(string.Format(baseMessage, i + 1, fileUrls.Count));
-                    string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
-                    string cachePath = GetCacheFilePath(thisUrl, act.Id, fileUrls[i].extension);
-                    if (File.Exists(cachePath))
-                    {
-                        continue;
-                    }
+                loadingDialog.SetTitle(Resource.String.PleaseWait);
+                loadingDialog.SetMessage(context.Resources.GetString(Resource.String.actLoadStart));
+                loadingDialog.Indeterminate = true;
+                loadingDialog.SetCancelable(false);
+                context.RunOnUiThread(() => loadingDialog.Show());
 
-                    try
+                string baseMessage = context.Resources.GetString(Resource.String.actLoadMessage);
+
+                // Get all tasks in this activity which use uploaded files
+                List<TaskFileInfo> fileUrls = GetFileTasks(act);
+
+                using (WebClient webClient = new WebClient())
+                {
+                    // Loop over and pre-prepare listed files
+                    for (int i = 0; i < fileUrls.Count; i++)
                     {
-                        await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
-                    }
-                    catch (System.Exception e)
-                    {
-                        File.Delete(cachePath);
-                        Console.WriteLine(e.Message);
-                        return false;
+                        context.RunOnUiThread(() => loadingDialog.SetMessage(string.Format(baseMessage, i + 1, fileUrls.Count)));
+                        string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
+                        string cachePath = GetCacheFilePath(thisUrl, act.Id, fileUrls[i].extension);
+                        if (File.Exists(cachePath))
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
+                        }
+                        catch (System.Exception e)
+                        {
+                            File.Delete(cachePath);
+                            Console.WriteLine(e.Message);
+                            return false;
+                        }
                     }
                 }
-            }
 
-            loadingDialog.Dismiss();
-            return true;
+                context.RunOnUiThread(() => loadingDialog.Dismiss());
+                return true;
+            }
         }
 
         public static void LoadActivityImageIntoView(ImageViewAsync targetImageView, string imageUrl, int activityId, int quality = 350)
@@ -188,8 +222,10 @@ namespace OurPlace.Android
                 }
 
                 Context context = activity.ApplicationContext;
-                Intent intent = new Intent(context, typeof(LoginActivity));
-                activity.StartActivity(intent);
+                using (Intent intent = new Intent(context, typeof(LoginActivity)))
+                {
+                    activity.StartActivity(intent);
+                }
                 activity.Finish();
             }
             catch (System.Exception e)

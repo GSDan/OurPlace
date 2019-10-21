@@ -39,12 +39,9 @@ namespace OurPlace.Common.Models
         public string RefreshToken { get; set; }
         public DateTime RefreshExpiresAt { get; set; }
 
-        public string CachedActivitiesJson { get; set; }
-        public string RemoteCreatedActivitiesJson { get; set; }
+        public string CachedContentJson { get; set; }
+        public string RemoteCreatedContentJson { get; set; }
         public string LocalCreatedActivitiesJson { get; set; }
-
-        public string CachedCollectionsJson { get; set; }
-        public string RemoteCreatedCollectionsJson { get; set; }
         public string LocalCreatedCollectionsJson { get; set; }
 
     }

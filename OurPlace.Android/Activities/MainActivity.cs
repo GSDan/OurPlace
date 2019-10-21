@@ -40,6 +40,7 @@ using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using ZXing.Mobile;
@@ -121,24 +122,24 @@ namespace OurPlace.Android.Activities
             return manager.CurrentUser;
         }
 
-        public async Task<List<FeedSection>> GetCachedActivities(bool ownedOnly)
+        public async Task<List<FeedSection>> GetCachedContent(bool ownedOnly)
         {
             ApplicationUser currentUser = await GetCurrentUser();
 
-            string jsonCache = (ownedOnly)
-                ? currentUser?.RemoteCreatedActivitiesJson
-                : currentUser?.CachedActivitiesJson;
+            string contentJsonCache = (ownedOnly)
+                ? currentUser?.RemoteCreatedContentJson
+                : currentUser?.CachedContentJson;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(jsonCache)) return new List<FeedSection>();
+                if (string.IsNullOrWhiteSpace(contentJsonCache)) return new List<FeedSection>();
 
-                return JsonConvert.DeserializeObject<List<FeedSection>>(jsonCache,
+                return JsonConvert.DeserializeObject<List<FeedSection>>(contentJsonCache,
                     new JsonSerializerSettings
                     {
-                        //TypeNameHandling = TypeNameHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.Objects,
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                        MaxDepth = 10
+                        MaxDepth = 12
                     });
             }
             catch (Exception e)
@@ -148,7 +149,7 @@ namespace OurPlace.Android.Activities
 
                 if (currentUser != null)
                 {
-                    currentUser.CachedActivitiesJson = null;
+                    currentUser.CachedContentJson = null;
                     (await GetDbManager()).AddUser(currentUser);
                 }
 
@@ -305,33 +306,23 @@ namespace OurPlace.Android.Activities
 
         public async void LaunchActivity(LearningActivity activity)
         {
-            int thisVersion = PackageManager.GetPackageInfo(PackageName, 0).VersionCode;
+            if (activity == null) return;
 
-            if (activity.AppVersionNumber > thisVersion)
-            {
-                new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                    .SetTitle(Resource.String.updateTitle)
-                    .SetMessage(Resource.String.updateMessage)
-                    .SetPositiveButton(Resource.String.dialog_ok, (a, b) => { })
-                    .Show();
-                return;
-            }
+            if (!AndroidUtils.IsContentVersionCompatible(activity, this)) return;
 
             Dictionary<string, string> properties = new Dictionary<string, string>
             {
-                { "UserId", (await GetDbManager()).CurrentUser.Id},
-                { "ActivityId", activity.Id.ToString() }
+                { "UserId", (await GetDbManager().ConfigureAwait(false)).CurrentUser.Id},
+                { "ActivityId", activity.Id.ToString(CultureInfo.InvariantCulture) }
             };
             Analytics.TrackEvent("MainActivity_LaunchActivity", properties);
 
-            Intent performActivityIntent = new Intent(this, typeof(ActTaskListActivity));
-
             activity.LearningTasks = activity.LearningTasks.OrderBy(t => t.Order).ToList();
-
             ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(this);
-
             // Save this activity to the database for showing in the 'recent' feed section
-            (await GetDbManager()).AddActivity(activity, int.Parse(preferences.GetString("pref_cacheNumber", "4")));
+            (await GetDbManager().ConfigureAwait(false)).AddContentCache(activity, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
+
+            MainLandingFragment.ForceRefresh = true;
 
             string json = JsonConvert.SerializeObject(activity, new JsonSerializerSettings
             {
@@ -340,9 +331,44 @@ namespace OurPlace.Android.Activities
                 MaxDepth = 5
             });
 
-            performActivityIntent.PutExtra("JSON", json);
+            using (Intent performActivityIntent = new Intent(this, typeof(ActTaskListActivity)))
+            {
+                performActivityIntent.PutExtra("JSON", json);
+                StartActivity(performActivityIntent);
+            }
+        }
+
+        public async void LaunchCollection(ActivityCollection coll)
+        {
+            if (coll == null) return;
+
+            if (!AndroidUtils.IsContentVersionCompatible(coll, this)) return;
+
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                { "UserId", (await GetDbManager().ConfigureAwait(false)).CurrentUser.Id},
+                { "CollectionId", coll.Id.ToString(CultureInfo.InvariantCulture) }
+            };
+            Analytics.TrackEvent("MainActivity_LaunchCollection", properties);
+
+            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(this);
+            // Save this activity to the database for showing in the 'recent' feed section
+            (await GetDbManager().ConfigureAwait(false)).AddContentCache(coll, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
+
             MainLandingFragment.ForceRefresh = true;
-            StartActivity(performActivityIntent);
+
+            string json = JsonConvert.SerializeObject(coll, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                MaxDepth = 6
+            });
+
+            using (Intent openCollectionIntent = new Intent(this, typeof(CollectionActivityListActivity)))
+            {
+                openCollectionIntent.PutExtra("JSON", json);
+                StartActivity(openCollectionIntent);
+            }
         }
     }
 }

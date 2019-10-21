@@ -155,22 +155,27 @@ namespace OurPlace.Common.LocalData
             return Path.Combine(folderPath, filename);
         }
 
-        public static void DeleteActivityFileCache(LearningActivity act)
+        public static void DeleteActivityFileCache(FeedItem content)
         {
-            List<TaskFileInfo> fileUrls = GetFileTasks(act);
-
-            for (int i = 0; i < fileUrls.Count; i++)
+            if(content is LearningActivity act)
             {
-                string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
-                string cachedFilePath = GetCacheFilePath(thisUrl, act.Id, fileUrls[i].extension);
+                List<TaskFileInfo> fileUrls = new List<TaskFileInfo>();
 
-                File.Delete(cachedFilePath);
+                GetFileTasks(act);
+
+                for (int i = 0; i < fileUrls.Count; i++)
+                {
+                    string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
+                    string cachedFilePath = GetCacheFilePath(thisUrl, content.Id, fileUrls[i].extension);
+
+                    File.Delete(cachedFilePath);
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(act.ImageUrl))
+            if (!string.IsNullOrWhiteSpace(content.ImageUrl))
             {
-                string thisUrl = ServerUtils.GetUploadUrl(act.ImageUrl);
-                string cachedFilePath = GetCacheFilePath(thisUrl, act.Id, Path.GetExtension(act.ImageUrl));
+                string thisUrl = ServerUtils.GetUploadUrl(content.ImageUrl);
+                string cachedFilePath = GetCacheFilePath(thisUrl, content.Id, Path.GetExtension(content.ImageUrl));
 
                 File.Delete(cachedFilePath);
             }
