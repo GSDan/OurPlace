@@ -63,7 +63,7 @@ namespace OurPlace.Android
             return dbManager ?? (dbManager = await GetDatabaseManager().ConfigureAwait(false));
         }
 
-        public static async Task LaunchActivity(LearningActivity activity, Activity context)
+        public static async Task LaunchActivity(LearningActivity activity, Activity context, bool fromCollection = false)
         {
             if (activity == null) return;
 
@@ -93,6 +93,7 @@ namespace OurPlace.Android
             using (Intent performActivityIntent = new Intent(context, typeof(ActTaskListActivity)))
             {
                 performActivityIntent.PutExtra("JSON", json);
+                performActivityIntent.PutExtra("FromCollection", fromCollection);
                 context.StartActivity(performActivityIntent);
             }
         }

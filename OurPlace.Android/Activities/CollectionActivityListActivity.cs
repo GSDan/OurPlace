@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Runtime;
-using Android.Support.V7.App;
 using Android.Support.V7.Widget;
-using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities.Abstracts;
 using OurPlace.Android.Adapters;
-using OurPlace.Common;
 using OurPlace.Common.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OurPlace.Android.Activities
 {
@@ -84,7 +77,7 @@ namespace OurPlace.Android.Activities
         private async void Adapter_OpenItemClick(object sender, int pos)
         {
             LearningActivity act = adapter.Collection.Activities[pos];
-            await AndroidUtils.LaunchActivity(act, this).ConfigureAwait(false);
+            await AndroidUtils.LaunchActivity(act, this, fromCollection: true).ConfigureAwait(false);
         }
         public override void OnAttachedToWindow()
         {

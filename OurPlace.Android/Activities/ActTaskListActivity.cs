@@ -136,7 +136,7 @@ namespace OurPlace.Android.Activities
         {
             Intent intent;
 
-            if (Intent.GetBooleanExtra("FROM_COLLECTION", false))
+            if (Intent.GetBooleanExtra("FromCollection", false))
             {
                 intent = new Intent(this, typeof(CollectionActivityListActivity));
             }
@@ -636,13 +636,15 @@ namespace OurPlace.Android.Activities
             {
                 string name = creator.FirstName[0] + ". " + creator.Surname;
 
-                new AlertDialog.Builder(this)
-                    .SetTitle(string.Format(Resources.GetString(Resource.String.shareCreatorTitle), name))
+                using (var builder = new AlertDialog.Builder(this))
+                {
+                    builder.SetTitle(string.Format(Resources.GetString(Resource.String.shareCreatorTitle), name))
                     .SetMessage(string.Format(Resources.GetString(Resource.String.shareCreatorMessage), name))
                     .SetPositiveButton("Yes, share", (a, b) => { Upload(preppedTasks, true); })
                     .SetNegativeButton("No", (a, b) => { Upload(preppedTasks, false); })
                     .SetCancelable(false)
                     .Show();
+                }
             }
             else
             {
@@ -675,8 +677,14 @@ namespace OurPlace.Android.Activities
             dbManager.AddUpload(uploadData);
             dbManager.DeleteProgress(learningActivity.Id);
 
-            Intent intent = new Intent(this, typeof(UploadsActivity));
-            StartActivity(intent);
+            if (!Intent.GetBooleanExtra("FromCollection", false))
+            {
+                using (Intent intent = new Intent(this, typeof(UploadsActivity)))
+                {
+                    StartActivity(intent);
+                }
+            }
+
             Finish();
         }
 
