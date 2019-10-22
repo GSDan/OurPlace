@@ -77,7 +77,7 @@ namespace OurPlace.Android.Fragments
             var widthInDp = AndroidUtils.ConvertPixelsToDp(metrics.WidthPixels, Activity);
             int cols = Math.Max(widthInDp / 300, 1);
 
-            adapter = new FeedItemsAdapter(cached, await ((MainActivity)Activity).GetDbManager());
+            adapter = new FeedItemsAdapter(cached, await AndroidUtils.GetDbManager().ConfigureAwait(false));
             adapter.ItemClick += OnItemClick;
             layoutManager = new GridLayoutManager(Activity, cols);
             layoutManager.SetSpanSizeLookup(new GridSpanner(adapter, cols));
@@ -92,8 +92,9 @@ namespace OurPlace.Android.Fragments
                 LoadRemoteData();
             }
 
-            uploadsHint.Visibility = ((await ((MainActivity)Activity).GetDbManager()).GetUploadQueue().Any()) ?
-                    ViewStates.Visible : ViewStates.Gone;
+            bool hasUploads = (await AndroidUtils.GetDbManager().ConfigureAwait(false)).GetUploadQueue().Any();
+
+            Activity.RunOnUiThread(() => uploadsHint.Visibility = hasUploads ? ViewStates.Visible : ViewStates.Gone);
         }
 
         public override bool UserVisibleHint
@@ -119,7 +120,7 @@ namespace OurPlace.Android.Fragments
                 refresher.Refreshing = true;
                 ForceRefresh = false;
 
-                DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
+                DatabaseManager dbManager = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
                 ServerResponse<FeedSection> results =
                     await ServerUtils.Get<FeedSection>(
@@ -135,38 +136,39 @@ namespace OurPlace.Android.Fragments
                     Activity.RunOnUiThread(() => Toast.MakeText(Activity, Resource.String.ForceSignOut, ToastLength.Long).Show());
                     return;
                 }
-
-                if (!results.Success)
+                else if (!results.Success)
                 {
                     Activity.RunOnUiThread(() => Toast.MakeText(Activity, Resource.String.ConnectionError, ToastLength.Long).Show());
                     await LoadIntoFeed(null).ConfigureAwait(false);
                     return;
                 }
-
-                // Save this in the offline cache
-                dbManager.CurrentUser.RemoteCreatedContentJson = JsonConvert.SerializeObject(results.Data,
-                    new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.Objects,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                        MaxDepth = 5
-                    });
-                dbManager.AddUser(dbManager.CurrentUser);
-
-                List<FeedItem> recentlyOpened = dbManager.GetCachedContent();
-                foreach (FeedItem cachedActivity in recentlyOpened)
+                else
                 {
-                    FeedItem refreshedVersion = results.Data.Activities.FirstOrDefault(act => act.Id == cachedActivity.Id);
-                    if (refreshedVersion != null)
+                    // Save this in the offline cache
+                    dbManager.CurrentUser.RemoteCreatedContentJson = JsonConvert.SerializeObject(results.Data,
+                        new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.Objects,
+                            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                            MaxDepth = 5
+                        });
+                    dbManager.AddUser(dbManager.CurrentUser);
+
+                    List<FeedItem> recentlyOpened = dbManager.GetCachedContent();
+                    foreach (FeedItem cachedActivity in recentlyOpened)
                     {
-                        dbManager.DeleteCachedActivity(cachedActivity);
-                        MainLandingFragment.ForceRefresh = true;
+                        FeedItem refreshedVersion = results.Data.Activities.FirstOrDefault(act => act.Id == cachedActivity.Id);
+                        if (refreshedVersion != null)
+                        {
+                            dbManager.DeleteCachedActivity(cachedActivity);
+                            MainLandingFragment.ForceRefresh = true;
+                        }
                     }
+
+                    await LoadIntoFeed(results.Data).ConfigureAwait(false);
+
+                    refreshingData = false;
                 }
-
-                await LoadIntoFeed(results.Data).ConfigureAwait(false);
-
-                refreshingData = false;
             }
             catch (Exception e)
             {
@@ -377,15 +379,17 @@ namespace OurPlace.Android.Fragments
                 }
                 else
                 {
-                    new AlertDialog.Builder(Activity)
-                        .SetTitle(chosen.Name)
+                    using (var builder = new AlertDialog.Builder(Activity))
+                    {
+                        builder.SetTitle(chosen.Name)
                         .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditCreation(chosenAct, false); })
                         .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
                         .SetCancelable(true)
                         .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdActivityDialogMessage), chosenAct.InviteCode)))
                         .SetNegativeButton(Resource.String.createdActivityDialogOpen,
-                        (a, b) => { ((MainActivity)Activity).LaunchActivity(chosenAct); })
+                        async (a, b) => { await AndroidUtils.LaunchActivity(chosenAct, Activity).ConfigureAwait(false); })
                         .Show();
+                    }  
                 }
             }
             else if(chosen is ActivityCollection chosenColl)

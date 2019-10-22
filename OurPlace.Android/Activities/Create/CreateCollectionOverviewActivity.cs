@@ -45,7 +45,7 @@ namespace OurPlace.Android.Activities.Create
             string jsonData = Intent.GetStringExtra("JSON") ?? "";
             newCollection = JsonConvert.DeserializeObject<ActivityCollection>(jsonData, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            adapter = new ActivityCollectionAdapter(this, newCollection, SaveProgress);
+            adapter = new ActivityCollectionAdapter(this, newCollection, SaveProgress, true);
             adapter.DeleteItemClick += Adapter_DeleteItemClick;
             adapter.EditCollectionClick += Adapter_EditCollectionClick;
             adapter.FinishClick += Adapter_FinishClick;

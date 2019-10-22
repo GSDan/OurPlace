@@ -19,27 +19,29 @@ namespace OurPlace.Android.Adapters
         public event EventHandler<int> FinishClick;
         public event EventHandler<int> OpenLocationClick;
         public event EventHandler<int> DeleteItemClick;
+        public event EventHandler<int> OpenItemClick;
 
-        private readonly Context context;
         public ActivityCollection Collection { get; private set; }
+        private readonly Action saveProgress;
+        private readonly Context context;
+        private readonly bool editingMode;
 
-        public Action SaveProgress;
-
-        public ActivityCollectionAdapter(Context context, ActivityCollection thisCollection, Action save)
+        public ActivityCollectionAdapter(Context context, ActivityCollection thisCollection, Action save, bool editing)
         {
             this.context = context;
             Collection = thisCollection;
-            SaveProgress = save;
+            saveProgress = save;
+            editingMode = editing;
         }
 
         public override long GetItemId(int position)
         {
-            if (position == 0)
+            if (position == 0 && editingMode)
             {
                 return -2;
             }
 
-            if (position >= Collection.Activities?.Count)
+            if (position > Collection.Activities?.Count)
             {
                 return -1;
             }
@@ -49,7 +51,7 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0)
+            if (position == 0 && editingMode)
             {
                 return 0;
             }
@@ -59,7 +61,7 @@ namespace OurPlace.Android.Adapters
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            if (position == 0)
+            if (position == 0 && editingMode)
             {
                 if (!(holder is ActivityViewHolder avh))
                 {
@@ -95,7 +97,10 @@ namespace OurPlace.Android.Adapters
                 return;
             }
 
-            position--;
+            if(editingMode)
+            {
+                position--;
+            }
 
             if (!(holder is ActivityCollectionAdapterViewHolder vh))
             {
@@ -134,6 +139,13 @@ namespace OurPlace.Android.Adapters
                     .Transform(new CircleTransformation())
                     .IntoAsync(vh.ActivityIcon);
             }
+
+            vh.HandleView.Visibility = (editingMode) ? ViewStates.Visible : ViewStates.Gone;
+
+            if(!editingMode)
+            {
+                vh.RemoveButton.SetText(Resource.String.collectionStartActivity);
+            }
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -157,8 +169,13 @@ namespace OurPlace.Android.Adapters
             }
 
             View itemView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.ActivityCollectionCard, parent, false);
-            var vh = new ActivityCollectionAdapterViewHolder(itemView, null, OnDeleteItemClick, OnOpenLocationClick);
-            return vh;
+
+            if(editingMode) 
+            {
+                return new ActivityCollectionAdapterViewHolder(itemView, null, OnDeleteItemClick, OnOpenLocationClick);
+            }
+
+            return new ActivityCollectionAdapterViewHolder(itemView, null, OnOpenItemClick, OnOpenLocationClick);
         }
 
         public override int ItemCount
@@ -167,10 +184,10 @@ namespace OurPlace.Android.Adapters
             {
                 if (Collection.Activities == null)
                 {
-                    return 2;
+                    return (editingMode)? 2 : 0;
                 }
 
-                return Collection.Activities.Count + 2;
+                return Collection.Activities.Count + ((editingMode) ? 2 : 0);
             }
         }
 
@@ -187,6 +204,11 @@ namespace OurPlace.Android.Adapters
         private void OnDeleteItemClick(int position)
         {
             DeleteItemClick?.Invoke(this, position);
+        }
+
+        private void OnOpenItemClick(int position)
+        {
+            OpenItemClick?.Invoke(this, position);
         }
 
         private void OnFinishClick(int position)
@@ -210,7 +232,7 @@ namespace OurPlace.Android.Adapters
             Collection.Activities.Swap(dataFrom, dataTo);
             NotifyItemMoved(fromPosition, toPosition);
 
-            SaveProgress?.Invoke();
+            saveProgress?.Invoke();
 
             return true;
         }
@@ -236,6 +258,7 @@ namespace OurPlace.Android.Adapters
         public Button LocationButton { get; protected set; }
         public View TtsButton { get; protected set; }
         public Button RemoveButton { get; protected set; }
+        public ImageView HandleView { get; protected set; }
 
         public ActivityCollectionAdapterViewHolder(View itemView, Action<int> ttsAction, Action<int> deleteListener, Action<int> openLocationListener) : base(itemView)
         {
@@ -246,6 +269,7 @@ namespace OurPlace.Android.Adapters
             LocationButton = itemView.FindViewById<Button>(Resource.Id.viewLocButton);
             RemoveButton = itemView.FindViewById<Button>(Resource.Id.removeBtn);
             TtsButton = itemView.FindViewById<View>(Resource.Id.ttsBtn);
+            HandleView = itemView.FindViewById<ImageView>(Resource.Id.handle);
 
             LocationButton.Click += (sender, e) => openLocationListener(AdapterPosition);
             RemoveButton.Click += (sender, e) => deleteListener(AdapterPosition);

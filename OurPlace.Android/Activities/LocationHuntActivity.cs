@@ -64,9 +64,21 @@ namespace OurPlace.Android.Activities
             string thisJsonData = Intent.GetStringExtra("JSON") ?? "";
             learningTask = JsonConvert.DeserializeObject<LearningTask>(thisJsonData,
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
-            SupportActionBar.Title = learningTask.Description;
 
-            target = JsonConvert.DeserializeObject<LocationHuntLocation>(learningTask.JsonData);
+            if(learningTask == null)
+            {
+                learningTask = new LearningTask()
+                {
+                    Description = Intent.GetStringExtra("Description"),
+                };
+                target = JsonConvert.DeserializeObject<LocationHuntLocation>(Intent.GetStringExtra("Target"));
+            }
+            else
+            {
+                target = JsonConvert.DeserializeObject<LocationHuntLocation>(learningTask.JsonData);
+            }
+
+            SupportActionBar.Title = learningTask.Description;
 
             TextView taskDesc = FindViewById<TextView>(Resource.Id.taskDesc);
             taskDesc.Text = learningTask.Description;

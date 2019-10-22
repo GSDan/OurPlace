@@ -25,6 +25,7 @@ using Android.Content.PM;
 using Android.Gms.Common;
 using Android.Graphics;
 using Android.Media;
+using Android.Preferences;
 using Android.Provider;
 using Android.Runtime;
 using Android.Support.V4.App;
@@ -35,13 +36,17 @@ using FFImageLoading;
 using FFImageLoading.Views;
 using Java.Lang;
 using Java.Util;
+using Microsoft.AppCenter.Analytics;
+using Newtonsoft.Json;
 using OurPlace.Android.Activities;
 using OurPlace.Android.Activities.Create;
+using OurPlace.Android.Fragments;
 using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -52,14 +57,89 @@ namespace OurPlace.Android
 {
     public static class AndroidUtils
     {
+        private static DatabaseManager dbManager;
+        public static async Task<DatabaseManager> GetDbManager()
+        {
+            return dbManager ?? (dbManager = await GetDatabaseManager().ConfigureAwait(false));
+        }
+
+        public static async Task LaunchActivity(LearningActivity activity, Activity context)
+        {
+            if (activity == null) return;
+
+            if (!IsContentVersionCompatible(activity, context)) return;
+
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                { "UserId",  (await GetDbManager().ConfigureAwait(false)).CurrentUser.Id},
+                { "ActivityId", activity.Id.ToString(CultureInfo.InvariantCulture) }
+            };
+            Analytics.TrackEvent("MainActivity_LaunchActivity", properties);
+
+            activity.LearningTasks = activity.LearningTasks.OrderBy(t => t.Order).ToList();
+            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(context);
+            // Save this activity to the database for showing in the 'recent' feed section
+            (await GetDbManager().ConfigureAwait(false)).AddContentCache(activity, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
+
+            MainLandingFragment.ForceRefresh = true;
+
+            string json = JsonConvert.SerializeObject(activity, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                MaxDepth = 5
+            });
+
+            using (Intent performActivityIntent = new Intent(context, typeof(ActTaskListActivity)))
+            {
+                performActivityIntent.PutExtra("JSON", json);
+                context.StartActivity(performActivityIntent);
+            }
+        }
+
+        public static async Task LaunchCollection(ActivityCollection coll, Activity context)
+        {
+            if (coll == null) return;
+
+            if (!IsContentVersionCompatible(coll, context)) return;
+
+            DatabaseManager db = await GetDbManager().ConfigureAwait(false);
+
+            Dictionary<string, string> properties = new Dictionary<string, string>
+            {
+                { "UserId", db.CurrentUser.Id},
+                { "CollectionId", coll.Id.ToString(CultureInfo.InvariantCulture) }
+            };
+            Analytics.TrackEvent("MainActivity_LaunchCollection", properties);
+
+            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(context);
+            // Save this activity to the database for showing in the 'recent' feed section
+            db.AddContentCache(coll, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
+
+            MainLandingFragment.ForceRefresh = true;
+
+            string json = JsonConvert.SerializeObject(coll, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                MaxDepth = 6
+            });
+
+            using (Intent openCollectionIntent = new Intent(context, typeof(CollectionActivityListActivity)))
+            {
+                openCollectionIntent.PutExtra("JSON", json);
+                context.StartActivity(openCollectionIntent);
+            }
+        }
+
         public static bool IsContentVersionCompatible(FeedItem content, Activity context)
         {
-            if(content == null)
+            if (content == null)
             {
                 throw new System.Exception("Content is null");
             }
 
-            if(context == null)
+            if (context == null)
             {
                 throw new System.Exception("Unable to access app context");
             }
@@ -68,7 +148,8 @@ namespace OurPlace.Android
 
             if (content.AppVersionNumber > thisVersion)
             {
-                context.RunOnUiThread(() => {
+                context.RunOnUiThread(() =>
+                {
                     using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(context))
                     {
                         builder.SetTitle(Resource.String.updateTitle)
@@ -139,7 +220,9 @@ namespace OurPlace.Android
 
         public static async Task<bool> PrepActivityFiles(Activity context, LearningActivity act)
         {
-            using (ProgressDialog loadingDialog = new ProgressDialog(context))
+            ProgressDialog loadingDialog = new ProgressDialog(context);
+
+            try
             {
                 loadingDialog.SetTitle(Resource.String.PleaseWait);
                 loadingDialog.SetMessage(context.Resources.GetString(Resource.String.actLoadStart));
@@ -167,7 +250,7 @@ namespace OurPlace.Android
 
                         try
                         {
-                            await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath);
+                            await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath).ConfigureAwait(false);
                         }
                         catch (System.Exception e)
                         {
@@ -177,10 +260,17 @@ namespace OurPlace.Android
                         }
                     }
                 }
-
-                context.RunOnUiThread(() => loadingDialog.Dismiss());
                 return true;
             }
+            finally
+            {
+                context.RunOnUiThread(() =>
+                {
+                    loadingDialog.Dismiss();
+                    loadingDialog.Dispose();
+                });
+            }
+
         }
 
         public static void LoadActivityImageIntoView(ImageViewAsync targetImageView, string imageUrl, int activityId, int quality = 350)

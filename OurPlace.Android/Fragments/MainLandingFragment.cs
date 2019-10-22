@@ -76,7 +76,7 @@ namespace OurPlace.Android.Fragments
 
             int cols = Math.Max(widthInDp / 300, 1);
 
-            adapter = new FeedItemsAdapter(cached, await ((MainActivity)Activity).GetDbManager());
+            adapter = new FeedItemsAdapter(cached, await AndroidUtils.GetDbManager().ConfigureAwait(false));
             adapter.ItemClick += OnItemClick;
 
             if (savedInstanceState != null)
@@ -259,7 +259,7 @@ namespace OurPlace.Android.Fragments
                 }
 
                 // Save this in the offline cache
-                DatabaseManager dbManager = await ((MainActivity)Activity).GetDbManager();
+                DatabaseManager dbManager = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
                 dbManager.CurrentUser.CachedContentJson = JsonConvert.SerializeObject(results.Data,
                     new JsonSerializerSettings
@@ -295,7 +295,7 @@ namespace OurPlace.Android.Fragments
         /// <returns></returns>
         private async Task<FeedSection> LoadRecent()
         {
-            List<FeedItem> recentlyOpened = (await ((MainActivity)Activity).GetDbManager()).GetCachedContent();
+            List<FeedItem> recentlyOpened = (await AndroidUtils.GetDbManager().ConfigureAwait(false)).GetCachedContent();
 
             if (recentlyOpened != null && recentlyOpened.Count > 0)
             {
@@ -324,9 +324,9 @@ namespace OurPlace.Android.Fragments
             return null;
         }
 
-        private void OnItemClick(object sender, int position)
+        private async void OnItemClick(object sender, int position)
         {
-            FeedItem item = adapter.GetItem(position - 1);
+            FeedItem item = adapter.GetItem(position, true);
 
             if(item == null)
             {
@@ -335,38 +335,41 @@ namespace OurPlace.Android.Fragments
             else if (item is LearningActivity act)
             {
                 viewLoaded = false;
-                ((MainActivity)Activity).LaunchActivity(act);
+                await AndroidUtils.LaunchActivity(act, Activity).ConfigureAwait(false);
             }
             else if(item is ActivityCollection coll)
             {
                 viewLoaded = false;
-                ((MainActivity)Activity).LaunchCollection(coll);
+                await AndroidUtils.LaunchCollection(coll, Activity).ConfigureAwait(false);
             }
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View view = inflater.Inflate(Resource.Layout.MainLanding, container, false);
+            View view = inflater?.Inflate(Resource.Layout.MainLanding, container, false);
             return view;
         }
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            refresher.Refresh += Refresher_Refresh;
-            refresher.SetColorSchemeResources(
-                Resource.Color.app_darkgreen,
-                Resource.Color.app_green,
-                Resource.Color.app_purple
-                );
+            if (view != null)
+            {
+                refresher = view.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+                refresher.Refresh += Refresher_Refresh;
+                refresher.SetColorSchemeResources(
+                    Resource.Color.app_darkgreen,
+                    Resource.Color.app_green,
+                    Resource.Color.app_purple
+                    );
 
-            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
-            recyclerView.SetLayoutManager(layoutManager);
-            recyclerView.SetAdapter(adapter);
+                recyclerView = view.FindViewById<RecyclerView>(Resource.Id.recyclerView);
+                recyclerView.SetLayoutManager(layoutManager);
+                recyclerView.SetAdapter(adapter);
 
-            viewLoaded = true;
+                viewLoaded = true;
 
-            CheckLocationPermission();
+                CheckLocationPermission();
+            }
 
             base.OnViewCreated(view, savedInstanceState);
         }
@@ -376,7 +379,12 @@ namespace OurPlace.Android.Fragments
             base.OnSaveInstanceState(outState);
             if (adapter != null && adapter.Data.Count > 0)
             {
-                outState.PutString("MAIN_ADAPTER_DATA", JsonConvert.SerializeObject(adapter.Data));
+                outState.PutString("MAIN_ADAPTER_DATA", JsonConvert.SerializeObject(adapter.Data, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                    MaxDepth = 6,
+                    TypeNameHandling = TypeNameHandling.Auto
+                }));
             }
         }
 

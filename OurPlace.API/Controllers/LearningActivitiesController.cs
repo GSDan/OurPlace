@@ -39,6 +39,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LearningTask = OurPlace.API.Models.LearningTask;
+using Microsoft.EntityFrameworkCore;
 
 namespace OurPlace.API.Controllers
 {
@@ -46,7 +47,9 @@ namespace OurPlace.API.Controllers
     {
         private IEnumerable<Common.Models.ActivityCollection> GetAllCollectionsWhere(Func<ActivityCollection, bool> predicate)
         {
-            return db.ActivityCollections.Where(predicate)
+            return db.ActivityCollections
+                .Include("Activities.LearningTasks.ChildTasks.TaskType")
+                .Where(predicate)
                 .Select(c => new Common.Models.ActivityCollection()
                 {
                     Id = c.Id,
@@ -243,7 +246,7 @@ namespace OurPlace.API.Controllers
                     GetAllActivitiesWhere(a => !a.SoftDeleted && ((a.IsPublic && (a.Approved || thisUser.Trusted)) || a.Author.Id == thisUser.Id)),
                     new JsonSerializerSettings() {
                         ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                        MaxDepth = 5
+                        MaxDepth = 6
                     }), Encoding.UTF8, "application/json");
 
             await MakeLog();
@@ -319,8 +322,8 @@ namespace OurPlace.API.Controllers
                     feed,
                     new JsonSerializerSettings()
                     {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        MaxDepth = 7
+                        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                        MaxDepth = 12
                     }), Encoding.UTF8, "application/json");
 
             await MakeLog(new Dictionary<string, string>(){ { "lat", lat.ToString() }, {"lon", lon.ToString() } } );

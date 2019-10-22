@@ -91,13 +91,20 @@ namespace OurPlace.Common.LocalData
 
             foreach (LearningTask t in act.LearningTasks)
             {
-                TaskFileInfo parentInfo = GetInfoForTask(t);
-                if (parentInfo != null) toRet.Add(parentInfo);
-
-                foreach (LearningTask child in t.ChildTasks)
+                try
                 {
-                    TaskFileInfo childInfo = GetInfoForTask(child);
-                    if (childInfo != null) toRet.Add(childInfo);
+                    TaskFileInfo parentInfo = GetInfoForTask(t);
+                    if (parentInfo != null) toRet.Add(parentInfo);
+
+                    foreach (LearningTask child in t.ChildTasks)
+                    {
+                        TaskFileInfo childInfo = GetInfoForTask(child);
+                        if (childInfo != null) toRet.Add(childInfo);
+                    }
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }
 
@@ -106,7 +113,7 @@ namespace OurPlace.Common.LocalData
 
         private static TaskFileInfo GetInfoForTask(LearningTask task)
         {
-            string tt = task.TaskType.IdName;
+            string tt = task.TaskType?.IdName;
             if (tt == "MATCH_PHOTO" || tt == "LISTEN_AUDIO" ||
                 (tt == "DRAW_PHOTO" && !task.JsonData.StartsWith("TASK::", StringComparison.OrdinalIgnoreCase)))
             {

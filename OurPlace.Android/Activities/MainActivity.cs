@@ -53,7 +53,6 @@ namespace OurPlace.Android.Activities
     [IntentFilter(new[] { Intent.ActionView }, DataScheme = "parklearn", DataHost = "activity", Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault })]
     public class MainActivity : AppCompatActivity
     {
-        private static DatabaseManager dbManager;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -104,14 +103,9 @@ namespace OurPlace.Android.Activities
             }
         }
 
-        public async Task<DatabaseManager> GetDbManager()
-        {
-            return dbManager ?? (dbManager = await Storage.GetDatabaseManager());
-        }
-
         public async Task<ApplicationUser> GetCurrentUser()
         {
-            DatabaseManager manager = await GetDbManager();
+            DatabaseManager manager = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
             if (manager.CurrentUser == null)
             {
@@ -124,7 +118,7 @@ namespace OurPlace.Android.Activities
 
         public async Task<List<FeedSection>> GetCachedContent(bool ownedOnly)
         {
-            ApplicationUser currentUser = await GetCurrentUser();
+            ApplicationUser currentUser = await GetCurrentUser().ConfigureAwait(false);
 
             string contentJsonCache = (ownedOnly)
                 ? currentUser?.RemoteCreatedContentJson
@@ -145,12 +139,12 @@ namespace OurPlace.Android.Activities
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Toast.MakeText(this, Resource.String.errorCache, ToastLength.Long).Show();
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.errorCache, ToastLength.Long).Show());
 
                 if (currentUser != null)
                 {
                     currentUser.CachedContentJson = null;
-                    (await GetDbManager()).AddUser(currentUser);
+                    (await AndroidUtils.GetDbManager().ConfigureAwait(false)).AddUser(currentUser);
                 }
 
                 return new List<FeedSection>();
@@ -246,21 +240,24 @@ namespace OurPlace.Android.Activities
             dialog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
             dialog.Show();
 
-            ServerResponse<LearningActivity> result =
-                await ServerUtils.Get<LearningActivity>("/api/LearningActivities/GetWithCode?code=" + code);
+            ServerResponse<LearningActivity> result = await ServerUtils.Get<LearningActivity>("/api/LearningActivities/GetWithCode?code=" + code).ConfigureAwait(false);
 
-            dialog.Dismiss();
+            RunOnUiThread(() =>
+            {
+                dialog.Dismiss();
+                dialog.Dispose();
+            });
 
             if (result == null)
             {
                 var suppress = AndroidUtils.ReturnToSignIn(this);
-                Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show());
                 return;
             }
 
             if (result.Success)
             {
-                LaunchActivity(result.Data);
+                await AndroidUtils.LaunchActivity(result.Data, this).ConfigureAwait(false);
             }
             else
             {
@@ -270,14 +267,13 @@ namespace OurPlace.Android.Activities
                     var suppress = AndroidUtils.ReturnToSignIn(this);
                     return;
                 }
-
                 if (result.Message.StartsWith("404"))
                 {
-                    Toast.MakeText(this, Resource.String.searchFail, ToastLength.Long).Show();
+                    RunOnUiThread(() => Toast.MakeText(this, Resource.String.searchFail, ToastLength.Long).Show());
                 }
                 else
                 {
-                    Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show();
+                    RunOnUiThread(() => Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show());
                 }
             }
         }
@@ -285,14 +281,14 @@ namespace OurPlace.Android.Activities
         // Update the TaskTypes available in the background
         public async Task UpdateTaskTypes()
         {
-            dbManager = await GetDbManager();
+            DatabaseManager db = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
-            List<TaskType> taskTypes = await ServerUtils.RefreshTaskTypes(dbManager);
+            List<TaskType> taskTypes = await ServerUtils.RefreshTaskTypes(db).ConfigureAwait(false);
 
             if (taskTypes == null)
             {
                 var suppress = AndroidUtils.ReturnToSignIn(this);
-                Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
+                RunOnUiThread(() => Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show());
                 return;
             }
 
@@ -301,74 +297,7 @@ namespace OurPlace.Android.Activities
                 return;
             }
 
-            dbManager.AddTaskTypes(taskTypes);
-        }
-
-        public async void LaunchActivity(LearningActivity activity)
-        {
-            if (activity == null) return;
-
-            if (!AndroidUtils.IsContentVersionCompatible(activity, this)) return;
-
-            Dictionary<string, string> properties = new Dictionary<string, string>
-            {
-                { "UserId", (await GetDbManager().ConfigureAwait(false)).CurrentUser.Id},
-                { "ActivityId", activity.Id.ToString(CultureInfo.InvariantCulture) }
-            };
-            Analytics.TrackEvent("MainActivity_LaunchActivity", properties);
-
-            activity.LearningTasks = activity.LearningTasks.OrderBy(t => t.Order).ToList();
-            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(this);
-            // Save this activity to the database for showing in the 'recent' feed section
-            (await GetDbManager().ConfigureAwait(false)).AddContentCache(activity, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
-
-            MainLandingFragment.ForceRefresh = true;
-
-            string json = JsonConvert.SerializeObject(activity, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                MaxDepth = 5
-            });
-
-            using (Intent performActivityIntent = new Intent(this, typeof(ActTaskListActivity)))
-            {
-                performActivityIntent.PutExtra("JSON", json);
-                StartActivity(performActivityIntent);
-            }
-        }
-
-        public async void LaunchCollection(ActivityCollection coll)
-        {
-            if (coll == null) return;
-
-            if (!AndroidUtils.IsContentVersionCompatible(coll, this)) return;
-
-            Dictionary<string, string> properties = new Dictionary<string, string>
-            {
-                { "UserId", (await GetDbManager().ConfigureAwait(false)).CurrentUser.Id},
-                { "CollectionId", coll.Id.ToString(CultureInfo.InvariantCulture) }
-            };
-            Analytics.TrackEvent("MainActivity_LaunchCollection", properties);
-
-            ISharedPreferences preferences = PreferenceManager.GetDefaultSharedPreferences(this);
-            // Save this activity to the database for showing in the 'recent' feed section
-            (await GetDbManager().ConfigureAwait(false)).AddContentCache(coll, int.Parse(preferences.GetString("pref_cacheNumber", "4"), CultureInfo.InvariantCulture));
-
-            MainLandingFragment.ForceRefresh = true;
-
-            string json = JsonConvert.SerializeObject(coll, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                MaxDepth = 6
-            });
-
-            using (Intent openCollectionIntent = new Intent(this, typeof(CollectionActivityListActivity)))
-            {
-                openCollectionIntent.PutExtra("JSON", json);
-                StartActivity(openCollectionIntent);
-            }
+            db.AddTaskTypes(taskTypes);
         }
     }
 }

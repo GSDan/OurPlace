@@ -35,60 +35,59 @@ namespace OurPlace.Android.Activities.Abstracts
     {
         protected void LoadHeaderImage(string imageUrl)
         {
-            using (ImageViewAsync headerImage = FindViewById<ImageViewAsync>(Resource.Id.backdrop))
+            ImageViewAsync headerImage = FindViewById<ImageViewAsync>(Resource.Id.backdrop);
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
             {
-                if (string.IsNullOrWhiteSpace(imageUrl))
-                {
-                    ImageService.Instance.LoadCompiledResource("logoRect").Into(headerImage);
-                    return;
-                }
-
-                using(var collapsingToolbar = FindViewById<CollapsingToolbarLayout>(Resource.Id.collapsing_toolbar))
-                {
-                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(imageUrl))
-                    .Success(() =>
-                    {
-                        try
-                        {
-                            if ((BitmapDrawable)headerImage.Drawable != null)
-                            {
-                                Bitmap headerBitmap = ((BitmapDrawable)headerImage.Drawable).Bitmap;
-                                if (headerBitmap != null && !headerBitmap.IsRecycled)
-                                {
-                                    Palette palette = Palette.From(headerBitmap).Generate();
-
-                                    if (palette.VibrantSwatch != null)
-                                    {
-                                        Color taskColor = new Color(palette.VibrantSwatch.Rgb);
-                                        Color statusColor = new Color(palette.VibrantSwatch.Rgb);
-                                        if (palette.DarkVibrantSwatch != null)
-                                        {
-                                            statusColor = new Color(palette.DarkVibrantSwatch.Rgb);
-                                        }
-
-                                        RunOnUiThread(() =>
-                                        {
-                                            Window.SetStatusBarColor(statusColor);
-                                            collapsingToolbar.SetContentScrimColor(taskColor);
-                                            collapsingToolbar.SetBackgroundColor(taskColor);
-                                        });
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Toast.MakeText(this, "Image load error", ToastLength.Short).Show();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-
-                    })
-                    .Into(headerImage);
-                }
+                ImageService.Instance.LoadCompiledResource("logoRect").Into(headerImage);
+                headerImage.Dispose();
+                return;
             }
+
+            var collapsingToolbar = FindViewById<CollapsingToolbarLayout>(Resource.Id.collapsing_toolbar);
+
+            ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(imageUrl))
+            .Success(() =>
+            {
+                try
+                {
+                    if ((BitmapDrawable)headerImage.Drawable != null)
+                    {
+                        Bitmap headerBitmap = ((BitmapDrawable)headerImage.Drawable).Bitmap;
+                        if (headerBitmap != null && !headerBitmap.IsRecycled)
+                        {
+                            Palette palette = Palette.From(headerBitmap).Generate();
+
+                            if (palette.VibrantSwatch != null)
+                            {
+                                Color taskColor = new Color(palette.VibrantSwatch.Rgb);
+                                Color statusColor = new Color(palette.VibrantSwatch.Rgb);
+                                if (palette.DarkVibrantSwatch != null)
+                                {
+                                    statusColor = new Color(palette.DarkVibrantSwatch.Rgb);
+                                }
+
+                                RunOnUiThread(() =>
+                                {
+                                    Window.SetStatusBarColor(statusColor);
+                                    collapsingToolbar.SetContentScrimColor(taskColor);
+                                    collapsingToolbar.SetBackgroundColor(taskColor);
+                                    collapsingToolbar.Dispose();
+                                    headerImage.Dispose();
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "Image load error", ToastLength.Short).Show();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }).Into(headerImage);
         }
     }
 }

@@ -164,6 +164,7 @@
   <string name="createCollectionAddActivityHeaderNoneLeft">You\ve added all of your Activities!</string>
   <string name="createCollectionAddActivityHelp">Choose an Activity to add to your collection. The Activities listed are ones created by you. If you want to add someone else\'s Activity, enter its share code or scan its QR code using the buttons at the top of the screen.</string>
   <string name="createCollectionAddActivityEnterCode">Enter an Activity\'s share code to add it to this collection:</string>
+  <string name="collectionStartActivity">Open</string>
   <string name="uploadsNone">No uploads pending</string>
   <string name="uploadsSome">Your pending uploads:</string>
   <string name="uploadBtn">Upload</string>

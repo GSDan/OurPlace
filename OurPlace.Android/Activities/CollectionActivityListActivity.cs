@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Activities.Abstracts;
 using OurPlace.Android.Adapters;
+using OurPlace.Common;
 using OurPlace.Common.Models;
 
 namespace OurPlace.Android.Activities
@@ -24,6 +26,7 @@ namespace OurPlace.Android.Activities
     {
         private ActivityCollectionAdapter adapter;
         private ActivityCollection collection;
+        private const int PermReqId = 111;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -35,7 +38,9 @@ namespace OurPlace.Android.Activities
             collection = JsonConvert.DeserializeObject<ActivityCollection>(jsonData,
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
-            adapter = new ActivityCollectionAdapter(this, collection, null);
+            adapter = new ActivityCollectionAdapter(this, collection, null, false);
+            adapter.OpenItemClick += Adapter_OpenItemClick;
+            adapter.OpenLocationClick += Adapter_OpenLocationClick;
 
             using (var toolbar = FindViewById<global::Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar))
             {
@@ -55,6 +60,42 @@ namespace OurPlace.Android.Activities
             }
 
             _ = DownloadActivities();
+        }
+
+        private void Adapter_OpenLocationClick(object sender, int position)
+        {
+            LearningActivity thisAct = adapter.Collection.Activities[position];
+            Place thisPlace = thisAct.Places?.FirstOrDefault();
+
+            if (thisPlace == null) return;
+
+            using (var lastReqIntent = new Intent(this, typeof(LocationHuntActivity)))
+            {
+                lastReqIntent.PutExtra("Target", JsonConvert.SerializeObject(
+                    new LocationHuntLocation((double)thisPlace.Latitude, (double)thisPlace.Longitude, 15.0f, true)));
+
+                AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
+                    new string[] { base.Resources.GetString(Resource.String.permissionLocationExplanation) },
+                    lastReqIntent, thisAct.Id, PermReqId, this);
+            }
+        }
+
+        private async void Adapter_OpenItemClick(object sender, int pos)
+        {
+            LearningActivity act = adapter.Collection.Activities[pos];
+            await AndroidUtils.LaunchActivity(act, this).ConfigureAwait(false);
+        }
+        public override void OnAttachedToWindow()
+        {
+            base.OnAttachedToWindow();
+            if (collection != null)
+            {
+                using(var toolbar = FindViewById<global::Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar))
+                {
+                    toolbar.Title = collection.Name;
+                }
+            }
         }
 
         private async Task DownloadActivities()
