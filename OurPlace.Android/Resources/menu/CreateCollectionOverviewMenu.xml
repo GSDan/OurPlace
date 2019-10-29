@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--For all properties see: https://aka.ms/android-menu-resource-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  
+    <item
+android:id="@+id/menudelete"
+android:title="@string/DeleteBtn"
+android:icon="@drawable/baseline_delete_forever_white_24"
+app:showAsAction="always"/>
+  
+  <item
+  android:id="@+id/menuhelp"
+  android:title="@string/MenuHelp"
+  android:icon="@drawable/ic_help_white_24dp"
+  app:showAsAction="ifRoom"/>
+
+  
+</menu>
+
+<!-- Code to implement into Activity:
+
+Android.Widget.SearchView searchView;
+public override bool OnCreateOptionsMenu(IMenu menu)
+{
+  this.MenuInflater.Inflate(Resource.Menu.CreateCollectionOverviewMenu, menu);
+
+  var searchItem = menu.FindItem(Resource.Id.action_search);
+
+  searchView = searchItem.ActionProvider.JavaCast<Android.Widget.SearchView>();
+
+  searchView.QueryTextSubmit += (sender, args) =>
+  {
+    Toast.MakeText(this, "You searched: " + args.Query, ToastLength.Short).Show();
+
+  };
+
+
+  return base.OnCreateOptionsMenu(menu);
+}
+
+-->

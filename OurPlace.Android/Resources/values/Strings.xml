@@ -182,6 +182,9 @@
   <string name="createdActivityDialogMessage">This activity\'s share code is &lt;b>{0}&lt;/b>&lt;br/>What do you want to do with it?</string>
   <string name="createdActivityDialogDelete">Delete</string>
   <string name="createdActivityDialogOpen">Open</string>
+  <string name="createdCollectionDialogTitle">Your Collection</string>
+  <string name="createdCollectionDialogMessage">This collection\'s share code is &lt;b>{0}&lt;/b>&lt;br/>What do you want to do with it?</string>
+  <string name="createdCollectionDialogOpen">Open</string>
   <string name="createdActivityDialogUnfinishedMessage">This activity is unfinished. What do you want to do with it?</string>
   <string name="createdFeedTitle">Your Uploaded Creations</string>
   <string name="createdFeedDesc">The activities and collections that you\'ve created and uploaded</string>

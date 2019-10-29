@@ -12,6 +12,7 @@ using Android.Widget;
 using Newtonsoft.Json;
 using OurPlace.Android.Adapters;
 using OurPlace.Android.Fragments;
+using OurPlace.Common;
 using OurPlace.Common.LocalData;
 using OurPlace.Common.Models;
 using System;
@@ -78,7 +79,7 @@ namespace OurPlace.Android.Activities.Create
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.HelpOnlyMenu, menu);
+            MenuInflater.Inflate(Resource.Menu.CreateCollectionOverviewMenu, menu);
             return base.OnPrepareOptionsMenu(menu);
         }
 
@@ -93,6 +94,58 @@ namespace OurPlace.Android.Activities.Create
                         alert.SetPositiveButton(Resource.String.dialog_ok, (a, b) => { });
                         alert.Show();
                     }
+                    return true;
+                case Resource.Id.menudelete:
+
+                    using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+                    {
+                        builder.SetTitle(Resource.String.deleteTitle)
+                        .SetMessage(Resource.String.deleteMessage)
+                        .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
+                        {
+                        })
+                        .SetPositiveButton(Resource.String.DeleteBtn, async (a, e) =>
+                        {
+                            if (editingSubmitted)
+                            {
+                                using (ProgressDialog prog = new ProgressDialog(this))
+                                {
+                                    prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+                                    prog.Show();
+                                    ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/activitycollections?id=" + newCollection.Id).ConfigureAwait(false);
+                                    RunOnUiThread(() => prog.Dismiss());
+                                    if (resp == null)
+                                    {
+                                        var suppress = AndroidUtils.ReturnToSignIn(this);
+                                        RunOnUiThread(() => Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show());
+                                    }
+                                    else if (resp.Success)
+                                    {
+                                        RunOnUiThread(() => Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show());
+                                        MainMyCreationsFragment.ForceRefresh = true;
+                                        Finish();
+                                    }
+                                    else
+                                    {
+                                        RunOnUiThread(() => Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show());
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                DatabaseManager db = await AndroidUtils.GetDbManager().ConfigureAwait(false);
+
+                                var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(db.CurrentUser.LocalCreatedActivitiesJson);
+                                localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newCollection.Id));
+                                db.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                                db.AddUser(db.CurrentUser);
+                                MainMyCreationsFragment.ForceRefresh = true;
+                                Finish();
+                            }
+                        })
+                        .Show();
+                    }
+
                     return true;
                 default:
                     return base.OnOptionsItemSelected(item);
@@ -142,7 +195,11 @@ namespace OurPlace.Android.Activities.Create
 
                 adapter.Collection.ActivityOrder = sb.ToString();
 
-                intent.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Collection));
+                intent.PutExtra("JSON", JsonConvert.SerializeObject(adapter.Collection, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                    MaxDepth = 6
+                }));
                 intent.PutExtra("EDITING_SUBMITTED", editingSubmitted);
                 StartActivity(intent);
             } 
@@ -153,7 +210,11 @@ namespace OurPlace.Android.Activities.Create
             // Edit the collection's basic details
             Intent intent = new Intent(this, typeof(CreateCollectionActivity));
             newCollection = adapter.Collection;
-            intent.PutExtra("JSON", JsonConvert.SerializeObject(newCollection));
+            intent.PutExtra("JSON", JsonConvert.SerializeObject(newCollection, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                MaxDepth = 6
+            }));
             StartActivityForResult(intent, editCollectionIntent);
             intent.Dispose();
         }

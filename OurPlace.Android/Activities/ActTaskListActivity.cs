@@ -697,7 +697,7 @@ namespace OurPlace.Android.Activities
 
             if (shouldSave && learningActivity != null && adapter != null && adapter.Items != null)
             {
-                (await Storage.GetDatabaseManager()).SaveActivityProgress(learningActivity, adapter.Items, enteredName);
+                (await Storage.GetDatabaseManager().ConfigureAwait(false)).SaveActivityProgress(learningActivity, adapter.Items, enteredName);
             }
         }
     }

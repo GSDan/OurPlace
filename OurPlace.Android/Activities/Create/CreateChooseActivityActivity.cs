@@ -71,7 +71,8 @@ namespace OurPlace.Android.Activities.Create
                 dbManager = await Storage.GetDatabaseManager().ConfigureAwait(false);
             }
 
-            activities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.CurrentUser.RemoteCreatedContentJson) ?? new List<LearningActivity>();
+            FeedSection cached = JsonConvert.DeserializeObject<FeedSection>(dbManager.CurrentUser.RemoteCreatedContentJson) ?? new FeedSection();
+            activities = cached.Activities ?? new List<LearningActivity>();
             int removed = activities.RemoveAll(act => previouslySelected.Any((rhs) => rhs.Id == act.Id)); //remove previously selected activities
             activities = activities.OrderByDescending(act => act.CreatedAt).ToList();
             

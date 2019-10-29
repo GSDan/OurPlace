@@ -57,7 +57,7 @@ namespace OurPlace.Android.Activities
 
         private void Adapter_OpenLocationClick(object sender, int position)
         {
-            LearningActivity thisAct = adapter.Collection.Activities[position];
+            LearningActivity thisAct = adapter.Collection.Activities[position - 1];
             Place thisPlace = thisAct.Places?.FirstOrDefault();
 
             if (thisPlace == null) return;
@@ -66,6 +66,8 @@ namespace OurPlace.Android.Activities
             {
                 lastReqIntent.PutExtra("Target", JsonConvert.SerializeObject(
                     new LocationHuntLocation((double)thisPlace.Latitude, (double)thisPlace.Longitude, 15.0f, true)));
+
+                lastReqIntent.PutExtra("Description", thisAct.Name);
 
                 AndroidUtils.CallWithPermission(new string[] { global::Android.Manifest.Permission.AccessFineLocation },
                     new string[] { base.Resources.GetString(Resource.String.permissionLocationTitle) },
@@ -76,7 +78,7 @@ namespace OurPlace.Android.Activities
 
         private async void Adapter_OpenItemClick(object sender, int pos)
         {
-            LearningActivity act = adapter.Collection.Activities[pos];
+            LearningActivity act = adapter.Collection.Activities[pos - 1];
             await AndroidUtils.LaunchActivity(act, this, fromCollection: true).ConfigureAwait(false);
         }
         public override void OnAttachedToWindow()

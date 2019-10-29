@@ -361,7 +361,7 @@ namespace OurPlace.Android.Fragments
 
         private void OnItemClick(object sender, int position)
         {
-            FeedItem chosen = adapter.GetItem(position);
+            FeedItem chosen = adapter.GetItem(position, true);
 
             if (chosen == null)
             {
@@ -399,6 +399,20 @@ namespace OurPlace.Android.Fragments
                 if(inProgress)
                 {
                     EditCreation(chosenColl, true);
+                }
+                else
+                {
+                    using (var builder = new AlertDialog.Builder(Activity))
+                    {
+                        builder.SetTitle(chosen.Name)
+                        .SetPositiveButton(Resource.String.EditBtn, (a, b) => { EditCreation(chosenColl, false); })
+                        .SetNeutralButton(Resource.String.dialog_cancel, (a, b) => { })
+                        .SetCancelable(true)
+                        .SetMessage(Html.FromHtml(string.Format(Resources.GetString(Resource.String.createdCollectionDialogMessage), chosenColl.InviteCode)))
+                        .SetNegativeButton(Resource.String.createdCollectionDialogOpen,
+                        async (a, b) => { await AndroidUtils.LaunchCollection(chosenColl, Activity).ConfigureAwait(false); })
+                        .Show();
+                    }
                 }
             }
         }

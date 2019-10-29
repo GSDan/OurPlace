@@ -221,15 +221,18 @@ namespace OurPlace.Android
 
         public static async Task<bool> PrepActivityFiles(Activity context, LearningActivity act)
         {
-            ProgressDialog loadingDialog = new ProgressDialog(context);
+            ProgressDialog loadingDialog = null;
 
             try
             {
-                loadingDialog.SetTitle(Resource.String.PleaseWait);
-                loadingDialog.SetMessage(context.Resources.GetString(Resource.String.actLoadStart));
-                loadingDialog.Indeterminate = true;
-                loadingDialog.SetCancelable(false);
-                context.RunOnUiThread(() => loadingDialog.Show());
+                context.RunOnUiThread(() => {
+                    loadingDialog = new ProgressDialog(context);
+                    loadingDialog.SetTitle(Resource.String.PleaseWait);
+                    loadingDialog.SetMessage(context.Resources.GetString(Resource.String.actLoadStart));
+                    loadingDialog.Indeterminate = true;
+                    loadingDialog.SetCancelable(false);
+                    loadingDialog.Show();                    
+                    });
 
                 string baseMessage = context.Resources.GetString(Resource.String.actLoadMessage);
 
@@ -241,16 +244,18 @@ namespace OurPlace.Android
                     // Loop over and pre-prepare listed files
                     for (int i = 0; i < fileUrls.Count; i++)
                     {
-                        context.RunOnUiThread(() => loadingDialog.SetMessage(string.Format(baseMessage, i + 1, fileUrls.Count)));
                         string thisUrl = ServerUtils.GetUploadUrl(fileUrls[i].fileUrl);
                         string cachePath = GetCacheFilePath(thisUrl, act.Id, fileUrls[i].extension);
-                        if (File.Exists(cachePath))
-                        {
-                            continue;
-                        }
 
                         try
                         {
+                            context.RunOnUiThread(() => loadingDialog.SetMessage(string.Format(baseMessage, i + 1, fileUrls.Count)));
+
+                            if (File.Exists(cachePath))
+                            {
+                                continue;
+                            }
+
                             await webClient.DownloadFileTaskAsync(new Uri(thisUrl), cachePath).ConfigureAwait(false);
                         }
                         catch (System.Exception e)
@@ -267,8 +272,8 @@ namespace OurPlace.Android
             {
                 context.RunOnUiThread(() =>
                 {
-                    loadingDialog.Dismiss();
-                    loadingDialog.Dispose();
+                    loadingDialog?.Dismiss();
+                    loadingDialog?.Dispose();
                 });
             }
 

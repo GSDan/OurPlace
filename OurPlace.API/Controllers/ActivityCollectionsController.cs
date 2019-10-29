@@ -15,7 +15,7 @@ namespace OurPlace.API.Controllers
     {
         // POST: api/ActivityCollections
         [ResponseType(typeof(LearningActivity))]
-        public async Task<HttpResponseMessage> PostLearningActivity(ActivityCollection collection)
+        public async Task<HttpResponseMessage> PostActivityCollection(ActivityCollection collection)
         {
             if (!ModelState.IsValid)
             {
@@ -64,6 +64,48 @@ namespace OurPlace.API.Controllers
             return Request.CreateResponse(HttpStatusCode.OK); ;
         }
 
+        // PUT: api/LearningActivities/5
+        [ResponseType(typeof(void))]
+        public async Task<IHttpActionResult> PutActivityCollection(int id, ActivityCollection collection)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ActivityCollection existing = db.ActivityCollections.FirstOrDefault(a => a.Id == id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            ApplicationUser thisUser = await GetUser();
+            if (thisUser == null || thisUser.Id != existing.Author.Id)
+            {
+                return Unauthorized();
+            }
+
+            List<Place> places = await ProcessPlacesInNewContent(collection.Places, thisUser, existing.Places.ToList());
+            List<LearningActivity> activities = (await ProcessActivities(collection.Activities, thisUser)).ToList();
+
+            existing.CollectionVersionNumber = collection.CollectionVersionNumber;
+            existing.Approved = thisUser.Trusted;
+            existing.CreatedAt = DateTime.UtcNow;
+            existing.Description = collection.Description;
+            existing.ImageUrl = collection.ImageUrl;
+            existing.Name = collection.Name;
+            existing.IsPublic = collection.IsPublic;
+            existing.Places = places;
+            existing.Activities = activities;
+            existing.ActivityOrder = collection.ActivityOrder;
+
+            db.Entry(existing).State = System.Data.Entity.EntityState.Modified;
+
+            await db.SaveChangesAsync();
+
+            return StatusCode(HttpStatusCode.OK);
+        }
+
         private async Task<ICollection<LearningActivity>> ProcessActivities(ICollection<LearningActivity> activities, ApplicationUser thisUser)
         {
             List<LearningActivity> finalActs = new List<LearningActivity>();
@@ -81,5 +123,33 @@ namespace OurPlace.API.Controllers
 
             return finalActs;
         }
+
+        // DELETE: api/ActivityCollections/5
+        [ResponseType(typeof(ActivityCollection))]
+        public async Task<HttpResponseMessage> DeleteActivityCollection(int id)
+        {
+            ActivityCollection collection = await db.ActivityCollections.FindAsync(id);
+            if (collection == null)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Invalid Id");
+            }
+
+            ApplicationUser thisUser = await GetUser();
+            if (thisUser == null || !thisUser.Trusted && collection.Author.Id != thisUser.Id)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Access denied");
+            }
+
+            // Just add a 'deleted' flag so it doesn't show up anywhere,
+            // in case users have downloaded + cached it offline
+            collection.SoftDeleted = true;
+
+            await db.SaveChangesAsync();
+
+            await MakeLog(new Dictionary<string, string>() { { "id", id.ToString() } });
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
     }
 }

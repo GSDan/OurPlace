@@ -51,7 +51,6 @@ namespace OurPlace.Android.Activities.Create
         private RecyclerView.LayoutManager layoutManager;
         private CreatedTasksAdapter adapter;
         private TextView fabPrompt;
-        private DatabaseManager dbManager;
         private const int EditTaskIntent = 198;
         private const int EditActivityIntent = 199;
         private const int AddTaskIntent = 200;
@@ -129,8 +128,9 @@ namespace OurPlace.Android.Activities.Create
                 return base.OnOptionsItemSelected(item);
             }
 
-            new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                .SetTitle(Resource.String.deleteTitle)
+            using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+            {
+                builder.SetTitle(Resource.String.deleteTitle)
                 .SetMessage(Resource.String.deleteMessage)
                 .SetNegativeButton(Resource.String.dialog_cancel, (a, e) =>
                 {
@@ -139,46 +139,44 @@ namespace OurPlace.Android.Activities.Create
                 {
                     if (editingSubmitted)
                     {
-                        ProgressDialog prog = new ProgressDialog(this);
-                        prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
-                        prog.Show();
-                        ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + newActivity.Id);
-                        prog.Dismiss();
-
-                        if (resp == null)
+                        using (ProgressDialog prog = new ProgressDialog(this))
                         {
-                            var suppress = AndroidUtils.ReturnToSignIn(this);
-                            Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show();
-                            return;
-                        }
-
-                        if (resp.Success)
-                        {
-                            Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show();
-                            MainMyCreationsFragment.ForceRefresh = true;
-                            Finish();
-                        }
-                        else
-                        {
-                            Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show();
+                            prog.SetMessage(Resources.GetString(Resource.String.PleaseWait));
+                            prog.Show();
+                            ServerResponse<string> resp = await ServerUtils.Delete<string>("/api/learningactivities?id=" + newActivity.Id).ConfigureAwait(false);
+                            RunOnUiThread(() => prog.Dismiss());
+                            if (resp == null)
+                            {
+                                var suppress = AndroidUtils.ReturnToSignIn(this);
+                                RunOnUiThread(() => Toast.MakeText(this, Resource.String.ForceSignOut, ToastLength.Long).Show());
+                            }
+                            else if (resp.Success)
+                            {
+                                RunOnUiThread(() => Toast.MakeText(this, Resource.String.uploadsUploadSuccessTitle, ToastLength.Long).Show());
+                                MainMyCreationsFragment.ForceRefresh = true;
+                                Finish();
+                            }
+                            else
+                            {
+                                RunOnUiThread(() => Toast.MakeText(this, Resource.String.ConnectionError, ToastLength.Long).Show());
+                            }
                         }
                     }
                     else
                     {
-                        if (dbManager == null)
-                        {
-                            dbManager = await GetDatabaseManager();
-                        }
+                        DatabaseManager db = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
-                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(dbManager.CurrentUser.LocalCreatedActivitiesJson);
+                        var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(db.CurrentUser.LocalCreatedActivitiesJson);
                         localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newActivity.Id));
-                        dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
-                        dbManager.AddUser(dbManager.CurrentUser);
+                        db.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                        db.AddUser(db.CurrentUser);
                         MainMyCreationsFragment.ForceRefresh = true;
                         Finish();
                     }
                 })
                 .Show();
+            }
+                
 
             return true;
         }
@@ -203,8 +201,9 @@ namespace OurPlace.Android.Activities.Create
         private void Adapter_DeleteItemClick(object sender, int position)
         {
             // Confirm task deletion
-            new global::Android.Support.V7.App.AlertDialog.Builder(this)
-                .SetTitle(Resource.String.deleteTitle)
+            using (var builder = new global::Android.Support.V7.App.AlertDialog.Builder(this))
+            {
+                builder.SetTitle(Resource.String.deleteTitle)
                 .SetMessage(Resource.String.deleteMessage)
                 .SetNegativeButton(Resource.String.dialog_cancel, (a, e) => { })
                 .SetPositiveButton(Resource.String.DeleteBtn, (a, b) =>
@@ -215,6 +214,7 @@ namespace OurPlace.Android.Activities.Create
                     SaveProgress();
                 })
                 .Show();
+            }
         }
 
         private void Adapter_EditItemClick(object sender, int position)
@@ -270,13 +270,10 @@ namespace OurPlace.Android.Activities.Create
             // Don't save changes to uploaded activities until we're ready to submit
             if (editingSubmitted) return;
 
-            if (dbManager == null)
-            {
-                dbManager = await GetDatabaseManager();
-            }
+            DatabaseManager db = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
             // Add/update this new activity in the user's inprogress cache
-            string cacheJson = dbManager.CurrentUser.LocalCreatedActivitiesJson;
+            string cacheJson = db.CurrentUser.LocalCreatedActivitiesJson;
             List<LearningActivity> inProgress = (string.IsNullOrWhiteSpace(cacheJson)) ?
                 new List<LearningActivity>() :
                 JsonConvert.DeserializeObject<List<LearningActivity>>(cacheJson);
@@ -293,8 +290,8 @@ namespace OurPlace.Android.Activities.Create
                 inProgress.Insert(0, newActivity);
             }
 
-            dbManager.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
-            dbManager.AddUser(dbManager.CurrentUser);
+            db.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(inProgress);
+            db.AddUser(db.CurrentUser);
             MainMyCreationsFragment.ForceRefresh = true;
         }
 

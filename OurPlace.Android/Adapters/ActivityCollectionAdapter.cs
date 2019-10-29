@@ -32,6 +32,14 @@ namespace OurPlace.Android.Adapters
             Collection = thisCollection;
             saveProgress = save;
             editingMode = editing;
+
+            if(!string.IsNullOrWhiteSpace(thisCollection.ActivityOrder))
+            {
+                // get the order of activities from the ActivityOrder string
+                List<int> idOrder = Array.ConvertAll(thisCollection.ActivityOrder.Split(','), int.Parse).ToList();
+
+                Collection.Activities = Collection.Activities.OrderBy(act => idOrder.IndexOf(act.Id)).ToList();
+            }
         }
 
         public override long GetItemId(int position)
@@ -51,40 +59,53 @@ namespace OurPlace.Android.Adapters
 
         public override int GetItemViewType(int position)
         {
-            if (position == 0 && editingMode)
+            if (position == 0)
             {
-                return 0;
+                return (editingMode) ? 0 : 1;
             }
 
-            return position > Collection.Activities?.Count ? 2 : 1;
+            return position > Collection.Activities?.Count ? 2 : 3;
         }
 
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            if (position == 0 && editingMode)
+            if (position == 0)
             {
-                if (!(holder is ActivityViewHolder avh))
+                if(editingMode)
                 {
-                    return;
-                }
+                    if (!(holder is ActivityViewHolder avh))
+                    {
+                        return;
+                    }
 
-                avh.Title.Text = Collection.Name;
-                avh.Description.Text = Collection.Description;
+                    avh.Title.Text = Collection.Name;
+                    avh.Description.Text = Collection.Description;
 
-                if (string.IsNullOrWhiteSpace(Collection.ImageUrl)) return;
+                    if (string.IsNullOrWhiteSpace(Collection.ImageUrl)) return;
 
-                if (Collection.ImageUrl.StartsWith("upload"))
-                {
-                    ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(Collection.ImageUrl))
-                        .Transform(new CircleTransformation())
-                        .Into(avh.TaskTypeIcon);
+                    if (Collection.ImageUrl.StartsWith("upload"))
+                    {
+                        ImageService.Instance.LoadUrl(ServerUtils.GetUploadUrl(Collection.ImageUrl))
+                            .Transform(new CircleTransformation())
+                            .Into(avh.TaskTypeIcon);
+                    }
+                    else
+                    {
+                        ImageService.Instance.LoadFile(Collection.ImageUrl)
+                            .Transform(new CircleTransformation())
+                            .Into(avh.TaskTypeIcon);
+                    }
                 }
                 else
                 {
-                    ImageService.Instance.LoadFile(Collection.ImageUrl)
-                        .Transform(new CircleTransformation())
-                        .Into(avh.TaskTypeIcon);
-                }
+                    if (!(holder is TaskViewHolder tvh))
+                    {
+                        return;
+                    }
+
+                    tvh.Description.Text = Collection.Description;
+                    tvh.Title.Visibility = ViewStates.Gone;
+                }                
 
                 return;
             }
@@ -97,10 +118,7 @@ namespace OurPlace.Android.Adapters
                 return;
             }
 
-            if(editingMode)
-            {
-                position--;
-            }
+            position--;
 
             if (!(holder is ActivityCollectionAdapterViewHolder vh))
             {
@@ -159,6 +177,13 @@ namespace OurPlace.Android.Adapters
                         ActivityViewHolder avh = new ActivityViewHolder(activityView, null, OnEditCollectionClick);
                         return avh;
                     }
+                case 1:
+                    {
+                        // The collection description
+                        View descView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.TaskCard, parent, false);
+                        TaskViewHolder dvh = new TaskViewHolder(descView, null);
+                        return dvh;
+                    }
                 case 2:
                     {
                         // The finish button at the bottom of the list
@@ -187,7 +212,7 @@ namespace OurPlace.Android.Adapters
                     return (editingMode)? 2 : 0;
                 }
 
-                return Collection.Activities.Count + ((editingMode) ? 2 : 0);
+                return Collection.Activities.Count + ((editingMode) ? 2 : 1);
             }
         }
 
