@@ -135,9 +135,9 @@ namespace OurPlace.Android.Activities.Create
                             {
                                 DatabaseManager db = await AndroidUtils.GetDbManager().ConfigureAwait(false);
 
-                                var localActivities = JsonConvert.DeserializeObject<List<LearningActivity>>(db.CurrentUser.LocalCreatedActivitiesJson);
-                                localActivities.Remove(localActivities.FirstOrDefault(act => act.Id == newCollection.Id));
-                                db.CurrentUser.LocalCreatedActivitiesJson = JsonConvert.SerializeObject(localActivities);
+                                var localCollections = JsonConvert.DeserializeObject<List<ActivityCollection>>(db.CurrentUser.LocalCreatedCollectionsJson);
+                                localCollections.Remove(localCollections.FirstOrDefault(act => act.Id == newCollection.Id));
+                                db.CurrentUser.LocalCreatedCollectionsJson = JsonConvert.SerializeObject(localCollections);
                                 db.AddUser(db.CurrentUser);
                                 MainMyCreationsFragment.ForceRefresh = true;
                                 Finish();

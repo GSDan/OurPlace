@@ -43,39 +43,44 @@ namespace OurPlace.Android.Fragments
 
         private void LogOut_PreferenceClick(object sender, Preference.PreferenceClickEventArgs e)
         {
-            new AlertDialog.Builder(Activity)
-                    .SetTitle(Resource.String.WarningTitle)
+            using (var builder = new AlertDialog.Builder(Activity))
+            {
+                builder.SetTitle(Resource.String.WarningTitle)
                     .SetMessage(Resource.String.pref_accountLogout_warning)
                     .SetPositiveButton(Resource.String.Continue, (a, b) => { LogOut(); })
                     .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
                     .SetCancelable(true)
                     .Show();
+            }
         }
 
         private void ClearCache_PreferenceClick(object sender, Preference.PreferenceClickEventArgs e)
         {
-            new AlertDialog.Builder(Activity)
-                    .SetTitle(Resource.String.WarningTitle)
+            using (var builder = new AlertDialog.Builder(Activity))
+            {
+                builder.SetTitle(Resource.String.WarningTitle)
                     .SetMessage(Resource.String.pref_cacheDelete_warning)
                     .SetPositiveButton(Resource.String.Continue, (a, b) => { var suppress = DeleteCache(); })
                     .SetNegativeButton(Resource.String.dialog_cancel, (a, b) => { })
                     .SetCancelable(true)
                     .Show();
+            }
         }
 
         private async Task DeleteCache()
         {
-            DatabaseManager dbManager = await GetDatabaseManager();
+            DatabaseManager dbManager = await GetDatabaseManager().ConfigureAwait(false);
             dbManager.DeleteLearnerCacheAndProgress();
 
             MainLandingFragment.ForceRefresh = true;
+            MainMyCreationsFragment.ForceRefresh = true;
 
-            Toast.MakeText(Activity, Resource.String.pref_cacheDelete_complete, ToastLength.Short).Show();
+            Activity.RunOnUiThread(() => Toast.MakeText(Activity, Resource.String.pref_cacheDelete_complete, ToastLength.Short).Show());
         }
 
         private void LogOut()
         {
-            var suppress = AndroidUtils.ReturnToSignIn(Activity);
+            _ = AndroidUtils.ReturnToSignIn(Activity);
         }
     }
 }

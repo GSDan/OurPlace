@@ -312,6 +312,9 @@ namespace OurPlace.Android
                     dbManager.CleanDatabase();
                 }
 
+                MainLandingFragment.ForceRefresh = true;
+                MainMyCreationsFragment.ForceRefresh = true;
+
                 if (activity == null)
                 {
                     return;
