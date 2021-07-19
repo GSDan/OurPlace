@@ -19,6 +19,8 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+using AppleAuth;
+using AppleAuth.TokenObjects;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -30,8 +32,10 @@ using Newtonsoft.Json;
 using OurPlace.API.Models;
 using OurPlace.API.Providers;
 using OurPlace.API.Results;
+using ParkLearn.PCL.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -267,19 +271,27 @@ namespace OurPlace.API.Controllers
         // https://stackoverflow.com/questions/25739710/how-to-create-refresh-token-with-external-login-provider
         private async Task<AuthenticationProperties> AddRefreshToken(ClaimsIdentity oAuthIdentity, AuthenticationProperties properties)
         {
-            AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties);
+            try
+            {
+                AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties);
 
-            AuthenticationTokenCreateContext context = new AuthenticationTokenCreateContext(
-                Request.GetOwinContext(),
-                Startup.OAuthOptions.AccessTokenFormat,
-                ticket);
+                AuthenticationTokenCreateContext context = new AuthenticationTokenCreateContext(
+                    Request.GetOwinContext(),
+                    Startup.OAuthOptions.AccessTokenFormat,
+                    ticket);
 
-            await Startup.OAuthOptions.RefreshTokenProvider.CreateAsync(context);
-            DateTimeOffset? refreshExpires = RefreshTokenProvider.GetExpiryDate(context.Token, Request.GetOwinContext());
-            properties.Dictionary.Add("refresh_token", context.Token);
-            properties.Dictionary.Add("refresh_token_expires", (refreshExpires == null) ? DateTime.UtcNow.Ticks.ToString() : ((DateTimeOffset)refreshExpires).UtcTicks.ToString());
+                await Startup.OAuthOptions.RefreshTokenProvider.CreateAsync(context);
+                DateTimeOffset? refreshExpires = RefreshTokenProvider.GetExpiryDate(context.Token, Request.GetOwinContext());
+                properties.Dictionary.Add("refresh_token", context.Token);
+                properties.Dictionary.Add("refresh_token_expires", (refreshExpires == null) ? DateTime.UtcNow.Ticks.ToString() : ((DateTimeOffset)refreshExpires).UtcTicks.ToString());
 
-            return properties;
+                return properties;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
 
         // GET api/Account/ExternalLogin
@@ -287,11 +299,23 @@ namespace OurPlace.API.Controllers
         [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
         [AllowAnonymous]
         [Route("ExternalLogin", Name = "ExternalLogin")]
-        public async Task<IHttpActionResult> GetExternalLogin(string provider, string error = null)
+        public async Task<IHttpActionResult> GetExternalLogin(string provider, string redirect_uri, string error = null)
         {
             if (error != null)
             {
                 return Redirect(Url.Content("~/") + "#error=" + Uri.EscapeDataString(error));
+            }
+
+            if (provider == "Apple")
+            {
+                Console.WriteLine(redirect_uri);
+
+                return Redirect(string.Format("https://appleid.apple.com/auth/authorize?client_id={0}&response_type=code&response_mode=form_post&scope={1}&redirect_uri={2}&state={3}",
+                    ConfigurationManager.AppSettings["oauth:apple:id"],
+                    Uri.EscapeDataString("name email"),
+                    string.Format("https://{0}/api/account/HandleResponseFromApple", Request.RequestUri.Authority),
+                    //"https://webhook.site/cb4691d4-fdaf-4250-8613-a9ed1623453b",
+                    redirect_uri));
             }
 
             if (!User.Identity.IsAuthenticated)
@@ -476,23 +500,152 @@ namespace OurPlace.API.Controllers
 
             foreach (AuthenticationDescription description in descriptions)
             {
+                string url = Url.Route("ExternalLogin", new
+                {
+                    provider = description.AuthenticationType,
+                    response_type = "token",
+                    client_id = Startup.PublicClientId,
+                    redirect_uri = new Uri(Request.RequestUri, returnUrl).AbsoluteUri,
+                    state = state
+                });
+
                 ExternalLoginViewModel login = new ExternalLoginViewModel
                 {
                     Name = description.Caption,
-                    Url = Url.Route("ExternalLogin", new
-                    {
-                        provider = description.AuthenticationType,
-                        response_type = "token",
-                        client_id = Startup.PublicClientId,
-                        redirect_uri = new Uri(Request.RequestUri, returnUrl).AbsoluteUri,
-                        state = state
-                    }),
+                    Url = url,
                     State = state
                 };
                 logins.Add(login);
             }
 
             return logins;
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IHttpActionResult> HandleResponseFromApple()
+        {
+            try
+            {
+                // TODO should probably check state here (and in the non-Apple one)
+
+                InitialTokenResponse response = new InitialTokenResponse();
+                response.code = HttpContext.Current.Request.Form["code"];
+                response.user = HttpContext.Current.Request.Form["user"];
+                response.state = HttpContext.Current.Request.Form["state"]; //use state as client's requested return uri
+
+                // Create a new instance of AppleAuthProvider
+                AppleAuthProvider provider = new AppleAuthProvider(
+                    ConfigurationManager.AppSettings["oauth:apple:id"],
+                    ConfigurationManager.AppSettings["oauth:apple:teamid"],
+                    ConfigurationManager.AppSettings["oauth:apple:keyid"],
+                    //"https://webhook.site/cb4691d4-fdaf-4250-8613-a9ed1623453b",//
+                    string.Format("https://{0}/api/account/HandleResponseFromApple", Request.RequestUri.Authority),
+                    response.state);
+                // Retrieve an authorization token
+                AuthorizationToken authorizationToken = await provider.GetAuthorizationToken(response.code, ConfigurationManager.AppSettings["oauth:apple:secret"]);
+
+                var login = new UserLoginInfo("Apple", authorizationToken.UserInformation.UserID);
+                ApplicationUser user = await UserManager.FindAsync(login);
+
+                if(user == null && string.IsNullOrWhiteSpace(response.user))
+                {
+                    // new user but apple didn't give details
+                    return InternalServerError(new Exception("Something went wrong while getting your details from Apple. Please remove OurPlace from your 'Sign in with Apple' security settings and try again."));
+                }
+                
+                // apple only returns the user's details on the first authentication
+                if (user == null && !string.IsNullOrWhiteSpace(response.user))
+                {
+                    dynamic appleUser = JsonConvert.DeserializeObject(response.user);
+
+                    user = new ApplicationUser
+                    {
+                        UserName = appleUser.email,
+                        Email = appleUser.email,
+                        FirstName = appleUser.name.firstName,
+                        Surname = appleUser.name.lastName,
+                        DateCreated = DateTime.UtcNow,
+                        AuthProvider = "Apple",
+                        Trusted = false,
+                        LastConsent = DateTime.UtcNow
+                    };
+
+                    ApplicationUser existingResult = await UserManager.FindByEmailAsync(user.Email);
+
+                    if (existingResult == null)
+                    {
+                        // New user
+                        IdentityResult createResult = await UserManager.CreateAsync(user);
+                        if (!createResult.Succeeded)
+                        {
+                            return GetErrorResult(createResult);
+                        }
+                    }
+                    else
+                    {
+                        // user already exists with that email
+                        user.Id = existingResult.Id;
+                        await UserManager.UpdateAsync(user);
+                    }
+
+                    // Add this oauth login to the user account
+                    IdentityResult idResult = await UserManager.AddLoginAsync(user.Id, login);
+                    if (!idResult.Succeeded)
+                    {
+                        return GetErrorResult(idResult);
+                    }
+                }
+                else
+                {
+                    // existing user
+                    Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
+                }
+
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager, OAuthDefaults.AuthenticationType);
+                ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager, CookieAuthenticationDefaults.AuthenticationType);
+
+                AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.UserName);
+                properties = await AddRefreshToken(oAuthIdentity, properties);
+                Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
+
+                user.LastConsent = DateTime.UtcNow;
+                await UserManager.UpdateAsync(user);
+
+                Dictionary<string, string> args = new Dictionary<string, string>()
+                {
+                    { "grant_type", "refresh_token" },
+                    { "refresh_token", properties.Dictionary["refresh_token"] }
+                };
+                RefreshResponse refResp;
+
+                using (var client = new HttpClient())
+                {
+                    HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, string.Format("https://{0}/Token", Request.RequestUri.Authority))
+                    {
+                        Content = new FormUrlEncodedContent(args)
+                    };
+                    HttpResponseMessage resp = await client.SendAsync(req);
+                    if (resp.Content == null || !resp.IsSuccessStatusCode)
+                    {
+                        throw new Exception("Couldn't get an access token");
+                    }
+                    string json = await resp.Content.ReadAsStringAsync();
+                    refResp = JsonConvert.DeserializeObject<RefreshResponse>(json);
+                }
+
+                return Redirect(string.Format("{0}#access_token={1}&token_type=bearer&expires_in={2}&refresh_token={3}&refresh_token_expires={4}",
+                    response.state,
+                    refResp.Access_token,
+                    refResp.Expires_in,
+                    properties.Dictionary["refresh_token"],
+                    properties.Dictionary["refresh_token_expires"]));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return InternalServerError(new Exception(string.Format("HandleResponseFromApple\nkey{2}\n{0}\n{1}", e.Message, e.StackTrace, ConfigurationManager.AppSettings["oauth:apple:secret"])));
+            }
         }
 
         // POST api/Account/Register
@@ -516,6 +669,7 @@ namespace OurPlace.API.Controllers
 
             return Ok();
         }
+
 
         private async Task<ExternalLoginInfo> AuthenticationManager_GetExternalLoginInfoAsync_WithExternalBearer()
         {

@@ -19,6 +19,8 @@
     along with this program.  If not, see https://www.gnu.org/licenses.
 */
 #endregion
+using AppleAuth;
+using AppleAuth.TokenObjects;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -30,9 +32,10 @@ using OurPlace.API.Models;
 using OurPlace.API.Providers;
 using OurPlace.Common;
 using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -332,8 +335,120 @@ namespace OurPlace.API.Controllers.Site
         [ValidateAntiForgeryToken]
         public ActionResult ExternalLogin(string provider, string returnUrl)
         {
+            if(provider == "Apple")
+            {
+                string url = string.Format("https://appleid.apple.com/auth/authorize?client_id={0}&response_type=code&response_mode=form_post&scope={1}&redirect_uri={2}&state={3}",
+                    ConfigurationManager.AppSettings["oauth:apple:id"], Uri.EscapeDataString("name email"), string.Format("https://{0}/account/HandleResponseFromApple", Request.Url.Authority), Session.SessionID);
+
+                return Redirect(url);
+            }
+            
             // Request a redirect to the external login provider
             return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult> HandleResponseFromApple(InitialTokenResponse response)
+        {
+            try
+            {
+                // TODO should probably check state here but MVC seems to have different session IDs for each request yay
+
+                // Create a new instance of AppleAuthProvider
+                AppleAuthProvider provider = new AppleAuthProvider(
+                    ConfigurationManager.AppSettings["oauth:apple:id"],
+                    ConfigurationManager.AppSettings["oauth:apple:teamid"],
+                    ConfigurationManager.AppSettings["oauth:apple:keyid"],
+                    string.Format("https://{0}/account/HandleResponseFromApple", Request.Url.Authority), 
+                    Session.SessionID);
+                // Retrieve an authorization token
+                AuthorizationToken authorizationToken = await provider.GetAuthorizationToken(response.code, ConfigurationManager.AppSettings["oauth:apple:secret"]);
+
+                var login = new UserLoginInfo("Apple", authorizationToken.UserInformation.UserID);
+                ApplicationUser user = await UserManager.FindAsync(login);
+
+                // apple only returns the user's details on the first authentication
+                if (user == null && !string.IsNullOrWhiteSpace(response.user))
+                {
+                    dynamic appleUser = JsonConvert.DeserializeObject(response.user);
+
+                    ApplicationUser appUser = new ApplicationUser
+                    {
+                        UserName = appleUser.email,
+                        Email = appleUser.email,
+                        FirstName = appleUser.name.firstName,
+                        Surname = appleUser.name.lastName,
+                        DateCreated = DateTime.UtcNow,
+                        AuthProvider = "Apple",
+                        Trusted = false,
+                        LastConsent = DateTime.UtcNow
+                    };
+
+                    ApplicationUser existingResult = await UserManager.FindByEmailAsync(appUser.Email);
+
+                    if (existingResult == null)
+                    {
+                        // New user
+                        IdentityResult createResult = await UserManager.CreateAsync(appUser);
+                        if (!createResult.Succeeded)
+                        {
+                            return RedirectToAction("Login");
+                        }
+                    }
+                    else
+                    {
+                        // user already exists with that email
+                        appUser = existingResult;
+                    }
+
+                    // Add this oauth login to the user account
+                    IdentityResult idResult = await UserManager.AddLoginAsync(appUser.Id, login);
+                    if (!idResult.Succeeded)
+                    {
+                        return RedirectToAction("Login");
+                    }
+
+                    ClaimsIdentity oAuthIdentity = await appUser.GenerateUserIdentityAsync(UserManager,
+                       OAuthDefaults.AuthenticationType);
+                    ClaimsIdentity cookieIdentity = await appUser.GenerateUserIdentityAsync(UserManager,
+                        CookieAuthenticationDefaults.AuthenticationType);
+
+                    AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(appUser.UserName);
+                    await SignInManager.SignInAsync(appUser, true, true);
+
+                    Request.GetOwinContext().Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
+
+                    return RedirectToLocal("/");
+                }
+                else if(user != null)
+                {
+                    // existing user
+                    ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager, OAuthDefaults.AuthenticationType);
+                    ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager, CookieAuthenticationDefaults.AuthenticationType);
+
+                    AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.UserName);
+                    Request.GetOwinContext().Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
+
+                    user.LastConsent = DateTime.UtcNow;
+                    await UserManager.UpdateAsync(user);
+
+                    return RedirectToLocal("/");
+                }
+                else
+                {
+                    // new user but apple didn't give details
+                    // TODO show instructions for removing ourplace from your apple account so that it can be re-added
+                    ViewData["errormessage"] = "Something went wrong while getting your details from Apple. Please remove OurPlace from your 'Sign in with Apple' security settings and try again.";
+                    return View("Error");
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                ViewData["errormessage"] = string.Format("HandleResponseFromApple\nkey{2}\n{0}\n{1}", e.Message, e.StackTrace, ConfigurationManager.AppSettings["oauth:apple:secret"]);
+                return View("Error");
+            }
         }
 
         //

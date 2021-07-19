@@ -43,8 +43,10 @@ namespace OurPlace.API.Providers
 
         public async Task CreateAsync(AuthenticationTokenCreateContext context)
         {
-            var form = context.Request.ReadFormAsync().Result;
-            var grantType = form.GetValues("grant_type");
+
+            // apple send a different form format back
+            var form = context.Request.Path == new PathString("/api/Account/handleresponsefromapple") ? null : await context.Request.ReadFormAsync();
+            var grantType = form?.GetValues("grant_type");
             
             // don't create a new refresh token if the user is only after a new access token
             if(grantType == null || grantType[0] != "refresh_token" )

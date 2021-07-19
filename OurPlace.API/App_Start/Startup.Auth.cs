@@ -25,6 +25,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.OAuth;
+using Owin.Security.Providers.OpenID;
 using Owin;
 using OurPlace.API.Models;
 using OurPlace.API.Providers;
@@ -33,6 +34,14 @@ using System.Security.Claims;
 using System.Net.Http;
 using ParkLearn.API.Providers;
 using System.Configuration;
+using Owin.Security.Providers.OpenIDBase;
+using Microsoft.Owin.Security.OpenIdConnect;
+using System.Net;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
+using Microsoft.Owin.Security.Notifications;
+using IdentityModel.Client;
 
 namespace OurPlace.API
 {
@@ -45,6 +54,8 @@ namespace OurPlace.API
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             // Configure the db context and user manager to use a single instance per request
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
@@ -117,6 +128,9 @@ namespace OurPlace.API
             };
             
             app.UseGoogleAuthentication(googleAuthOptions);
+
+            app.UseOpenIDAuthentication("https://appleid.apple.com/auth/authorize", "Apple", true);
+
         }
     }
 }
